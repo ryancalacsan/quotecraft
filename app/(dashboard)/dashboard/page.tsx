@@ -1,17 +1,24 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
+import { getQuotesByUserId } from '@/lib/db/queries';
+import { QuoteList } from '@/components/dashboard/quote-list';
+import { Toaster } from '@/components/ui/sonner';
+
 export default async function DashboardPage() {
   const { userId } = await auth();
+  if (!userId) redirect('/sign-in');
 
-  if (!userId) {
-    redirect('/sign-in');
-  }
+  const quotes = await getQuotesByUserId(userId);
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold">Dashboard</h2>
-      <p className="text-muted-foreground mt-2">Your quotes will appear here.</p>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight">Quotes</h2>
+        <p className="text-muted-foreground">Manage your quotes and proposals.</p>
+      </div>
+      <QuoteList quotes={quotes} />
+      <Toaster />
     </div>
   );
 }

@@ -95,7 +95,7 @@ Portfolio project demonstrating full-stack skills: complex form state, real-time
 
 ```
 quotecraft/
-├── middleware.ts                     # Clerk auth
+├── proxy.ts                         # Clerk auth (Next.js 16 convention)
 ├── app/
 │   ├── (auth)/                       # Sign-in/sign-up pages
 │   ├── (dashboard)/                  # Protected routes: dashboard, quote CRUD
@@ -125,7 +125,7 @@ quotecraft/
 
 ## Progress
 
-### Current Phase: Week 1 — Day 3-4 Auth Setup
+### Current Phase: Week 2 — Quote Builder & Public View
 
 - [x] Project brief finalized
 - [x] Architectural decisions documented
@@ -141,16 +141,28 @@ quotecraft/
 - [x] proxy.ts with clerkMiddleware + public/protected route matching
 - [x] ClerkProvider in root layout
 - [x] Sign-in / sign-up pages
-- [x] Dashboard layout with UserButton
+- [x] Dashboard layout with sidebar + UserButton
 - [x] Dashboard page with server-side auth check
 - [x] Clerk webhook route for user sync (user.created, user.updated, user.deleted)
+- [x] Server Actions: createQuote, updateQuote, deleteQuote, duplicateQuote, updateQuoteStatus
+- [x] Server Actions: addLineItem, updateLineItem, removeLineItem
+- [x] Quote list with status filter tabs + empty state
+- [x] QuoteCard with dropdown menu (edit, copy link, duplicate, delete)
+- [x] New quote form page (/quotes/new)
+- [x] Quote view page (/quotes/[id]) with client info, line items, pricing summary, status actions
+- [x] Quote edit page (/quotes/[id]/edit) with client-side line item management
+- [x] QuoteForm component (metadata fields + inline line item editing)
+- [x] LineItemRow component (description, pricing type, rate, qty, discount, total)
+- [x] PricingSummary component (subtotal, deposit, total)
+- [x] QuoteStatusActions component (mark as sent, accept, decline)
 - [ ] Set up Clerk webhook in dashboard (needs deployed URL or ngrok)
 - [ ] Test full auth flow in browser (sign up → user synced to DB → dashboard)
 
-### Week 1 (remaining)
+### Week 1
 
-- [ ] Day 3-4: Auth setup (Clerk, middleware, webhook, protected routes)
-- [ ] Day 5-7: Basic quote CRUD (dashboard, Server Actions, quote form)
+- [x] Day 1-2: Project setup (Next.js, Tailwind, shadcn/ui, Drizzle, Supabase)
+- [x] Day 3-4: Auth setup (Clerk, proxy.ts, webhook, protected routes)
+- [x] Day 5-7: Basic quote CRUD (dashboard, Server Actions, quote form, view/edit pages)
 
 ### Week 2
 

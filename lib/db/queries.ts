@@ -1,7 +1,34 @@
+import { currentUser } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 
 import { db } from '.';
-import { quotes, lineItems } from './schema';
+import { users, quotes, lineItems } from './schema';
+
+/**
+ * Ensures the Clerk user exists in our DB.
+ * Needed until the Clerk webhook is operational (requires deployed URL).
+ */
+export async function ensureUserExists(userId: string) {
+  const existing = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+  });
+  if (existing) return existing;
+
+  const clerkUser = await currentUser();
+  if (!clerkUser) throw new Error('Unable to fetch current user from Clerk');
+
+  const [newUser] = await db
+    .insert(users)
+    .values({
+      id: userId,
+      email: clerkUser.emailAddresses[0]?.emailAddress ?? '',
+      businessName: `${clerkUser.firstName ?? ''} ${clerkUser.lastName ?? ''}`.trim() || null,
+    })
+    .onConflictDoNothing()
+    .returning();
+
+  return newUser ?? (await db.query.users.findFirst({ where: eq(users.id, userId) }));
+}
 
 export async function getQuotesByUserId(userId: string) {
   return db.query.quotes.findMany({
