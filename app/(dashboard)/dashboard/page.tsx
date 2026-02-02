@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 
 import { getQuotesByUserId } from '@/lib/db/queries';
 import { QuoteList } from '@/components/dashboard/quote-list';
-import { Toaster } from '@/components/ui/sonner';
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -18,7 +17,6 @@ export default async function DashboardPage() {
         <p className="text-muted-foreground">Manage your quotes and proposals.</p>
       </div>
       <QuoteList quotes={quotes} />
-      <Toaster />
     </div>
   );
 }

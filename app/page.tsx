@@ -1,65 +1,144 @@
-import Image from 'next/image';
+import Link from 'next/link';
+import { FileText, Share2, CreditCard, Zap, Shield, BarChart3 } from 'lucide-react';
 
-export default function Home() {
+import { Button } from '@/components/ui/button';
+import { DemoLoginButton } from '@/components/shared/demo-login-button';
+
+export default function LandingPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between bg-white px-16 py-32 sm:items-start dark:bg-black">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl leading-10 font-semibold tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex min-h-screen flex-col">
+      {/* Nav */}
+      <header className="border-b">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <span className="text-xl font-bold">QuoteCraft</span>
+          <div className="flex items-center gap-3">
+            <DemoLoginButton variant="outline" />
+            <Link href="/sign-up">
+              <Button>Sign Up Free</Button>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <section className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
+        <div className="mx-auto max-w-3xl space-y-6">
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            Professional quotes
+            <br />
+            <span className="text-muted-foreground">in minutes, not hours</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{' '}
+          <p className="text-muted-foreground mx-auto max-w-xl text-lg">
+            Create polished quotes with real-time pricing, share them with a link, and get paid
+            — all in one place. Built for freelancers and contractors.
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <DemoLoginButton size="lg" />
+            <Link href="/sign-up">
+              <Button variant="outline" size="lg">
+                Sign Up Free
+              </Button>
+            </Link>
+          </div>
+          <p className="text-muted-foreground text-xs">No credit card required</p>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="border-t bg-muted/30 px-6 py-24">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="mb-12 text-center text-2xl font-bold tracking-tight sm:text-3xl">
+            Everything you need to quote with confidence
+          </h2>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <FeatureCard
+              icon={<FileText className="h-6 w-6" />}
+              title="Quote Builder"
+              description="Add line items with hourly, fixed, or per-unit pricing. Real-time totals powered by precise decimal math."
+            />
+            <FeatureCard
+              icon={<Share2 className="h-6 w-6" />}
+              title="Shareable Links"
+              description="Send a link to your client. They can view, accept, or decline — no account needed."
+            />
+            <FeatureCard
+              icon={<CreditCard className="h-6 w-6" />}
+              title="Stripe Payments"
+              description="Collect deposits or full payments via Stripe Checkout. Status updates automatically on payment."
+            />
+            <FeatureCard
+              icon={<Zap className="h-6 w-6" />}
+              title="Real-Time Pricing"
+              description="Subtotals, discounts, and deposits calculated instantly as you build your quote."
+            />
+            <FeatureCard
+              icon={<Shield className="h-6 w-6" />}
+              title="Quote Locking"
+              description="Quotes freeze when sent so clients see a consistent proposal. Revert to draft to make changes."
+            />
+            <FeatureCard
+              icon={<BarChart3 className="h-6 w-6" />}
+              title="Status Tracking"
+              description="Track quotes through draft, sent, accepted, and paid stages with a clear dashboard."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="px-6 py-24 text-center">
+        <div className="mx-auto max-w-2xl space-y-6">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Ready to streamline your quoting?
+          </h2>
+          <p className="text-muted-foreground">
+            Try the demo to see QuoteCraft in action, or sign up to start creating quotes today.
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <DemoLoginButton size="lg" />
+            <Link href="/sign-up">
+              <Button variant="outline" size="lg">
+                Sign Up Free
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-center px-6">
+          <p className="text-muted-foreground text-sm">
+            Built by{' '}
             <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              href="https://github.com/ryancalacsan"
+              className="hover:text-foreground underline underline-offset-4"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Templates
-            </a>{' '}
-            or the{' '}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{' '}
-            center.
+              Ryan Calacsan
+            </a>
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="bg-foreground text-background flex h-12 w-full items-center justify-center gap-2 rounded-full px-5 transition-colors hover:bg-[#383838] md:w-[158px] dark:hover:bg-[#ccc]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </footer>
+    </div>
+  );
+}
+
+function FeatureCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="space-y-3 rounded-lg border p-6">
+      <div className="text-foreground">{icon}</div>
+      <h3 className="font-semibold">{title}</h3>
+      <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
     </div>
   );
 }

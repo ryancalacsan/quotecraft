@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, Copy, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -14,8 +14,12 @@ interface ShareLinkCardProps {
 
 export function ShareLinkCard({ shareToken }: ShareLinkCardProps) {
   const [copied, setCopied] = useState(false);
+  const sharePath = `/q/${shareToken}`;
+  const [shareUrl, setShareUrl] = useState(sharePath);
 
-  const shareUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/q/${shareToken}`;
+  useEffect(() => {
+    setShareUrl(`${window.location.origin}${sharePath}`);
+  }, [sharePath]);
 
   async function handleCopy() {
     await navigator.clipboard.writeText(shareUrl);
@@ -39,7 +43,7 @@ export function ShareLinkCard({ shareToken }: ShareLinkCardProps) {
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </Button>
           <Button variant="outline" size="icon" asChild>
-            <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+            <a href={sharePath} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="h-4 w-4" />
             </a>
           </Button>

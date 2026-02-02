@@ -16,6 +16,7 @@ const envSchema = z.object({
 
   // Demo
   DEMO_USER_ID: z.string().min(1).optional(),
+  CRON_SECRET: z.string().min(1).optional(),
 });
 
 // Validate at import time — will throw if required vars are missing

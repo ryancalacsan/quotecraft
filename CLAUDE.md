@@ -174,15 +174,21 @@ quotecraft/
 
 ### Week 3
 
-- [ ] Stripe Checkout integration
-- [ ] Stripe webhook handler
-- [ ] Demo mode (Sign-In Tokens, seed data, reset cron, banner)
+- [x] Stripe Checkout integration (/api/checkout — server-side amount calculation, deposit or full)
+- [x] Stripe webhook handler (/api/webhooks/stripe — checkout.session.completed → paid status)
+- [x] Pay button on public quote view (accepted quotes with line items)
+- [x] Payment success page (/q/[shareToken]/success)
+- [x] Demo login API (/api/demo/login — Clerk Sign-In Tokens)
+- [x] Demo seed data (4 quotes: draft, sent, accepted, paid with realistic line items)
+- [x] Demo reset cron (/api/cron/reset-demo — Vercel Cron at 2am UTC)
+- [x] Demo banner (cookie-based, shown when demo_mode=true)
+- [x] Landing page (hero, features grid, CTAs: Try Demo + Sign Up)
 
 ### Week 4
 
 - [ ] Testing (Vitest unit tests, Playwright e2e)
 - [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Landing page, polish, responsive design
+- [ ] Polish, responsive design
 - [ ] Deploy to Vercel, README with screenshots
 
 ## Phase 2 Backlog

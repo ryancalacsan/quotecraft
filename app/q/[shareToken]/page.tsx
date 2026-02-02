@@ -180,11 +180,17 @@ export default async function PublicQuotePage({
         </Card>
       )}
 
-      {/* Accept/Decline actions */}
+      {/* Accept/Decline/Pay actions */}
       <PublicQuoteActions
         shareToken={shareToken}
         currentStatus={quote.status}
         isExpired={isExpired}
+        paymentAmount={
+          items.length > 0
+            ? formatCurrency(quote.depositPercent > 0 ? pricing.depositAmount : pricing.subtotal)
+            : undefined
+        }
+        paymentLabel={quote.depositPercent > 0 ? 'Deposit' : 'Full Amount'}
       />
     </div>
   );

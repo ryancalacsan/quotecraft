@@ -6,7 +6,9 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',
   '/q/(.*)', // Public quote view
   '/api/webhooks/(.*)', // Clerk + Stripe webhooks
+  '/api/checkout', // Stripe checkout session creation (public clients pay)
   '/api/demo/login', // Demo sign-in token endpoint
+  '/api/cron/(.*)', // Cron jobs (authenticated via CRON_SECRET header)
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
