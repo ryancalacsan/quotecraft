@@ -66,7 +66,7 @@ export function QuoteForm({
           <CardTitle>Quote Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor={`${formId}-title`}>Title</Label>
               <Input
@@ -95,7 +95,7 @@ export function QuoteForm({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor={`${formId}-clientEmail`}>Client Email</Label>
               <Input
@@ -122,7 +122,7 @@ export function QuoteForm({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor={`${formId}-depositPercent`}>Deposit Percentage</Label>
               <Input
@@ -165,7 +165,7 @@ export function QuoteForm({
             {/* Column headers */}
             {lineItems.length > 0 && (
               <>
-                <div className="text-muted-foreground grid grid-cols-12 gap-2 text-xs font-medium">
+                <div className="text-muted-foreground hidden grid-cols-12 gap-2 text-xs font-medium lg:grid">
                   <span className="col-span-3">Description</span>
                   <span className="col-span-2">Pricing Type</span>
                   <span className="col-span-2">Rate</span>

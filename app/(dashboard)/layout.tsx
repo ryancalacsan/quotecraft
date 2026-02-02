@@ -4,12 +4,13 @@ import { FileText, LayoutDashboard, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { MobileNav } from '@/components/dashboard/mobile-nav';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="bg-muted/40 flex w-64 flex-col border-r">
+      {/* Desktop sidebar — hidden on mobile */}
+      <aside className="bg-muted/40 hidden w-64 flex-col border-r md:flex">
         <div className="flex h-16 items-center px-6">
           <Link href="/dashboard" className="text-xl font-bold">
             QuoteCraft
@@ -40,16 +41,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main content */}
       <div className="flex flex-1 flex-col">
-        <header className="flex h-16 items-center justify-between border-b px-6">
-          <div />
+        <header className="flex h-16 items-center justify-between border-b px-4 md:px-6">
+          <div className="flex items-center gap-3">
+            <MobileNav />
+            <UserButton />
+          </div>
           <Link href="/quotes/new">
             <Button size="sm" className="gap-2">
               <FileText className="h-4 w-4" />
-              New Quote
+              <span className="hidden sm:inline">New Quote</span>
+              <span className="sm:hidden">New</span>
             </Button>
           </Link>
         </header>
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

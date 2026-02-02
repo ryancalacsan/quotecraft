@@ -75,7 +75,7 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
           <CardTitle>Client Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <dl className="grid grid-cols-2 gap-4 text-sm">
+          <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-muted-foreground">Name</dt>
               <dd className="font-medium">{quote.clientName}</dd>
@@ -112,8 +112,8 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
             </p>
           ) : (
             <div className="space-y-3">
-              {/* Header row */}
-              <div className="text-muted-foreground grid grid-cols-12 gap-2 text-xs font-medium">
+              {/* Desktop header row */}
+              <div className="text-muted-foreground hidden grid-cols-12 gap-2 text-xs font-medium md:grid">
                 <span className="col-span-4">Description</span>
                 <span className="col-span-2">Type</span>
                 <span className="col-span-2 text-right">Rate</span>
@@ -121,30 +121,47 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
                 <span className="col-span-1 text-right">Discount</span>
                 <span className="col-span-2 text-right">Total</span>
               </div>
-              <Separator />
+              <Separator className="hidden md:block" />
 
               {items.map((item, index) => (
-                <div key={item.id} className="grid grid-cols-12 gap-2 text-sm">
-                  <span className="col-span-4">{item.description}</span>
-                  <span className="text-muted-foreground col-span-2">
-                    {PRICING_TYPE_LABELS[item.pricingType]}
-                    {item.unit ? ` (${item.unit})` : ''}
-                  </span>
-                  <span className="col-span-2 text-right">{formatCurrency(Number(item.rate))}</span>
-                  <span className="col-span-1 text-right">{item.quantity}</span>
-                  <span className="col-span-1 text-right">
-                    {Number(item.discount) > 0 ? `${item.discount}%` : '—'}
-                  </span>
-                  <span className="col-span-2 text-right font-medium">
-                    {formatCurrency(pricing.lineItemTotals[index])}
-                  </span>
+                <div key={item.id}>
+                  {/* Desktop row */}
+                  <div className="hidden grid-cols-12 gap-2 text-sm md:grid">
+                    <span className="col-span-4">{item.description}</span>
+                    <span className="text-muted-foreground col-span-2">
+                      {PRICING_TYPE_LABELS[item.pricingType]}
+                      {item.unit ? ` (${item.unit})` : ''}
+                    </span>
+                    <span className="col-span-2 text-right">{formatCurrency(Number(item.rate))}</span>
+                    <span className="col-span-1 text-right">{item.quantity}</span>
+                    <span className="col-span-1 text-right">
+                      {Number(item.discount) > 0 ? `${item.discount}%` : '—'}
+                    </span>
+                    <span className="col-span-2 text-right font-medium">
+                      {formatCurrency(pricing.lineItemTotals[index])}
+                    </span>
+                  </div>
+                  {/* Mobile card */}
+                  <div className="space-y-1 rounded-lg border p-3 text-sm md:hidden">
+                    <div className="flex items-start justify-between">
+                      <span className="font-medium">{item.description}</span>
+                      <span className="font-semibold">
+                        {formatCurrency(pricing.lineItemTotals[index])}
+                      </span>
+                    </div>
+                    <div className="text-muted-foreground flex flex-wrap gap-x-3 text-xs">
+                      <span>{PRICING_TYPE_LABELS[item.pricingType]}{item.unit ? ` (${item.unit})` : ''}</span>
+                      <span>{formatCurrency(Number(item.rate))} × {item.quantity}</span>
+                      {Number(item.discount) > 0 && <span>{item.discount}% off</span>}
+                    </div>
+                  </div>
                 </div>
               ))}
 
               <Separator />
 
               {/* Pricing summary */}
-              <div className="ml-auto w-64 space-y-2">
+              <div className="ml-auto w-full space-y-2 sm:w-64">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-medium">{formatCurrency(pricing.subtotal)}</span>

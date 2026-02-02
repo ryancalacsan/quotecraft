@@ -125,7 +125,7 @@ quotecraft/
 
 ## Progress
 
-### Current Phase: Week 2 — Quote Builder & Public View
+### Current Phase: Week 4 — Testing, CI/CD, Polish
 
 - [x] Project brief finalized
 - [x] Architectural decisions documented
@@ -186,10 +186,12 @@ quotecraft/
 
 ### Week 4
 
-- [ ] Testing (Vitest unit tests, Playwright e2e)
-- [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Polish, responsive design
-- [ ] Deploy to Vercel, README with screenshots
+- [x] Vitest setup + 50 unit tests (pricing, utils, validations)
+- [x] Playwright setup + smoke tests (landing page)
+- [x] GitHub Actions CI pipeline (lint, format, type check, unit tests, build)
+- [x] Responsive design fixes (mobile nav, quote form, line items, public quote view)
+- [x] README with project overview, setup instructions, tech stack
+- [ ] Deploy to Vercel
 
 ## Phase 2 Backlog
 
