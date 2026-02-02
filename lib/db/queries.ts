@@ -51,6 +51,13 @@ export async function getQuoteByShareToken(shareToken: string) {
   });
 }
 
+/** Fetches a user by ID (for public views where we need business name). */
+export async function getUserById(userId: string) {
+  return db.query.users.findFirst({
+    where: eq(users.id, userId),
+  });
+}
+
 export async function getLineItemsByQuoteId(quoteId: string) {
   return db.query.lineItems.findMany({
     where: eq(lineItems.quoteId, quoteId),

@@ -166,9 +166,11 @@ quotecraft/
 
 ### Week 2
 
-- [ ] Quote builder with line items and real-time pricing
-- [ ] Shareable quote links (public view)
-- [ ] Quote status transitions and locking
+- [x] Quote builder with line items and real-time pricing (completed in Week 1 Day 5-7)
+- [x] Shareable quote links (public view at /q/[shareToken])
+- [x] Public accept/decline with atomic status transitions and expiration enforcement
+- [x] Share link card on authenticated quote view (copy to clipboard, open in new tab)
+- [x] Quote status transitions and locking
 
 ### Week 3
 

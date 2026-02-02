@@ -1,18 +1,13 @@
-import { auth } from '@clerk/nextjs/server';
-import { notFound, redirect } from 'next/navigation';
-import Link from 'next/link';
-import { Edit, Send } from 'lucide-react';
+import { notFound } from 'next/navigation';
 
-import { getQuoteById, getLineItemsByQuoteId } from '@/lib/db/queries';
+import { getQuoteByShareToken, getUserById, getLineItemsByQuoteId } from '@/lib/db/queries';
 import { calculateQuotePricing } from '@/lib/pricing';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { QUOTE_STATUS_LABELS, PRICING_TYPE_LABELS } from '@/lib/constants';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { QuoteStatusActions } from '@/components/quote-builder/quote-status-actions';
-import { ShareLinkCard } from '@/components/dashboard/share-link-card';
+import { PublicQuoteActions } from './public-quote-actions';
 
 const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   draft: 'secondary',
@@ -22,15 +17,21 @@ const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'o
   paid: 'default',
 };
 
-export default async function QuoteViewPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const { userId } = await auth();
-  if (!userId) redirect('/sign-in');
+export default async function PublicQuotePage({
+  params,
+}: {
+  params: Promise<{ shareToken: string }>;
+}) {
+  const { shareToken } = await params;
 
-  const quote = await getQuoteById(id, userId);
+  const quote = await getQuoteByShareToken(shareToken);
   if (!quote) notFound();
 
-  const items = await getLineItemsByQuoteId(id);
+  const [user, items] = await Promise.all([
+    getUserById(quote.userId),
+    getLineItemsByQuoteId(quote.id),
+  ]);
+
   const pricing = calculateQuotePricing(
     items.map((item) => ({
       rate: item.rate,
@@ -40,39 +41,39 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
     quote.depositPercent,
   );
 
+  const isExpired = quote.validUntil ? new Date(quote.validUntil) < new Date() : false;
+
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6 px-6">
+      {/* Expiration banner */}
+      {isExpired && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          This quote expired on {formatDate(quote.validUntil!)}. It can no longer be accepted.
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold tracking-tight">{quote.title}</h2>
-            <Badge variant={statusVariant[quote.status] ?? 'secondary'}>
-              {QUOTE_STATUS_LABELS[quote.status]}
-            </Badge>
-          </div>
-          <p className="text-muted-foreground">{quote.quoteNumber}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {quote.status === 'draft' && (
-            <Link href={`/quotes/${quote.id}/edit`}>
-              <Button variant="outline" size="sm">
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </Button>
-            </Link>
+          {user?.businessName && (
+            <p className="text-muted-foreground text-sm font-medium uppercase tracking-wide">
+              {user.businessName}
+            </p>
           )}
-          <QuoteStatusActions quoteId={quote.id} currentStatus={quote.status} />
+          <h1 className="text-2xl font-bold tracking-tight">{quote.title}</h1>
+          <p className="text-muted-foreground text-sm">
+            {quote.quoteNumber} &middot; {formatDate(quote.createdAt)}
+          </p>
         </div>
+        <Badge variant={statusVariant[quote.status] ?? 'secondary'} className="text-sm">
+          {QUOTE_STATUS_LABELS[quote.status]}
+        </Badge>
       </div>
-
-      {/* Share link */}
-      {quote.status !== 'draft' && <ShareLinkCard shareToken={quote.shareToken} />}
 
       {/* Client info */}
       <Card>
         <CardHeader>
-          <CardTitle>Client Information</CardTitle>
+          <CardTitle>Prepared For</CardTitle>
         </CardHeader>
         <CardContent>
           <dl className="grid grid-cols-2 gap-4 text-sm">
@@ -89,13 +90,11 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
             {quote.validUntil && (
               <div>
                 <dt className="text-muted-foreground">Valid Until</dt>
-                <dd className="font-medium">{formatDate(quote.validUntil)}</dd>
+                <dd className={`font-medium ${isExpired ? 'text-red-600' : ''}`}>
+                  {formatDate(quote.validUntil)}
+                </dd>
               </div>
             )}
-            <div>
-              <dt className="text-muted-foreground">Created</dt>
-              <dd className="font-medium">{formatDate(quote.createdAt)}</dd>
-            </div>
           </dl>
         </CardContent>
       </Card>
@@ -112,7 +111,6 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
             </p>
           ) : (
             <div className="space-y-3">
-              {/* Header row */}
               <div className="text-muted-foreground grid grid-cols-12 gap-2 text-xs font-medium">
                 <span className="col-span-4">Description</span>
                 <span className="col-span-2">Type</span>
@@ -130,10 +128,12 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
                     {PRICING_TYPE_LABELS[item.pricingType]}
                     {item.unit ? ` (${item.unit})` : ''}
                   </span>
-                  <span className="col-span-2 text-right">{formatCurrency(Number(item.rate))}</span>
+                  <span className="col-span-2 text-right">
+                    {formatCurrency(Number(item.rate))}
+                  </span>
                   <span className="col-span-1 text-right">{item.quantity}</span>
                   <span className="col-span-1 text-right">
-                    {Number(item.discount) > 0 ? `${item.discount}%` : '—'}
+                    {Number(item.discount) > 0 ? `${item.discount}%` : '\u2014'}
                   </span>
                   <span className="col-span-2 text-right font-medium">
                     {formatCurrency(pricing.lineItemTotals[index])}
@@ -158,7 +158,7 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
                   </div>
                 )}
                 <Separator />
-                <div className="flex justify-between font-medium">
+                <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
                   <span>{formatCurrency(pricing.subtotal)}</span>
                 </div>
@@ -172,13 +172,20 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
       {quote.notes && (
         <Card>
           <CardHeader>
-            <CardTitle>Notes</CardTitle>
+            <CardTitle>Notes & Terms</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm whitespace-pre-wrap">{quote.notes}</p>
           </CardContent>
         </Card>
       )}
+
+      {/* Accept/Decline actions */}
+      <PublicQuoteActions
+        shareToken={shareToken}
+        currentStatus={quote.status}
+        isExpired={isExpired}
+      />
     </div>
   );
 }
