@@ -6,7 +6,7 @@ Built as a portfolio project demonstrating full-stack skills: complex form state
 
 **[Live Demo](https://quotecraft.vercel.app)** · **[Try Demo Mode](https://quotecraft.vercel.app)** (no signup required)
 
-![QuoteCraft Dashboard](https://quotecraft.vercel.app/og-image.png)
+![QuoteCraft Dashboard](./public/screenshot-dashboard.png)
 
 ## Features
 
