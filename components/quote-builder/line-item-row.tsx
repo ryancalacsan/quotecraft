@@ -55,6 +55,7 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
     <button
       type="button"
       className="text-muted-foreground hover:text-foreground cursor-grab touch-none active:cursor-grabbing"
+      aria-label="Drag to reorder line item"
       {...attributes}
       {...listeners}
     >
@@ -136,7 +137,13 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
           {formatCurrency(total)}
         </div>
         <div className="col-span-1 flex justify-end">
-          <Button type="button" variant="ghost" size="icon" onClick={() => onRemove(item.id)}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => onRemove(item.id)}
+            aria-label="Remove line item"
+          >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -160,6 +167,7 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
             size="icon"
             className="shrink-0"
             onClick={() => onRemove(item.id)}
+            aria-label="Remove line item"
           >
             <Trash2 className="h-4 w-4" />
           </Button>

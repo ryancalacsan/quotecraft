@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -21,6 +22,23 @@ const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'o
   declined: 'destructive',
   paid: 'default',
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const { userId } = await auth();
+  if (!userId) return { title: 'Quote' };
+
+  const quote = await getQuoteById(id, userId);
+  if (!quote) return { title: 'Quote Not Found' };
+
+  return {
+    title: `${quote.title} - ${quote.quoteNumber}`,
+  };
+}
 
 export default async function QuoteViewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

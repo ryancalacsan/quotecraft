@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { AlertTriangle } from 'lucide-react';
 
 import { getQuoteByShareToken, getUserById, getLineItemsByQuoteId } from '@/lib/db/queries';
 import { calculateQuotePricing } from '@/lib/pricing';
@@ -46,9 +47,15 @@ export default async function PublicQuotePage({
   return (
     <div className="mx-auto max-w-4xl space-y-6 px-6">
       {/* Expiration banner */}
-      {isExpired && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          This quote expired on {formatDate(quote.validUntil!)}. It can no longer be accepted.
+      {isExpired && quote.validUntil && (
+        <div
+          className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+          role="alert"
+        >
+          <AlertTriangle className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <span>
+            This quote expired on {formatDate(quote.validUntil)}. It can no longer be accepted.
+          </span>
         </div>
       )}
 

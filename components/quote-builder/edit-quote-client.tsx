@@ -14,6 +14,7 @@ import {
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates, arrayMove } from '@dnd-kit/sortable';
 
+import { Button } from '@/components/ui/button';
 import { QuoteForm } from './quote-form';
 import type { LineItemData } from './line-item-row';
 import { addLineItem, updateLineItem, removeLineItem } from '@/app/actions/line-items';
@@ -133,14 +134,9 @@ export function EditQuoteClient({ quote, initialLineItems }: EditQuoteClientProp
       </DndContext>
       {lineItems.length > 0 && (
         <div className="flex justify-end">
-          <button
-            type="button"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium disabled:opacity-50"
-            onClick={handleSaveLineItems}
-            disabled={isPending}
-          >
+          <Button type="button" onClick={handleSaveLineItems} disabled={isPending}>
             {isPending ? 'Saving Items...' : 'Save Line Items'}
-          </button>
+          </Button>
         </div>
       )}
     </div>

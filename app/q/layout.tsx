@@ -1,4 +1,14 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Quote',
+  description: 'View and respond to your quote from QuoteCraft.',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function PublicQuoteLayout({ children }: { children: React.ReactNode }) {
   return (
