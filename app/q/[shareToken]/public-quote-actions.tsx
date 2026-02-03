@@ -127,7 +127,7 @@ export function PublicQuoteActions({
   return (
     <Card>
       <CardContent className="flex items-center justify-between py-4">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Would you like to accept or decline this quote?
         </p>
         <div className="flex gap-2">

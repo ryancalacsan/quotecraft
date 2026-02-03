@@ -28,7 +28,9 @@ export function QuoteList({ quotes }: { quotes: Quote[] }) {
             onClick={() => setFilter(status)}
           >
             {status === 'all' ? 'All' : QUOTE_STATUS_LABELS[status]}
-            {status === 'all' ? ` (${quotes.length})` : ` (${quotes.filter((q) => q.status === status).length})`}
+            {status === 'all'
+              ? ` (${quotes.length})`
+              : ` (${quotes.filter((q) => q.status === status).length})`}
           </Button>
         ))}
       </div>

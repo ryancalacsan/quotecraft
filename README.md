@@ -22,21 +22,21 @@ Built as a portfolio project demonstrating full-stack skills: complex form state
 
 ## Tech Stack
 
-| Layer           | Technology            |
-| --------------- | --------------------- |
-| Framework       | Next.js 16 (App Router) |
-| Language        | TypeScript (strict)   |
-| Styling         | Tailwind CSS + shadcn/ui |
-| Database        | Supabase (PostgreSQL) |
-| ORM             | Drizzle ORM           |
-| Auth            | Clerk                 |
-| Payments        | Stripe Checkout       |
-| Pricing Math    | Decimal.js            |
-| Validation      | Zod                   |
-| Unit Tests      | Vitest                |
-| E2E Tests       | Playwright            |
-| CI/CD           | GitHub Actions        |
-| Deployment      | Vercel                |
+| Layer        | Technology               |
+| ------------ | ------------------------ |
+| Framework    | Next.js 16 (App Router)  |
+| Language     | TypeScript (strict)      |
+| Styling      | Tailwind CSS + shadcn/ui |
+| Database     | Supabase (PostgreSQL)    |
+| ORM          | Drizzle ORM              |
+| Auth         | Clerk                    |
+| Payments     | Stripe Checkout          |
+| Pricing Math | Decimal.js               |
+| Validation   | Zod                      |
+| Unit Tests   | Vitest                   |
+| E2E Tests    | Playwright               |
+| CI/CD        | GitHub Actions           |
+| Deployment   | Vercel                   |
 
 ## Getting Started
 
@@ -66,15 +66,15 @@ cp .env.local.example .env.local
 
 Required variables:
 
-| Variable                       | Source                  |
-| ------------------------------ | ----------------------- |
-| `DATABASE_URL`                 | Supabase → Settings → Database |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk Dashboard        |
-| `CLERK_SECRET_KEY`             | Clerk Dashboard        |
-| `STRIPE_SECRET_KEY`            | Stripe Dashboard       |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe Dashboard  |
-| `STRIPE_WEBHOOK_SECRET`        | Stripe CLI or Dashboard |
-| `NEXT_PUBLIC_APP_URL`          | `http://localhost:3000` for dev |
+| Variable                             | Source                          |
+| ------------------------------------ | ------------------------------- |
+| `DATABASE_URL`                       | Supabase → Settings → Database  |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`  | Clerk Dashboard                 |
+| `CLERK_SECRET_KEY`                   | Clerk Dashboard                 |
+| `STRIPE_SECRET_KEY`                  | Stripe Dashboard                |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe Dashboard                |
+| `STRIPE_WEBHOOK_SECRET`              | Stripe CLI or Dashboard         |
+| `NEXT_PUBLIC_APP_URL`                | `http://localhost:3000` for dev |
 
 ### Database Setup
 

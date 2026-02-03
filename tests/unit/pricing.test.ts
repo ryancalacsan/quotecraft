@@ -38,9 +38,9 @@ describe('calculateLineItemTotal', () => {
 
   it('handles large values without floating-point errors', () => {
     // 99999.99 * 100 = 9999999, 0% discount
-    expect(
-      calculateLineItemTotal({ rate: '99999.99', quantity: '100', discount: '0' }),
-    ).toBe(9999999);
+    expect(calculateLineItemTotal({ rate: '99999.99', quantity: '100', discount: '0' })).toBe(
+      9999999,
+    );
   });
 });
 
@@ -60,19 +60,13 @@ describe('calculateQuotePricing', () => {
   });
 
   it('calculates deposit amount', () => {
-    const result = calculateQuotePricing(
-      [{ rate: '1000', quantity: '1', discount: '0' }],
-      25,
-    );
+    const result = calculateQuotePricing([{ rate: '1000', quantity: '1', discount: '0' }], 25);
     expect(result.subtotal).toBe(1000);
     expect(result.depositAmount).toBe(250);
   });
 
   it('handles 50% deposit', () => {
-    const result = calculateQuotePricing(
-      [{ rate: '500', quantity: '2', discount: '10' }],
-      50,
-    );
+    const result = calculateQuotePricing([{ rate: '500', quantity: '2', discount: '10' }], 50);
     // 500 * 2 = 1000, 10% off = 900
     expect(result.subtotal).toBe(900);
     expect(result.depositAmount).toBe(450);
@@ -92,10 +86,7 @@ describe('calculateQuotePricing', () => {
   });
 
   it('handles 100% deposit', () => {
-    const result = calculateQuotePricing(
-      [{ rate: '250', quantity: '4', discount: '0' }],
-      100,
-    );
+    const result = calculateQuotePricing([{ rate: '250', quantity: '4', discount: '0' }], 100);
     expect(result.depositAmount).toBe(1000);
   });
 });

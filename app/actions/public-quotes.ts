@@ -7,7 +7,11 @@ import { z } from 'zod';
 import { db } from '@/lib/db';
 import { quotes } from '@/lib/db/schema';
 
-const shareTokenSchema = z.string().min(1).max(30).regex(/^[A-Za-z0-9_-]+$/);
+const shareTokenSchema = z
+  .string()
+  .min(1)
+  .max(30)
+  .regex(/^[A-Za-z0-9_-]+$/);
 
 /**
  * Atomically updates a quote's status via shareToken.

@@ -33,7 +33,7 @@ export function DemoBanner() {
       You&apos;re in demo mode. Data resets nightly.
       <button
         onClick={handleDismiss}
-        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-sm p-0.5 hover:bg-amber-600/30"
+        className="absolute top-1/2 right-3 -translate-y-1/2 rounded-sm p-0.5 hover:bg-amber-600/30"
         aria-label="Dismiss banner"
       >
         <X className="h-4 w-4" />

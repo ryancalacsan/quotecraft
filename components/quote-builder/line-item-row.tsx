@@ -35,14 +35,9 @@ interface LineItemRowProps {
 }
 
 export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: item.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -150,9 +145,7 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
       {/* Mobile: stacked layout */}
       <div className="space-y-3 rounded-lg border p-3 lg:hidden">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-1 pt-1">
-            {dragHandle}
-          </div>
+          <div className="flex items-center gap-1 pt-1">{dragHandle}</div>
           <div className="flex-1 space-y-1">
             <Label className="text-muted-foreground text-xs">Description</Label>
             <Input

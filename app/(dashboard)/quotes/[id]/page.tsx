@@ -132,7 +132,9 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
                       {PRICING_TYPE_LABELS[item.pricingType]}
                       {item.unit ? ` (${item.unit})` : ''}
                     </span>
-                    <span className="col-span-2 text-right">{formatCurrency(Number(item.rate))}</span>
+                    <span className="col-span-2 text-right">
+                      {formatCurrency(Number(item.rate))}
+                    </span>
                     <span className="col-span-1 text-right">{item.quantity}</span>
                     <span className="col-span-1 text-right">
                       {Number(item.discount) > 0 ? `${item.discount}%` : '—'}
@@ -150,8 +152,13 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
                       </span>
                     </div>
                     <div className="text-muted-foreground flex flex-wrap gap-x-3 text-xs">
-                      <span>{PRICING_TYPE_LABELS[item.pricingType]}{item.unit ? ` (${item.unit})` : ''}</span>
-                      <span>{formatCurrency(Number(item.rate))} × {item.quantity}</span>
+                      <span>
+                        {PRICING_TYPE_LABELS[item.pricingType]}
+                        {item.unit ? ` (${item.unit})` : ''}
+                      </span>
+                      <span>
+                        {formatCurrency(Number(item.rate))} × {item.quantity}
+                      </span>
                       {Number(item.discount) > 0 && <span>{item.discount}% off</span>}
                     </div>
                   </div>
@@ -168,9 +175,7 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
                 </div>
                 {quote.depositPercent > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Deposit ({quote.depositPercent}%)
-                    </span>
+                    <span className="text-muted-foreground">Deposit ({quote.depositPercent}%)</span>
                     <span className="font-medium">{formatCurrency(pricing.depositAmount)}</span>
                   </div>
                 )}

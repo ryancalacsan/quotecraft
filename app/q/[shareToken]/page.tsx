@@ -56,7 +56,7 @@ export default async function PublicQuotePage({
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           {user?.businessName && (
-            <p className="text-muted-foreground text-sm font-medium uppercase tracking-wide">
+            <p className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
               {user.businessName}
             </p>
           )}
@@ -151,8 +151,13 @@ export default async function PublicQuotePage({
                       </span>
                     </div>
                     <div className="text-muted-foreground flex flex-wrap gap-x-3 text-xs">
-                      <span>{PRICING_TYPE_LABELS[item.pricingType]}{item.unit ? ` (${item.unit})` : ''}</span>
-                      <span>{formatCurrency(Number(item.rate))} × {item.quantity}</span>
+                      <span>
+                        {PRICING_TYPE_LABELS[item.pricingType]}
+                        {item.unit ? ` (${item.unit})` : ''}
+                      </span>
+                      <span>
+                        {formatCurrency(Number(item.rate))} × {item.quantity}
+                      </span>
                       {Number(item.discount) > 0 && <span>{item.discount}% off</span>}
                     </div>
                   </div>
@@ -169,9 +174,7 @@ export default async function PublicQuotePage({
                 </div>
                 {quote.depositPercent > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Deposit ({quote.depositPercent}%)
-                    </span>
+                    <span className="text-muted-foreground">Deposit ({quote.depositPercent}%)</span>
                     <span className="font-medium">{formatCurrency(pricing.depositAmount)}</span>
                   </div>
                 )}

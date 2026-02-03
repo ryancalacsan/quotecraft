@@ -35,7 +35,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="border-t bg-muted/30 px-6 py-24">
+      <section className="bg-muted/30 border-t px-6 py-24">
         <div className="mx-auto max-w-6xl">
           <h2 className="mb-12 text-center text-2xl font-bold tracking-tight sm:text-3xl">
             Everything you need to quote with confidence

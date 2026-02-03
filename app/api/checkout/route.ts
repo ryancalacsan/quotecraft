@@ -8,7 +8,11 @@ import { stripe } from '@/lib/stripe';
 import { calculateQuotePricing, toStripeCents } from '@/lib/pricing';
 
 const checkoutSchema = z.object({
-  shareToken: z.string().min(1).max(30).regex(/^[A-Za-z0-9_-]+$/),
+  shareToken: z
+    .string()
+    .min(1)
+    .max(30)
+    .regex(/^[A-Za-z0-9_-]+$/),
 });
 
 export async function POST(req: Request) {

@@ -2,10 +2,7 @@
 
 import { useActionState, useId } from 'react';
 import { Plus } from 'lucide-react';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -217,9 +214,7 @@ export function QuoteForm({
       )}
 
       {/* Form error */}
-      {fieldErrors?._form && (
-        <p className="text-destructive text-sm">{fieldErrors._form[0]}</p>
-      )}
+      {fieldErrors?._form && <p className="text-destructive text-sm">{fieldErrors._form[0]}</p>}
 
       {/* Submit */}
       <div className="flex justify-end gap-3">

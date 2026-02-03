@@ -12,10 +12,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from '@dnd-kit/core';
-import {
-  sortableKeyboardCoordinates,
-  arrayMove,
-} from '@dnd-kit/sortable';
+import { sortableKeyboardCoordinates, arrayMove } from '@dnd-kit/sortable';
 
 import { QuoteForm } from './quote-form';
 import type { LineItemData } from './line-item-row';
@@ -54,7 +51,9 @@ export function EditQuoteClient({ quote, initialLineItems }: EditQuoteClientProp
 
   const handleLineItemChange = useCallback(
     (id: string, field: keyof LineItemData, value: string) => {
-      setLineItems((prev) => prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
+      setLineItems((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
+      );
     },
     [],
   );
@@ -123,11 +122,7 @@ export function EditQuoteClient({ quote, initialLineItems }: EditQuoteClientProp
 
   return (
     <div className="space-y-6">
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <QuoteForm
           quote={quote}
           lineItems={lineItems}
