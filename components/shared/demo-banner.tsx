@@ -1,22 +1,31 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { X } from 'lucide-react';
 
+function subscribeToCookie() {
+  // No real subscription needed - cookie only changes on user action
+  return () => {};
+}
+
+function getSnapshot() {
+  return typeof document !== 'undefined' && document.cookie.includes('demo_mode=true');
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
 export function DemoBanner() {
   const { user } = useUser();
-  const [isDemoMode, setIsDemoMode] = useState(false);
-
-  useEffect(() => {
-    setIsDemoMode(document.cookie.includes('demo_mode=true'));
-  }, []);
+  const isDemoMode = useSyncExternalStore(subscribeToCookie, getSnapshot, getServerSnapshot);
 
   if (!isDemoMode || !user) return null;
 
   function handleDismiss() {
     document.cookie = 'demo_mode=; path=/; max-age=0';
-    setIsDemoMode(false);
+    window.location.reload();
   }
 
   return (

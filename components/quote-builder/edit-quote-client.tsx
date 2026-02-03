@@ -13,9 +13,7 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core';
 import {
-  SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
 

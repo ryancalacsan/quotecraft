@@ -1,7 +1,5 @@
 import Link from 'next/link';
 
-import { Separator } from '@/components/ui/separator';
-
 export default function PublicQuoteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">

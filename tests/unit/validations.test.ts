@@ -38,7 +38,8 @@ describe('quoteFormSchema', () => {
   });
 
   it('allows missing email', () => {
-    const { clientEmail: _, ...noEmail } = validQuote;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { clientEmail, ...noEmail } = validQuote;
     const result = quoteFormSchema.safeParse(noEmail);
     expect(result.success).toBe(true);
   });

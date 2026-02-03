@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Edit, Send } from 'lucide-react';
+import { Edit } from 'lucide-react';
 
 import { getQuoteById, getLineItemsByQuoteId } from '@/lib/db/queries';
 import { calculateQuotePricing } from '@/lib/pricing';

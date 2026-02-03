@@ -1,6 +1,6 @@
 'use server';
 
-import { and, eq, isNull, gt } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 

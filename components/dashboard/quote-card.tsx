@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { QUOTE_STATUS_LABELS } from '@/lib/constants';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { deleteQuote, duplicateQuote } from '@/app/actions/quotes';
 import type { Quote } from '@/lib/db/schema';
 
