@@ -38,8 +38,8 @@ jobs:
         run: pnpm build
         env:
           NEXT_PUBLIC_APP_URL: http://localhost:3000
-          # Clerk requires valid key format - this is a dummy key that passes validation
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xpZW50X2J1aWxkX3BsYWNlaG9sZGVy
+          # Clerk publishable key (safe to expose - it's meant for frontend use)
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_c2ltcGxlLWxhY2V3aW5nLTY3LmNsZXJrLmFjY291bnRzLmRldiQ
           CLERK_SECRET_KEY: sk_test_placeholder
           DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
           STRIPE_SECRET_KEY: sk_test_placeholder
