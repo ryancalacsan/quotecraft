@@ -4,7 +4,7 @@ A modern quote builder for freelancers and contractors. Create professional quot
 
 Built as a portfolio project demonstrating full-stack skills: complex form state, real-time pricing with Decimal.js, Stripe Checkout, Clerk auth, testing, and CI/CD.
 
-**[Live Demo](https://quotecraft.vercel.app)** · **[Try Demo Mode](https://quotecraft.vercel.app)** (no signup required)
+**[Try the Live Demo](https://quotecraft.vercel.app)** — no signup required, explore instantly
 
 ![QuoteCraft Dashboard](./public/screenshot-dashboard.png)
 
@@ -16,7 +16,7 @@ Built as a portfolio project demonstrating full-stack skills: complex form state
 - **Client Actions** — Clients can accept, decline, or pay quotes directly from the public link
 - **Stripe Payments** — Secure checkout for deposits or full amounts via Stripe Checkout
 - **Quote Lifecycle** — Draft, Sent, Accepted, Declined, Paid statuses with locking on send
-- **Demo Mode** — Try the full app without signing up (Clerk Sign-In Tokens + seeded data)
+- **Demo Mode** — Explore the full app instantly with pre-seeded data (Clerk Sign-In Tokens)
 - **Responsive Design** — Desktop sidebar + mobile slide-out nav, stacked layouts for small screens
 - **Dashboard** — Filter quotes by status, duplicate, delete, and manage from one place
 
@@ -141,6 +141,10 @@ quotecraft/
     ├── unit/                        # Vitest (pricing, utils, validations)
     └── e2e/                         # Playwright (smoke tests)
 ```
+
+## Note
+
+This is a portfolio demo project. User registration is disabled — click "Try Demo" to explore the full application with pre-seeded sample data. Data resets nightly.
 
 ## License
 

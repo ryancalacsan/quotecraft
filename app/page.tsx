@@ -1,7 +1,5 @@
-import Link from 'next/link';
 import { FileText, Share2, CreditCard, Zap, Shield, BarChart3 } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { DemoLoginButton } from '@/components/shared/demo-login-button';
 
 export default function LandingPage() {
@@ -11,12 +9,7 @@ export default function LandingPage() {
       <header className="border-b">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <span className="text-xl font-bold">QuoteCraft</span>
-          <div className="flex items-center gap-3">
-            <DemoLoginButton variant="outline" />
-            <Link href="/sign-up">
-              <Button>Sign Up Free</Button>
-            </Link>
-          </div>
+          <DemoLoginButton />
         </div>
       </header>
 
@@ -29,18 +22,15 @@ export default function LandingPage() {
             <span className="text-muted-foreground">in minutes, not hours</span>
           </h1>
           <p className="text-muted-foreground mx-auto max-w-xl text-lg">
-            Create polished quotes with real-time pricing, share them with a link, and get paid
-            — all in one place. Built for freelancers and contractors.
+            Create polished quotes with real-time pricing, share them with a link, and get paid —
+            all in one place. Built for freelancers and contractors.
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col items-center justify-center gap-4">
             <DemoLoginButton size="lg" />
-            <Link href="/sign-up">
-              <Button variant="outline" size="lg">
-                Sign Up Free
-              </Button>
-            </Link>
+            <p className="text-muted-foreground text-sm">
+              This is a portfolio demo — explore the full app instantly
+            </p>
           </div>
-          <p className="text-muted-foreground text-xs">No credit card required</p>
         </div>
       </section>
 
@@ -89,19 +79,12 @@ export default function LandingPage() {
       <section className="px-6 py-24 text-center">
         <div className="mx-auto max-w-2xl space-y-6">
           <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Ready to streamline your quoting?
+            Ready to see it in action?
           </h2>
           <p className="text-muted-foreground">
-            Try the demo to see QuoteCraft in action, or sign up to start creating quotes today.
+            Try the interactive demo to explore quote creation, client sharing, and Stripe payments.
           </p>
-          <div className="flex items-center justify-center gap-4">
-            <DemoLoginButton size="lg" />
-            <Link href="/sign-up">
-              <Button variant="outline" size="lg">
-                Sign Up Free
-              </Button>
-            </Link>
-          </div>
+          <DemoLoginButton size="lg" />
         </div>
       </section>
 

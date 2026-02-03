@@ -1,9 +1,6 @@
-import { SignUp } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
 
 export default function SignUpPage() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" />
-    </div>
-  );
+  // Sign-up disabled for portfolio demo — redirect to landing page
+  redirect('/');
 }
