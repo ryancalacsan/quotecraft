@@ -1,5 +1,8 @@
 # QuoteCraft
 
+[![CI](https://github.com/ryancalacsan/quotecraft/actions/workflows/ci.yml/badge.svg)](https://github.com/ryancalacsan/quotecraft/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/ryancalacsan/quotecraft/graph/badge.svg)](https://codecov.io/gh/ryancalacsan/quotecraft)
+
 A modern quote builder for freelancers and contractors. Create professional quotes, share them with clients via unique links, accept payments through Stripe, and track everything from a clean dashboard.
 
 Built as a portfolio project demonstrating full-stack skills: complex form state, real-time pricing with Decimal.js, Stripe Checkout, Clerk auth, testing, and CI/CD.
