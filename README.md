@@ -4,6 +4,10 @@ A modern quote builder for freelancers and contractors. Create professional quot
 
 Built as a portfolio project demonstrating full-stack skills: complex form state, real-time pricing with Decimal.js, Stripe Checkout, Clerk auth, testing, and CI/CD.
 
+**[Live Demo](https://quotecraft.vercel.app)** · **[Try Demo Mode](https://quotecraft.vercel.app)** (no signup required)
+
+![QuoteCraft Dashboard](https://quotecraft.vercel.app/og-image.png)
+
 ## Features
 
 - **Quote Builder** — Create quotes with multiple line items, pricing types (fixed, hourly, per-unit), discounts, and deposit percentages
