@@ -209,6 +209,7 @@ export default async function PublicQuotePage({
             : undefined
         }
         paymentLabel={quote.depositPercent > 0 ? 'Deposit' : 'Full Amount'}
+        testCardInfo={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_test_')}
       />
     </div>
   );

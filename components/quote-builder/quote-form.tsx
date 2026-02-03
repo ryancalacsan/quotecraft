@@ -2,6 +2,10 @@
 
 import { useActionState, useId } from 'react';
 import { Plus } from 'lucide-react';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -183,14 +187,19 @@ export function QuoteForm({
                 No line items yet. Click &quot;Add Item&quot; to get started.
               </p>
             ) : (
-              lineItems.map((item) => (
-                <LineItemRow
-                  key={item.id}
-                  item={item}
-                  onChange={onLineItemChange!}
-                  onRemove={onLineItemRemove!}
-                />
-              ))
+              <SortableContext
+                items={lineItems.map((item) => item.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {lineItems.map((item) => (
+                  <LineItemRow
+                    key={item.id}
+                    item={item}
+                    onChange={onLineItemChange!}
+                    onRemove={onLineItemRemove!}
+                  />
+                ))}
+              </SortableContext>
             )}
 
             {lineItems.length > 0 && (

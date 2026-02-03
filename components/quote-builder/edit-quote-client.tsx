@@ -3,6 +3,21 @@
 import { useCallback, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
 
 import { QuoteForm } from './quote-form';
 import type { LineItemData } from './line-item-row';
@@ -18,6 +33,26 @@ export function EditQuoteClient({ quote, initialLineItems }: EditQuoteClientProp
   const router = useRouter();
   const [lineItems, setLineItems] = useState<LineItemData[]>(initialLineItems);
   const [isPending, startTransition] = useTransition();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setLineItems((prev) => {
+        const oldIndex = prev.findIndex((item) => item.id === active.id);
+        const newIndex = prev.findIndex((item) => item.id === over.id);
+        return arrayMove(prev, oldIndex, newIndex);
+      });
+    }
+  }, []);
 
   const handleLineItemChange = useCallback(
     (id: string, field: keyof LineItemData, value: string) => {
@@ -90,13 +125,19 @@ export function EditQuoteClient({ quote, initialLineItems }: EditQuoteClientProp
 
   return (
     <div className="space-y-6">
-      <QuoteForm
-        quote={quote}
-        lineItems={lineItems}
-        onLineItemChange={handleLineItemChange}
-        onLineItemRemove={handleLineItemRemove}
-        onLineItemAdd={handleLineItemAdd}
-      />
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <QuoteForm
+          quote={quote}
+          lineItems={lineItems}
+          onLineItemChange={handleLineItemChange}
+          onLineItemRemove={handleLineItemRemove}
+          onLineItemAdd={handleLineItemAdd}
+        />
+      </DndContext>
       {lineItems.length > 0 && (
         <div className="flex justify-end">
           <button

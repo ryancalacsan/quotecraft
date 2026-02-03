@@ -1,6 +1,8 @@
 'use client';
 
-import { Trash2 } from 'lucide-react';
+import { GripVertical, Trash2 } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,21 +35,49 @@ interface LineItemRowProps {
 }
 
 export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  };
+
   const total = calculateLineItemTotal({
     rate: item.rate || '0',
     quantity: item.quantity || '0',
     discount: item.discount || '0',
   });
 
+  const dragHandle = (
+    <button
+      type="button"
+      className="text-muted-foreground hover:text-foreground cursor-grab touch-none active:cursor-grabbing"
+      {...attributes}
+      {...listeners}
+    >
+      <GripVertical className="h-4 w-4" />
+    </button>
+  );
+
   return (
-    <>
+    <div ref={setNodeRef} style={style}>
       {/* Desktop: grid layout */}
       <div className="hidden items-start gap-2 lg:grid lg:grid-cols-12">
-        <div className="col-span-3">
+        <div className="col-span-3 flex items-center gap-1">
+          {dragHandle}
           <Input
             placeholder="Description"
             value={item.description}
             onChange={(e) => onChange(item.id, 'description', e.target.value)}
+            className="flex-1"
           />
         </div>
         <div className="col-span-2">
@@ -120,6 +150,9 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
       {/* Mobile: stacked layout */}
       <div className="space-y-3 rounded-lg border p-3 lg:hidden">
         <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-1 pt-1">
+            {dragHandle}
+          </div>
           <div className="flex-1 space-y-1">
             <Label className="text-muted-foreground text-xs">Description</Label>
             <Input
@@ -213,6 +246,6 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
           <div className="text-right text-sm font-medium">{formatCurrency(total)}</div>
         )}
       </div>
-    </>
+    </div>
   );
 }
