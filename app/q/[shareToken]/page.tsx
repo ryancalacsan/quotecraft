@@ -180,8 +180,12 @@ export default async function PublicQuotePage({
                 )}
                 <Separator />
                 <div className="flex justify-between text-lg font-semibold">
-                  <span>Total</span>
-                  <span>{formatCurrency(pricing.subtotal)}</span>
+                  <span>{quote.depositPercent > 0 ? 'Amount Due' : 'Total'}</span>
+                  <span>
+                    {formatCurrency(
+                      quote.depositPercent > 0 ? pricing.depositAmount : pricing.subtotal,
+                    )}
+                  </span>
                 </div>
               </div>
             </div>
