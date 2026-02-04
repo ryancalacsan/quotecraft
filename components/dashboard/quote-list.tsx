@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { FileText, Search } from 'lucide-react';
+import { FileText, Search, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/shared/empty-state';
 import { QuoteCard } from './quote-card';
 import { QUOTE_STATUSES, QUOTE_STATUS_LABELS } from '@/lib/constants';
+import { STAGGER_DELAY } from '@/lib/animations';
 import type { Quote } from '@/lib/db/schema';
 
 const FILTER_OPTIONS = ['all', ...QUOTE_STATUSES] as const;
@@ -41,11 +42,14 @@ export function QuoteList({ quotes }: { quotes: Quote[] }) {
         quotes.length === 0 ? (
           <EmptyState
             icon={<FileText />}
-            title="No quotes yet"
-            description="Create your first quote and start sending professional proposals to your clients."
+            title="Your first quote awaits"
+            description="Create a professional quote in minutes. Add line items, set pricing, and share with your client."
             action={
               <Link href="/quotes/new">
-                <Button>Create Your First Quote</Button>
+                <Button variant="gold" size="lg" className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Create Your First Quote
+                </Button>
               </Link>
             }
           />
@@ -58,8 +62,17 @@ export function QuoteList({ quotes }: { quotes: Quote[] }) {
         )
       ) : (
         <div className="grid gap-4">
-          {filtered.map((quote) => (
-            <QuoteCard key={quote.id} quote={quote} />
+          {filtered.map((quote, index) => (
+            <div
+              key={quote.id}
+              className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both"
+              style={{
+                animationDelay: `${200 + index * STAGGER_DELAY}ms`,
+                animationDuration: '400ms',
+              }}
+            >
+              <QuoteCard quote={quote} />
+            </div>
           ))}
         </div>
       )}

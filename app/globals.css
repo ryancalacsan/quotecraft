@@ -194,6 +194,13 @@
   .tracking-display {
     letter-spacing: 0.05em;
   }
+  /* Animation fill mode for staggered animations */
+  .fill-mode-both {
+    animation-fill-mode: both;
+  }
+  .fill-mode-forwards {
+    animation-fill-mode: forwards;
+  }
 }
 
 /* Card hover transition */
