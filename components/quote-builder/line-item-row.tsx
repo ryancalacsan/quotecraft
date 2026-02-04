@@ -1,6 +1,6 @@
 'use client';
 
-import { GripVertical, HelpCircle, Trash2 } from 'lucide-react';
+import { GripVertical, HelpCircle, Trash2, Clock, Tag, Package } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { PRICING_TYPE_LABELS, PRICING_TYPES } from '@/lib/constants';
+import { PRICING_TYPE_LABELS, PRICING_TYPES, type PricingType } from '@/lib/constants';
 import { calculateLineItemTotal } from '@/lib/pricing';
 import { formatCurrency } from '@/lib/utils';
 
@@ -23,6 +23,13 @@ const PRICING_TYPE_DESCRIPTIONS: Record<string, string> = {
   hourly: 'Charge by the hour (e.g., consulting, development)',
   fixed: 'One-time flat fee for the entire item',
   per_unit: 'Charge per unit (e.g., per page, per word)',
+};
+
+// Icons for pricing types
+const PRICING_TYPE_ICONS: Record<string, React.ElementType> = {
+  hourly: Clock,
+  fixed: Tag,
+  per_unit: Package,
 };
 
 export interface LineItemData {
@@ -61,19 +68,22 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
   const dragHandle = (
     <button
       type="button"
-      className="text-muted-foreground hover:text-foreground cursor-grab touch-none active:cursor-grabbing"
+      className="flex h-8 w-6 items-center justify-center rounded text-muted-foreground/50 transition-colors hover:bg-muted hover:text-foreground cursor-grab touch-none active:cursor-grabbing"
       aria-label="Drag to reorder line item"
       {...attributes}
       {...listeners}
     >
-      <GripVertical className="h-4 w-4" />
+      <GripVertical className="h-5 w-5" />
     </button>
   );
+
+  // Get icon for current pricing type
+  const PricingIcon = PRICING_TYPE_ICONS[item.pricingType] || Tag;
 
   return (
     <div ref={setNodeRef} style={style}>
       {/* Desktop: grid layout */}
-      <div className="hidden items-start gap-2 lg:grid lg:grid-cols-12">
+      <div className="hidden items-start gap-2 xl:grid xl:grid-cols-12">
         <div className="col-span-3 flex items-center gap-1">
           {dragHandle}
           <Input
@@ -89,14 +99,23 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
             onValueChange={(val) => onChange(item.id, 'pricingType', val)}
           >
             <SelectTrigger>
-              <SelectValue />
+              <div className="flex items-center gap-1.5">
+                <PricingIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                <span className="truncate">{PRICING_TYPE_LABELS[item.pricingType as PricingType]}</span>
+              </div>
             </SelectTrigger>
             <SelectContent>
-              {PRICING_TYPES.map((type) => (
-                <SelectItem key={type} value={type}>
-                  {PRICING_TYPE_LABELS[type]}
-                </SelectItem>
-              ))}
+              {PRICING_TYPES.map((type) => {
+                const Icon = PRICING_TYPE_ICONS[type];
+                return (
+                  <SelectItem key={type} value={type}>
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+                      {PRICING_TYPE_LABELS[type]}
+                    </div>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
@@ -127,6 +146,7 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
             step="0.01"
             value={item.quantity}
             onChange={(e) => onChange(item.id, 'quantity', e.target.value)}
+            className="px-1.5 text-center text-xs"
           />
         </div>
         <div className="col-span-1">
@@ -135,12 +155,13 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
             placeholder="%"
             min="0"
             max="100"
-            step="0.01"
+            step="1"
             value={item.discount}
             onChange={(e) => onChange(item.id, 'discount', e.target.value)}
+            className="px-1.5 text-center text-xs"
           />
         </div>
-        <div className="col-span-1 flex h-9 items-center justify-end text-sm font-medium">
+        <div className="col-span-2 flex h-9 items-center justify-end font-mono text-sm tabular-nums">
           {formatCurrency(total)}
         </div>
         <div className="col-span-1 flex justify-end">
@@ -156,8 +177,8 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
         </div>
       </div>
 
-      {/* Mobile: stacked layout */}
-      <div className="space-y-3 rounded-lg border p-3 lg:hidden">
+      {/* Mobile/Tablet: stacked layout */}
+      <div className="space-y-3 rounded-lg border p-3 xl:hidden">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-1 pt-1">{dragHandle}</div>
           <div className="flex-1 space-y-1">
@@ -265,13 +286,13 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
             </div>
           )}
           {item.pricingType !== 'per_unit' && (
-            <div className="flex items-end justify-end pb-1 text-sm font-medium">
+            <div className="flex items-end justify-end pb-1 font-mono text-sm tabular-nums">
               {formatCurrency(total)}
             </div>
           )}
         </div>
         {item.pricingType === 'per_unit' && (
-          <div className="text-right text-sm font-medium">{formatCurrency(total)}</div>
+          <div className="text-right font-mono text-sm tabular-nums">{formatCurrency(total)}</div>
         )}
       </div>
     </div>

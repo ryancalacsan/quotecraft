@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useTransition } from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
@@ -29,6 +29,12 @@ export function EditQuoteClient({ quote, initialLineItems }: EditQuoteClientProp
   const router = useRouter();
   const [lineItems, setLineItems] = useState<LineItemData[]>(initialLineItems);
   const [isPending, startTransition] = useTransition();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Delay mounting dnd-kit until after hydration to prevent ID mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -121,17 +127,26 @@ export function EditQuoteClient({ quote, initialLineItems }: EditQuoteClientProp
     });
   }, [lineItems, quote.id, router]);
 
+  // Render without DndContext on server, with DndContext after hydration
+  const formContent = (
+    <QuoteForm
+      quote={quote}
+      lineItems={lineItems}
+      onLineItemChange={handleLineItemChange}
+      onLineItemRemove={handleLineItemRemove}
+      onLineItemAdd={handleLineItemAdd}
+    />
+  );
+
   return (
     <div className="space-y-6">
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <QuoteForm
-          quote={quote}
-          lineItems={lineItems}
-          onLineItemChange={handleLineItemChange}
-          onLineItemRemove={handleLineItemRemove}
-          onLineItemAdd={handleLineItemAdd}
-        />
-      </DndContext>
+      {isMounted ? (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          {formContent}
+        </DndContext>
+      ) : (
+        formContent
+      )}
       {lineItems.length > 0 && (
         <div className="flex justify-end">
           <Button type="button" onClick={handleSaveLineItems} disabled={isPending}>
