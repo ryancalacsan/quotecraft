@@ -76,9 +76,13 @@ export function QuoteForm({
                 placeholder="e.g. Website Redesign"
                 defaultValue={quote?.title ?? ''}
                 required
+                aria-invalid={!!fieldErrors?.title}
+                aria-describedby={fieldErrors?.title ? `${formId}-title-error` : undefined}
               />
               {fieldErrors?.title && (
-                <p className="text-destructive text-sm">{fieldErrors.title[0]}</p>
+                <p id={`${formId}-title-error`} className="text-destructive text-sm" role="alert">
+                  {fieldErrors.title[0]}
+                </p>
               )}
             </div>
             <div className="space-y-2">
@@ -89,9 +93,19 @@ export function QuoteForm({
                 placeholder="e.g. Acme Corp"
                 defaultValue={quote?.clientName ?? ''}
                 required
+                aria-invalid={!!fieldErrors?.clientName}
+                aria-describedby={
+                  fieldErrors?.clientName ? `${formId}-clientName-error` : undefined
+                }
               />
               {fieldErrors?.clientName && (
-                <p className="text-destructive text-sm">{fieldErrors.clientName[0]}</p>
+                <p
+                  id={`${formId}-clientName-error`}
+                  className="text-destructive text-sm"
+                  role="alert"
+                >
+                  {fieldErrors.clientName[0]}
+                </p>
               )}
             </div>
           </div>
@@ -105,9 +119,19 @@ export function QuoteForm({
                 type="email"
                 placeholder="client@example.com"
                 defaultValue={quote?.clientEmail ?? ''}
+                aria-invalid={!!fieldErrors?.clientEmail}
+                aria-describedby={
+                  fieldErrors?.clientEmail ? `${formId}-clientEmail-error` : undefined
+                }
               />
               {fieldErrors?.clientEmail && (
-                <p className="text-destructive text-sm">{fieldErrors.clientEmail[0]}</p>
+                <p
+                  id={`${formId}-clientEmail-error`}
+                  className="text-destructive text-sm"
+                  role="alert"
+                >
+                  {fieldErrors.clientEmail[0]}
+                </p>
               )}
             </div>
             <div className="space-y-2">
@@ -214,7 +238,11 @@ export function QuoteForm({
       )}
 
       {/* Form error */}
-      {fieldErrors?._form && <p className="text-destructive text-sm">{fieldErrors._form[0]}</p>}
+      {fieldErrors?._form && (
+        <p className="text-destructive text-sm" role="alert">
+          {fieldErrors._form[0]}
+        </p>
+      )}
 
       {/* Submit */}
       <div className="flex justify-end gap-3">

@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 
 import { getQuoteById, getLineItemsByQuoteId } from '@/lib/db/queries';
 import { EditQuoteClient } from '@/components/quote-builder/edit-quote-client';
+import { Breadcrumbs } from '@/components/shared/breadcrumbs';
 
 export default async function EditQuotePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -20,6 +21,14 @@ export default async function EditQuotePage({ params }: { params: Promise<{ id: 
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: quote.title, href: `/quotes/${quote.id}` },
+          { label: 'Edit' },
+        ]}
+      />
+
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Edit Quote</h2>
         <p className="text-muted-foreground">{quote.quoteNumber}</p>

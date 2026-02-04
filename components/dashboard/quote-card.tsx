@@ -1,7 +1,8 @@
 'use client';
 
+import { useState, useTransition } from 'react';
 import Link from 'next/link';
-import { Copy, Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Copy, Edit, Loader2, MoreHorizontal, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +29,8 @@ const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'o
 };
 
 export function QuoteCard({ quote }: { quote: Quote }) {
+  const [isPending, startTransition] = useTransition();
+  const [pendingAction, setPendingAction] = useState<'duplicate' | 'delete' | null>(null);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const shareUrl = `${appUrl}/q/${quote.shareToken}`;
 
@@ -36,14 +39,23 @@ export function QuoteCard({ quote }: { quote: Quote }) {
     toast.success('Share link copied to clipboard');
   }
 
-  async function handleDuplicate() {
-    await duplicateQuote(quote.id);
+  function handleDuplicate() {
+    setPendingAction('duplicate');
+    startTransition(async () => {
+      await duplicateQuote(quote.id);
+      toast.success('Quote duplicated');
+      setPendingAction(null);
+    });
   }
 
-  async function handleDelete() {
+  function handleDelete() {
     if (!confirm('Are you sure you want to delete this quote?')) return;
-    await deleteQuote(quote.id);
-    toast.success('Quote deleted');
+    setPendingAction('delete');
+    startTransition(async () => {
+      await deleteQuote(quote.id);
+      toast.success('Quote deleted');
+      setPendingAction(null);
+    });
   }
 
   return (
@@ -80,14 +92,26 @@ export function QuoteCard({ quote }: { quote: Quote }) {
                 <Copy className="mr-2 h-4 w-4" />
                 Copy Share Link
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDuplicate}>
-                <Copy className="mr-2 h-4 w-4" />
-                Duplicate
+              <DropdownMenuItem onClick={handleDuplicate} disabled={isPending}>
+                {pendingAction === 'duplicate' ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Copy className="mr-2 h-4 w-4" />
+                )}
+                {pendingAction === 'duplicate' ? 'Duplicating...' : 'Duplicate'}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleDelete} className="text-destructive">
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
+              <DropdownMenuItem
+                onClick={handleDelete}
+                disabled={isPending}
+                className="text-destructive"
+              >
+                {pendingAction === 'delete' ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="mr-2 h-4 w-4" />
+                )}
+                {pendingAction === 'delete' ? 'Deleting...' : 'Delete'}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

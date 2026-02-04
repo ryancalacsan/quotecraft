@@ -14,6 +14,7 @@ import { QUOTE_STATUS_LABELS, PRICING_TYPE_LABELS } from '@/lib/constants';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { QuoteStatusActions } from '@/components/quote-builder/quote-status-actions';
 import { ShareLinkCard } from '@/components/dashboard/share-link-card';
+import { Breadcrumbs } from '@/components/shared/breadcrumbs';
 
 const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   draft: 'secondary',
@@ -60,6 +61,8 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
+      <Breadcrumbs items={[{ label: 'Dashboard', href: '/dashboard' }, { label: quote.title }]} />
+
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">

@@ -14,7 +14,9 @@ import { quoteFormSchema, quoteStatusSchema } from '@/lib/validations/quote';
 
 export async function createQuote(formData: FormData) {
   const { userId } = await auth();
-  if (!userId) throw new Error('Unauthorized');
+  if (!userId) {
+    return { error: { _form: ['You must be signed in to create a quote'] } };
+  }
 
   await ensureUserExists(userId);
 
@@ -32,37 +34,50 @@ export async function createQuote(formData: FormData) {
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  const quoteNumber = await generateQuoteNumber(userId);
-  const shareToken = nanoid();
+  try {
+    const quoteNumber = await generateQuoteNumber(userId);
+    const shareToken = nanoid();
 
-  const [quote] = await db
-    .insert(quotes)
-    .values({
-      userId,
-      quoteNumber,
-      shareToken,
-      title: parsed.data.title,
-      clientName: parsed.data.clientName,
-      clientEmail: parsed.data.clientEmail || null,
-      notes: parsed.data.notes || null,
-      validUntil: parsed.data.validUntil ? new Date(parsed.data.validUntil) : null,
-      depositPercent: parsed.data.depositPercent,
-    })
-    .returning({ id: quotes.id });
+    const [quote] = await db
+      .insert(quotes)
+      .values({
+        userId,
+        quoteNumber,
+        shareToken,
+        title: parsed.data.title,
+        clientName: parsed.data.clientName,
+        clientEmail: parsed.data.clientEmail || null,
+        notes: parsed.data.notes || null,
+        validUntil: parsed.data.validUntil ? new Date(parsed.data.validUntil) : null,
+        depositPercent: parsed.data.depositPercent,
+      })
+      .returning({ id: quotes.id });
 
-  revalidatePath('/dashboard');
-  redirect(`/quotes/${quote.id}/edit`);
+    revalidatePath('/dashboard');
+    redirect(`/quotes/${quote.id}/edit`);
+  } catch (error) {
+    // Re-throw redirect errors (they're not actual errors)
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      throw error;
+    }
+    console.error('Failed to create quote:', error);
+    return { error: { _form: ['Failed to create quote. Please try again.'] } };
+  }
 }
 
 export async function updateQuote(quoteId: string, formData: FormData) {
   const { userId } = await auth();
-  if (!userId) throw new Error('Unauthorized');
+  if (!userId) {
+    return { error: { _form: ['You must be signed in to update a quote'] } };
+  }
 
   const existing = await db.query.quotes.findFirst({
     where: and(eq(quotes.id, quoteId), eq(quotes.userId, userId)),
   });
 
-  if (!existing) throw new Error('Quote not found');
+  if (!existing) {
+    return { error: { _form: ['Quote not found'] } };
+  }
   if (existing.status !== 'draft') {
     return { error: { _form: ['Only draft quotes can be edited'] } };
   }
@@ -81,21 +96,26 @@ export async function updateQuote(quoteId: string, formData: FormData) {
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  await db
-    .update(quotes)
-    .set({
-      title: parsed.data.title,
-      clientName: parsed.data.clientName,
-      clientEmail: parsed.data.clientEmail || null,
-      notes: parsed.data.notes || null,
-      validUntil: parsed.data.validUntil ? new Date(parsed.data.validUntil) : null,
-      depositPercent: parsed.data.depositPercent,
-      version: existing.version + 1,
-    })
-    .where(and(eq(quotes.id, quoteId), eq(quotes.userId, userId)));
+  try {
+    await db
+      .update(quotes)
+      .set({
+        title: parsed.data.title,
+        clientName: parsed.data.clientName,
+        clientEmail: parsed.data.clientEmail || null,
+        notes: parsed.data.notes || null,
+        validUntil: parsed.data.validUntil ? new Date(parsed.data.validUntil) : null,
+        depositPercent: parsed.data.depositPercent,
+        version: existing.version + 1,
+      })
+      .where(and(eq(quotes.id, quoteId), eq(quotes.userId, userId)));
 
-  revalidatePath('/dashboard');
-  revalidatePath(`/quotes/${quoteId}`);
+    revalidatePath('/dashboard');
+    revalidatePath(`/quotes/${quoteId}`);
+  } catch (error) {
+    console.error('Failed to update quote:', error);
+    return { error: { _form: ['Failed to save changes. Please try again.'] } };
+  }
 }
 
 export async function deleteQuote(quoteId: string) {
