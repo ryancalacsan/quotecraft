@@ -1,6 +1,24 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { cn, formatCurrency, formatDate } from '@/lib/utils';
+
+describe('cn', () => {
+  it('merges class names', () => {
+    expect(cn('foo', 'bar')).toBe('foo bar');
+  });
+
+  it('handles conditional classes', () => {
+    expect(cn('base', true && 'included', false && 'excluded')).toBe('base included');
+  });
+
+  it('merges Tailwind classes intelligently', () => {
+    expect(cn('px-2 py-1', 'px-4')).toBe('py-1 px-4');
+  });
+
+  it('handles empty inputs', () => {
+    expect(cn()).toBe('');
+  });
+});
 
 describe('formatCurrency', () => {
   it('formats USD amount with dollar sign', () => {

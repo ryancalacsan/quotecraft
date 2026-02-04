@@ -9,7 +9,14 @@ export default defineConfig({
       reporter: ['text', 'json', 'json-summary'],
       reportsDirectory: './coverage',
       include: ['lib/**/*.ts'],
-      exclude: ['lib/db/index.ts', 'lib/db/schema.ts', 'lib/stripe.ts'],
+      exclude: [
+        'lib/db/index.ts', // DB client setup
+        'lib/db/schema.ts', // Schema definitions
+        'lib/db/queries.ts', // DB queries - integration test territory
+        'lib/stripe.ts', // Stripe client setup
+        'lib/demo-seed.ts', // Demo data - not business logic
+        'lib/env.ts', // Runtime config validation
+      ],
     },
   },
   resolve: {
