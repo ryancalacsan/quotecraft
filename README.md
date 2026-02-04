@@ -152,4 +152,3 @@ This is a portfolio demo project. User registration is disabled — click "Try D
 ## License
 
 MIT
-# test
