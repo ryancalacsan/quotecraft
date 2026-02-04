@@ -1,14 +1,21 @@
 import { notFound } from 'next/navigation';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Clock, Tag, Package } from 'lucide-react';
 
 import { getQuoteByShareToken, getUserById, getLineItemsByQuoteId } from '@/lib/db/queries';
 import { calculateQuotePricing } from '@/lib/pricing';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { QUOTE_STATUS_LABELS, PRICING_TYPE_LABELS } from '@/lib/constants';
+import { QUOTE_STATUS_LABELS, PRICING_TYPE_LABELS, type PricingType } from '@/lib/constants';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { PublicQuoteActions } from './public-quote-actions';
+
+// Icons for pricing types
+const PRICING_TYPE_ICONS: Record<PricingType, React.ElementType> = {
+  hourly: Clock,
+  fixed: Tag,
+  per_unit: Package,
+};
 
 const statusVariant: Record<
   string,
@@ -47,12 +54,23 @@ export default async function PublicQuotePage({
 
   const isExpired = quote.validUntil ? new Date(quote.validUntil) < new Date() : false;
 
+  const isPaid = quote.status === 'paid';
+
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-6">
+    <div className="mx-auto max-w-4xl space-y-8 px-6 py-8">
+      {/* Paid watermark overlay */}
+      {isPaid && (
+        <div className="pointer-events-none fixed inset-0 flex items-center justify-center">
+          <span className="select-none text-[120px] font-bold uppercase tracking-[0.3em] text-jade/[0.06] rotate-[-15deg]">
+            Paid
+          </span>
+        </div>
+      )}
+
       {/* Expiration banner */}
       {isExpired && quote.validUntil && (
         <div
-          className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+          className="flex items-center gap-3 rounded-lg border border-ember/30 bg-ember/5 p-4 text-sm text-ember"
           role="alert"
         >
           <AlertTriangle className="h-5 w-5 shrink-0" aria-hidden="true" />
@@ -62,45 +80,55 @@ export default async function PublicQuotePage({
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          {user?.businessName && (
-            <p className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
-              {user.businessName}
-            </p>
-          )}
-          <h1 className="text-2xl font-bold tracking-tight">{quote.title}</h1>
-          <p className="text-muted-foreground text-sm">
-            {quote.quoteNumber} &middot; {formatDate(quote.createdAt)}
+      {/* Digital Letterhead Header */}
+      <header className="text-center space-y-4 pb-6 border-b border-border/60">
+        {user?.businessName && (
+          <p className="text-muted-foreground text-sm font-medium tracking-[0.2em] uppercase">
+            {user.businessName}
+          </p>
+        )}
+        <div className="space-y-2">
+          <p className="text-xs font-medium tracking-[0.4em] uppercase text-muted-foreground">
+            Quote
+          </p>
+          <h1 className="font-display text-3xl tracking-tight">{quote.title}</h1>
+          <p className="font-mono text-sm text-muted-foreground">
+            {quote.quoteNumber}
           </p>
         </div>
-        <Badge variant={statusVariant[quote.status] ?? 'secondary'} className="text-sm">
-          {QUOTE_STATUS_LABELS[quote.status]}
-        </Badge>
-      </div>
+        <div className="flex items-center justify-center gap-4 pt-2">
+          <span className="text-muted-foreground text-sm">
+            Issued {formatDate(quote.createdAt)}
+          </span>
+          <Badge variant={statusVariant[quote.status] ?? 'secondary'} className="text-sm">
+            {QUOTE_STATUS_LABELS[quote.status]}
+          </Badge>
+        </div>
+      </header>
 
       {/* Client info */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Prepared For</CardTitle>
+      <Card className="paper-texture">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground">
+            Prepared For
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
-            <div>
-              <dt className="text-muted-foreground">Name</dt>
-              <dd className="font-medium">{quote.clientName}</dd>
+          <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-3">
+            <div className="space-y-1">
+              <dt className="text-xs text-muted-foreground">Client</dt>
+              <dd className="font-display text-lg">{quote.clientName}</dd>
             </div>
             {quote.clientEmail && (
-              <div>
-                <dt className="text-muted-foreground">Email</dt>
+              <div className="space-y-1">
+                <dt className="text-xs text-muted-foreground">Email</dt>
                 <dd className="font-medium">{quote.clientEmail}</dd>
               </div>
             )}
             {quote.validUntil && (
-              <div>
-                <dt className="text-muted-foreground">Valid Until</dt>
-                <dd className={`font-medium ${isExpired ? 'text-red-600' : ''}`}>
+              <div className="space-y-1">
+                <dt className="text-xs text-muted-foreground">Valid Until</dt>
+                <dd className={`font-mono font-medium ${isExpired ? 'text-ember' : ''}`}>
                   {formatDate(quote.validUntil)}
                 </dd>
               </div>
@@ -110,9 +138,11 @@ export default async function PublicQuotePage({
       </Card>
 
       {/* Line items */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Line Items</CardTitle>
+      <Card className="paper-texture">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground">
+            Line Items
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {items.length === 0 ? (
@@ -122,80 +152,105 @@ export default async function PublicQuotePage({
           ) : (
             <div className="space-y-3">
               {/* Desktop table header */}
-              <div className="text-muted-foreground hidden grid-cols-12 gap-2 text-xs font-medium md:grid">
+              <div className="text-muted-foreground hidden grid-cols-12 gap-2 text-xs font-medium uppercase tracking-wide md:grid">
                 <span className="col-span-4">Description</span>
                 <span className="col-span-2">Type</span>
                 <span className="col-span-2 text-right">Rate</span>
                 <span className="col-span-1 text-right">Qty</span>
-                <span className="col-span-1 text-right">Discount</span>
+                <span className="col-span-1 text-right">Disc</span>
                 <span className="col-span-2 text-right">Total</span>
               </div>
               <Separator className="hidden md:block" />
 
-              {items.map((item, index) => (
-                <div key={item.id}>
-                  {/* Desktop row */}
-                  <div className="hidden grid-cols-12 gap-2 text-sm md:grid">
-                    <span className="col-span-4">{item.description}</span>
-                    <span className="text-muted-foreground col-span-2">
-                      {PRICING_TYPE_LABELS[item.pricingType]}
-                      {item.unit ? ` (${item.unit})` : ''}
-                    </span>
-                    <span className="col-span-2 text-right">
-                      {formatCurrency(Number(item.rate))}
-                    </span>
-                    <span className="col-span-1 text-right">{item.quantity}</span>
-                    <span className="col-span-1 text-right">
-                      {Number(item.discount) > 0 ? `${item.discount}%` : '\u2014'}
-                    </span>
-                    <span className="col-span-2 text-right font-medium">
-                      {formatCurrency(pricing.lineItemTotals[index])}
-                    </span>
-                  </div>
-                  {/* Mobile card */}
-                  <div className="space-y-1 rounded-lg border p-3 text-sm md:hidden">
-                    <div className="flex items-start justify-between">
-                      <span className="font-medium">{item.description}</span>
-                      <span className="font-semibold">
+              {items.map((item, index) => {
+                const PricingIcon = PRICING_TYPE_ICONS[item.pricingType as PricingType] || Tag;
+                return (
+                  <div key={item.id}>
+                    {/* Desktop row */}
+                    <div className="hidden grid-cols-12 gap-2 text-sm md:grid py-2 hover:bg-muted/30 rounded transition-colors">
+                      <span className="col-span-4 font-medium">{item.description}</span>
+                      <span className="text-muted-foreground col-span-2 flex items-center gap-1.5">
+                        <PricingIcon className="h-3.5 w-3.5" />
+                        {PRICING_TYPE_LABELS[item.pricingType as PricingType]}
+                        {item.unit ? ` (${item.unit})` : ''}
+                      </span>
+                      <span className="col-span-2 text-right font-mono tabular-nums">
+                        {formatCurrency(Number(item.rate))}
+                      </span>
+                      <span className="col-span-1 text-right font-mono tabular-nums">{item.quantity}</span>
+                      <span className="col-span-1 text-right font-mono tabular-nums text-muted-foreground">
+                        {Number(item.discount) > 0 ? `${item.discount}%` : '\u2014'}
+                      </span>
+                      <span className="col-span-2 text-right font-mono tabular-nums font-semibold">
                         {formatCurrency(pricing.lineItemTotals[index])}
                       </span>
                     </div>
-                    <div className="text-muted-foreground flex flex-wrap gap-x-3 text-xs">
-                      <span>
-                        {PRICING_TYPE_LABELS[item.pricingType]}
-                        {item.unit ? ` (${item.unit})` : ''}
-                      </span>
-                      <span>
-                        {formatCurrency(Number(item.rate))} × {item.quantity}
-                      </span>
-                      {Number(item.discount) > 0 && <span>{item.discount}% off</span>}
+                    {/* Mobile card */}
+                    <div className="space-y-2 rounded-lg border border-border/60 p-4 text-sm md:hidden">
+                      <div className="flex items-start justify-between">
+                        <span className="font-medium">{item.description}</span>
+                        <span className="font-mono tabular-nums font-semibold">
+                          {formatCurrency(pricing.lineItemTotals[index])}
+                        </span>
+                      </div>
+                      <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                        <span className="flex items-center gap-1">
+                          <PricingIcon className="h-3 w-3" />
+                          {PRICING_TYPE_LABELS[item.pricingType as PricingType]}
+                          {item.unit ? ` (${item.unit})` : ''}
+                        </span>
+                        <span className="font-mono">
+                          {formatCurrency(Number(item.rate))} × {item.quantity}
+                        </span>
+                        {Number(item.discount) > 0 && (
+                          <span className="text-gold font-medium">{item.discount}% off</span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               <Separator />
 
-              {/* Pricing summary */}
-              <div className="ml-auto w-full space-y-2 sm:w-64">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium">{formatCurrency(pricing.subtotal)}</span>
-                </div>
-                {quote.depositPercent > 0 && (
+              {/* Pricing summary - receipt style */}
+              <div className="ml-auto w-72 rounded-lg border border-border/60 bg-card/50 p-4 paper-texture">
+                <p className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Quote Summary
+                </p>
+                <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Deposit ({quote.depositPercent}%)</span>
-                    <span className="font-medium">{formatCurrency(pricing.depositAmount)}</span>
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span className="font-mono tabular-nums">{formatCurrency(pricing.subtotal)}</span>
                   </div>
-                )}
-                <Separator />
-                <div className="flex justify-between text-lg font-semibold">
-                  <span>{quote.depositPercent > 0 ? 'Amount Due' : 'Total'}</span>
-                  <span>
-                    {formatCurrency(
-                      quote.depositPercent > 0 ? pricing.depositAmount : pricing.subtotal,
-                    )}
-                  </span>
+                  {quote.depositPercent > 0 && (
+                    <>
+                      <Separator className="my-2" />
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Deposit ({quote.depositPercent}%)</span>
+                        <span className="font-mono tabular-nums text-gold font-medium">
+                          {formatCurrency(pricing.depositAmount)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Balance Due</span>
+                        <span className="font-mono tabular-nums">
+                          {formatCurrency(pricing.subtotal - pricing.depositAmount)}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                  <Separator className="my-2" />
+                  <div className="flex items-baseline justify-between pt-1">
+                    <span className="font-display text-base">
+                      {quote.depositPercent > 0 ? 'Amount Due' : 'Total'}
+                    </span>
+                    <span className="font-mono tabular-nums text-xl font-semibold">
+                      {formatCurrency(
+                        quote.depositPercent > 0 ? pricing.depositAmount : pricing.subtotal,
+                      )}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -205,12 +260,16 @@ export default async function PublicQuotePage({
 
       {/* Notes */}
       {quote.notes && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Notes & Terms</CardTitle>
+        <Card className="paper-texture">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground">
+              Notes & Terms
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm whitespace-pre-wrap">{quote.notes}</p>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+              {quote.notes}
+            </p>
           </CardContent>
         </Card>
       )}
