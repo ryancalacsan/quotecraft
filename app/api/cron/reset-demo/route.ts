@@ -5,7 +5,7 @@ import { db } from '@/lib/db';
 import { quotes } from '@/lib/db/schema';
 
 /**
- * Cron job to clean up all demo session data.
+ * Cron job to clean up all demo session data (runs daily at 2am UTC).
  * Deletes all quotes with a demoSessionId (cascade deletes line items).
  * Fresh data is seeded when users start a new demo session.
  */
