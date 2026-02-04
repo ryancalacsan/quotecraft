@@ -1,7 +1,7 @@
 'use client';
 
-import { useActionState, useId } from 'react';
-import { Plus } from 'lucide-react';
+import { useActionState, useId, useState } from 'react';
+import { HelpCircle, ListPlus, Plus } from 'lucide-react';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import { Button } from '@/components/ui/button';
@@ -10,12 +10,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { EmptyState } from '@/components/shared/empty-state';
 import { LineItemRow, type LineItemData } from './line-item-row';
 import { PricingSummary } from './pricing-summary';
 import { calculateQuotePricing } from '@/lib/pricing';
 import { createQuote, updateQuote } from '@/app/actions/quotes';
 import type { Quote } from '@/lib/db/schema';
-import { useState } from 'react';
 
 interface QuoteFormProps {
   quote?: Quote;
@@ -192,7 +193,33 @@ export function QuoteForm({
               <>
                 <div className="text-muted-foreground hidden grid-cols-12 gap-2 text-xs font-medium lg:grid">
                   <span className="col-span-3">Description</span>
-                  <span className="col-span-2">Pricing Type</span>
+                  <span className="col-span-2 flex items-center gap-1">
+                    Pricing Type
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          <HelpCircle className="h-3 w-3" />
+                          <span className="sr-only">Pricing type help</span>
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs">
+                        <ul className="space-y-1">
+                          <li>
+                            <strong>Hourly:</strong> Charge by the hour
+                          </li>
+                          <li>
+                            <strong>Fixed:</strong> One-time flat fee
+                          </li>
+                          <li>
+                            <strong>Per Unit:</strong> Charge per unit (e.g., per page)
+                          </li>
+                        </ul>
+                      </TooltipContent>
+                    </Tooltip>
+                  </span>
                   <span className="col-span-2">Rate</span>
                   <span className="col-span-1">Qty</span>
                   <span className="col-span-1">Discount</span>
@@ -204,9 +231,18 @@ export function QuoteForm({
             )}
 
             {lineItems.length === 0 ? (
-              <p className="text-muted-foreground py-8 text-center text-sm">
-                No line items yet. Click &quot;Add Item&quot; to get started.
-              </p>
+              <EmptyState
+                icon={<ListPlus />}
+                title="No line items yet"
+                description="Add services, products, or fees to build your quote. Each item can have its own pricing type and discount."
+                action={
+                  <Button type="button" variant="outline" onClick={onLineItemAdd}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Your First Item
+                  </Button>
+                }
+                className="py-12"
+              />
             ) : (
               <SortableContext
                 items={lineItems.map((item) => item.id)}

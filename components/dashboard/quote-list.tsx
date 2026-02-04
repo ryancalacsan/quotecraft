@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { FileText } from 'lucide-react';
+import { FileText, Search } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/shared/empty-state';
 import { QuoteCard } from './quote-card';
 import { QUOTE_STATUSES, QUOTE_STATUS_LABELS } from '@/lib/constants';
 import type { Quote } from '@/lib/db/schema';
@@ -37,22 +38,24 @@ export function QuoteList({ quotes }: { quotes: Quote[] }) {
 
       {/* Quote list or empty state */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16">
-          <FileText className="text-muted-foreground mb-4 h-12 w-12" />
-          <h3 className="mb-2 text-lg font-medium">
-            {quotes.length === 0 ? 'No quotes yet' : 'No matching quotes'}
-          </h3>
-          <p className="text-muted-foreground mb-4 text-sm">
-            {quotes.length === 0
-              ? 'Create your first quote to get started.'
-              : 'Try a different filter.'}
-          </p>
-          {quotes.length === 0 && (
-            <Link href="/quotes/new">
-              <Button>Create Quote</Button>
-            </Link>
-          )}
-        </div>
+        quotes.length === 0 ? (
+          <EmptyState
+            icon={<FileText />}
+            title="No quotes yet"
+            description="Create your first quote and start sending professional proposals to your clients."
+            action={
+              <Link href="/quotes/new">
+                <Button>Create Your First Quote</Button>
+              </Link>
+            }
+          />
+        ) : (
+          <EmptyState
+            icon={<Search />}
+            title="No matching quotes"
+            description="No quotes match the selected filter. Try selecting a different status."
+          />
+        )
       ) : (
         <div className="grid gap-4">
           {filtered.map((quote) => (

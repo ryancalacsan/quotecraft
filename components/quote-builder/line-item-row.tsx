@@ -1,6 +1,6 @@
 'use client';
 
-import { GripVertical, Trash2 } from 'lucide-react';
+import { GripVertical, HelpCircle, Trash2 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -14,9 +14,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { PRICING_TYPE_LABELS, PRICING_TYPES } from '@/lib/constants';
 import { calculateLineItemTotal } from '@/lib/pricing';
 import { formatCurrency } from '@/lib/utils';
+
+const PRICING_TYPE_DESCRIPTIONS: Record<string, string> = {
+  hourly: 'Charge by the hour (e.g., consulting, development)',
+  fixed: 'One-time flat fee for the entire item',
+  per_unit: 'Charge per unit (e.g., per page, per word)',
+};
 
 export interface LineItemData {
   id: string;
@@ -174,7 +181,27 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs">Type</Label>
+            <div className="flex items-center gap-1">
+              <Label className="text-muted-foreground text-xs">Type</Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="text-muted-foreground hover:text-foreground">
+                    <HelpCircle className="h-3 w-3" />
+                    <span className="sr-only">Pricing type help</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs">
+                  <ul className="space-y-1">
+                    {PRICING_TYPES.map((type) => (
+                      <li key={type}>
+                        <strong>{PRICING_TYPE_LABELS[type]}:</strong>{' '}
+                        {PRICING_TYPE_DESCRIPTIONS[type]}
+                      </li>
+                    ))}
+                  </ul>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <Select
               value={item.pricingType}
               onValueChange={(val) => onChange(item.id, 'pricingType', val)}

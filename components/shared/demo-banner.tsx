@@ -2,7 +2,9 @@
 
 import { useSyncExternalStore } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { X } from 'lucide-react';
+import { HelpCircle, X } from 'lucide-react';
+
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 function subscribeToCookie() {
   // No real subscription needed - cookie only changes on user action
@@ -30,7 +32,21 @@ export function DemoBanner() {
 
   return (
     <div className="relative z-50 bg-amber-500 px-4 py-2 text-center text-sm font-medium text-amber-950">
-      You&apos;re in demo mode. Data resets nightly.
+      <span className="inline-flex items-center gap-1">
+        You&apos;re in demo mode. Data resets nightly.
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button type="button" className="hover:text-amber-800">
+              <HelpCircle className="h-3.5 w-3.5" />
+              <span className="sr-only">Demo mode info</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-xs text-left">
+            This is a demo environment. All data (quotes, line items) resets daily at 2am UTC. Feel
+            free to explore — your changes won&apos;t affect other users.
+          </TooltipContent>
+        </Tooltip>
+      </span>
       <button
         onClick={handleDismiss}
         className="absolute top-1/2 right-3 -translate-y-1/2 rounded-sm p-0.5 hover:bg-amber-600/30"

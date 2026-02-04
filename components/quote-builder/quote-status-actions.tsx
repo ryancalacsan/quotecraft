@@ -1,7 +1,7 @@
 'use client';
 
 import { useTransition } from 'react';
-import { Send, CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, Loader2, Send, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -26,14 +26,22 @@ export function QuoteStatusActions({ quoteId, currentStatus }: QuoteStatusAction
     <>
       {currentStatus === 'draft' && (
         <Button size="sm" disabled={isPending} onClick={() => handleStatusChange('sent')}>
-          <Send className="mr-2 h-4 w-4" />
+          {isPending ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="mr-2 h-4 w-4" />
+          )}
           {isPending ? 'Sending...' : 'Mark as Sent'}
         </Button>
       )}
       {currentStatus === 'sent' && (
         <div className="flex gap-2">
           <Button size="sm" disabled={isPending} onClick={() => handleStatusChange('accepted')}>
-            <CheckCircle className="mr-2 h-4 w-4" />
+            {isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle className="mr-2 h-4 w-4" />
+            )}
             Accept
           </Button>
           <Button
@@ -42,7 +50,11 @@ export function QuoteStatusActions({ quoteId, currentStatus }: QuoteStatusAction
             disabled={isPending}
             onClick={() => handleStatusChange('declined')}
           >
-            <XCircle className="mr-2 h-4 w-4" />
+            {isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <XCircle className="mr-2 h-4 w-4" />
+            )}
             Decline
           </Button>
         </div>

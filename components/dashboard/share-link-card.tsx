@@ -39,8 +39,17 @@ export function ShareLinkCard({ shareToken }: ShareLinkCardProps) {
         </p>
         <div className="flex gap-2">
           <Input value={shareUrl} readOnly className="font-mono text-sm" />
-          <Button variant="outline" size="icon" onClick={handleCopy}>
-            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleCopy}
+            className={copied ? 'border-green-500 text-green-600' : ''}
+          >
+            {copied ? (
+              <Check className="animate-in zoom-in-50 h-4 w-4 duration-200" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
           </Button>
           <Button variant="outline" size="icon" asChild>
             <a href={sharePath} target="_blank" rel="noopener noreferrer">
