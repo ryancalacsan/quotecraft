@@ -1,7 +1,7 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { nanoid } from 'nanoid';
@@ -9,6 +9,7 @@ import { nanoid } from 'nanoid';
 import { db } from '@/lib/db';
 import { quotes, lineItems } from '@/lib/db/schema';
 import { ensureUserExists } from '@/lib/db/queries';
+import { getDemoSessionId } from '@/lib/demo-session';
 import { generateQuoteNumber } from '@/lib/quote-number';
 import { quoteFormSchema, quoteStatusSchema } from '@/lib/validations/quote';
 
@@ -35,13 +36,15 @@ export async function createQuote(formData: FormData) {
   }
 
   try {
-    const quoteNumber = await generateQuoteNumber(userId);
+    const demoSessionId = await getDemoSessionId(userId);
+    const quoteNumber = await generateQuoteNumber(userId, demoSessionId);
     const shareToken = nanoid();
 
     const [quote] = await db
       .insert(quotes)
       .values({
         userId,
+        demoSessionId,
         quoteNumber,
         shareToken,
         title: parsed.data.title,
@@ -71,8 +74,13 @@ export async function updateQuote(quoteId: string, formData: FormData) {
     return { error: { _form: ['You must be signed in to update a quote'] } };
   }
 
+  const demoSessionId = await getDemoSessionId(userId);
+  const sessionFilter = demoSessionId
+    ? eq(quotes.demoSessionId, demoSessionId)
+    : isNull(quotes.demoSessionId);
+
   const existing = await db.query.quotes.findFirst({
-    where: and(eq(quotes.id, quoteId), eq(quotes.userId, userId)),
+    where: and(eq(quotes.id, quoteId), eq(quotes.userId, userId), sessionFilter),
   });
 
   if (!existing) {
@@ -108,7 +116,7 @@ export async function updateQuote(quoteId: string, formData: FormData) {
         depositPercent: parsed.data.depositPercent,
         version: existing.version + 1,
       })
-      .where(and(eq(quotes.id, quoteId), eq(quotes.userId, userId)));
+      .where(and(eq(quotes.id, quoteId), eq(quotes.userId, userId), sessionFilter));
 
     revalidatePath('/dashboard');
     revalidatePath(`/quotes/${quoteId}`);
@@ -122,7 +130,14 @@ export async function deleteQuote(quoteId: string) {
   const { userId } = await auth();
   if (!userId) throw new Error('Unauthorized');
 
-  await db.delete(quotes).where(and(eq(quotes.id, quoteId), eq(quotes.userId, userId)));
+  const demoSessionId = await getDemoSessionId(userId);
+  const sessionFilter = demoSessionId
+    ? eq(quotes.demoSessionId, demoSessionId)
+    : isNull(quotes.demoSessionId);
+
+  await db
+    .delete(quotes)
+    .where(and(eq(quotes.id, quoteId), eq(quotes.userId, userId), sessionFilter));
 
   revalidatePath('/dashboard');
 }
@@ -131,8 +146,13 @@ export async function duplicateQuote(quoteId: string) {
   const { userId } = await auth();
   if (!userId) throw new Error('Unauthorized');
 
+  const demoSessionId = await getDemoSessionId(userId);
+  const sessionFilter = demoSessionId
+    ? eq(quotes.demoSessionId, demoSessionId)
+    : isNull(quotes.demoSessionId);
+
   const existing = await db.query.quotes.findFirst({
-    where: and(eq(quotes.id, quoteId), eq(quotes.userId, userId)),
+    where: and(eq(quotes.id, quoteId), eq(quotes.userId, userId), sessionFilter),
   });
 
   if (!existing) throw new Error('Quote not found');
@@ -141,13 +161,14 @@ export async function duplicateQuote(quoteId: string) {
     where: eq(lineItems.quoteId, quoteId),
   });
 
-  const quoteNumber = await generateQuoteNumber(userId);
+  const quoteNumber = await generateQuoteNumber(userId, demoSessionId);
   const shareToken = nanoid();
 
   const [newQuote] = await db
     .insert(quotes)
     .values({
       userId,
+      demoSessionId,
       quoteNumber,
       shareToken,
       title: `${existing.title} (Copy)`,
@@ -187,8 +208,13 @@ export async function updateQuoteStatus(quoteId: string, status: string) {
   const parsed = quoteStatusSchema.safeParse(status);
   if (!parsed.success) throw new Error('Invalid quote status');
 
+  const demoSessionId = await getDemoSessionId(userId);
+  const sessionFilter = demoSessionId
+    ? eq(quotes.demoSessionId, demoSessionId)
+    : isNull(quotes.demoSessionId);
+
   const existing = await db.query.quotes.findFirst({
-    where: and(eq(quotes.id, quoteId), eq(quotes.userId, userId)),
+    where: and(eq(quotes.id, quoteId), eq(quotes.userId, userId), sessionFilter),
   });
 
   if (!existing) throw new Error('Quote not found');
@@ -196,7 +222,7 @@ export async function updateQuoteStatus(quoteId: string, status: string) {
   await db
     .update(quotes)
     .set({ status: parsed.data })
-    .where(and(eq(quotes.id, quoteId), eq(quotes.userId, userId)));
+    .where(and(eq(quotes.id, quoteId), eq(quotes.userId, userId), sessionFilter));
 
   revalidatePath('/dashboard');
   revalidatePath(`/quotes/${quoteId}`);

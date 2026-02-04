@@ -57,6 +57,9 @@ export const quotes = pgTable(
 
     // Public sharing
     shareToken: text('share_token').unique().notNull(),
+
+    // Demo session isolation (null for real users)
+    demoSessionId: text('demo_session_id'),
   },
   (table) => [
     check(
@@ -66,6 +69,7 @@ export const quotes = pgTable(
     index('quotes_user_id_idx').on(table.userId),
     index('quotes_share_token_idx').on(table.shareToken),
     index('quotes_status_idx').on(table.status),
+    index('quotes_demo_session_idx').on(table.demoSessionId),
   ],
 );
 

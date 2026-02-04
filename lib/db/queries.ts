@@ -1,5 +1,5 @@
 import { currentUser } from '@clerk/nextjs/server';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 
 import { db } from '.';
 import { users, quotes, lineItems } from './schema';
@@ -30,17 +30,39 @@ export async function ensureUserExists(userId: string) {
   return newUser ?? (await db.query.users.findFirst({ where: eq(users.id, userId) }));
 }
 
-export async function getQuotesByUserId(userId: string) {
+/**
+ * Fetches quotes for a user, filtering by demo session if applicable.
+ * - Real users (demoSessionId = null): only see quotes with null demoSessionId
+ * - Demo users with session: only see quotes matching their session
+ * - Demo users without session (cookie expired): see no quotes
+ */
+export async function getQuotesByUserId(userId: string, demoSessionId: string | null = null) {
+  const sessionFilter = demoSessionId
+    ? eq(quotes.demoSessionId, demoSessionId)
+    : isNull(quotes.demoSessionId);
+
   return db.query.quotes.findMany({
-    where: eq(quotes.userId, userId),
+    where: and(eq(quotes.userId, userId), sessionFilter),
     orderBy: (quotes, { desc }) => [desc(quotes.createdAt)],
   });
 }
 
-/** Fetches a quote only if it belongs to the given user. */
-export async function getQuoteById(quoteId: string, userId: string) {
+/**
+ * Fetches a quote only if it belongs to the given user and matches the session.
+ * - Real users: only see quotes with null demoSessionId
+ * - Demo users: only see quotes matching their session
+ */
+export async function getQuoteById(
+  quoteId: string,
+  userId: string,
+  demoSessionId: string | null = null,
+) {
+  const sessionFilter = demoSessionId
+    ? eq(quotes.demoSessionId, demoSessionId)
+    : isNull(quotes.demoSessionId);
+
   return db.query.quotes.findFirst({
-    where: and(eq(quotes.id, quoteId), eq(quotes.userId, userId)),
+    where: and(eq(quotes.id, quoteId), eq(quotes.userId, userId), sessionFilter),
   });
 }
 

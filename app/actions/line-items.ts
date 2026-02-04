@@ -1,33 +1,48 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 import { db } from '@/lib/db';
 import { quotes, lineItems } from '@/lib/db/schema';
+import { getDemoSessionId } from '@/lib/demo-session';
 import { lineItemSchema } from '@/lib/validations/line-item';
 
-async function verifyQuoteOwnership(quoteId: string, userId: string) {
+async function verifyQuoteOwnership(quoteId: string, userId: string, demoSessionId: string | null) {
+  const sessionFilter = demoSessionId
+    ? eq(quotes.demoSessionId, demoSessionId)
+    : isNull(quotes.demoSessionId);
+
   const quote = await db.query.quotes.findFirst({
-    where: and(eq(quotes.id, quoteId), eq(quotes.userId, userId)),
+    where: and(eq(quotes.id, quoteId), eq(quotes.userId, userId), sessionFilter),
   });
   if (!quote) throw new Error('Quote not found');
   if (quote.status !== 'draft') throw new Error('Only draft quotes can be edited');
   return quote;
 }
 
-async function bumpQuoteVersion(quoteId: string, currentVersion: number) {
+async function bumpQuoteVersion(
+  quoteId: string,
+  userId: string,
+  demoSessionId: string | null,
+  currentVersion: number,
+) {
+  const sessionFilter = demoSessionId
+    ? eq(quotes.demoSessionId, demoSessionId)
+    : isNull(quotes.demoSessionId);
+
   await db
     .update(quotes)
     .set({ version: currentVersion + 1 })
-    .where(eq(quotes.id, quoteId));
+    .where(and(eq(quotes.id, quoteId), eq(quotes.userId, userId), sessionFilter));
 }
 
 export async function addLineItem(quoteId: string, formData: FormData) {
   const { userId } = await auth();
   if (!userId) throw new Error('Unauthorized');
-  const quote = await verifyQuoteOwnership(quoteId, userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const quote = await verifyQuoteOwnership(quoteId, userId, demoSessionId);
 
   const raw = {
     description: formData.get('description'),
@@ -55,7 +70,7 @@ export async function addLineItem(quoteId: string, formData: FormData) {
     sortOrder: parsed.data.sortOrder,
   });
 
-  await bumpQuoteVersion(quoteId, quote.version);
+  await bumpQuoteVersion(quoteId, userId, demoSessionId, quote.version);
   revalidatePath(`/quotes/${quoteId}`);
   revalidatePath(`/quotes/${quoteId}/edit`);
 }
@@ -63,7 +78,8 @@ export async function addLineItem(quoteId: string, formData: FormData) {
 export async function updateLineItem(lineItemId: string, quoteId: string, formData: FormData) {
   const { userId } = await auth();
   if (!userId) throw new Error('Unauthorized');
-  const quote = await verifyQuoteOwnership(quoteId, userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const quote = await verifyQuoteOwnership(quoteId, userId, demoSessionId);
 
   const raw = {
     description: formData.get('description'),
@@ -93,7 +109,7 @@ export async function updateLineItem(lineItemId: string, quoteId: string, formDa
     })
     .where(and(eq(lineItems.id, lineItemId), eq(lineItems.quoteId, quoteId)));
 
-  await bumpQuoteVersion(quoteId, quote.version);
+  await bumpQuoteVersion(quoteId, userId, demoSessionId, quote.version);
   revalidatePath(`/quotes/${quoteId}`);
   revalidatePath(`/quotes/${quoteId}/edit`);
 }
@@ -101,13 +117,14 @@ export async function updateLineItem(lineItemId: string, quoteId: string, formDa
 export async function removeLineItem(lineItemId: string, quoteId: string) {
   const { userId } = await auth();
   if (!userId) throw new Error('Unauthorized');
-  const quote = await verifyQuoteOwnership(quoteId, userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const quote = await verifyQuoteOwnership(quoteId, userId, demoSessionId);
 
   await db
     .delete(lineItems)
     .where(and(eq(lineItems.id, lineItemId), eq(lineItems.quoteId, quoteId)));
 
-  await bumpQuoteVersion(quoteId, quote.version);
+  await bumpQuoteVersion(quoteId, userId, demoSessionId, quote.version);
   revalidatePath(`/quotes/${quoteId}`);
   revalidatePath(`/quotes/${quoteId}/edit`);
 }

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { clerkClient } from '@clerk/nextjs/server';
+import { nanoid } from 'nanoid';
 
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
@@ -60,15 +61,18 @@ export async function POST(request: NextRequest) {
       })
       .onConflictDoNothing();
 
-    // Seed demo data so the user has quotes to explore
-    await seedDemoData(demoUserId);
+    // Generate unique session ID for this demo user
+    const sessionId = nanoid();
+
+    // Seed demo data scoped to this session
+    await seedDemoData(demoUserId, sessionId);
 
     const signInToken = await client.signInTokens.createSignInToken({
       userId: demoUserId,
       expiresInSeconds: 3600, // 1 hour
     });
 
-    return NextResponse.json({ token: signInToken.token });
+    return NextResponse.json({ token: signInToken.token, sessionId });
   } catch (err) {
     console.error('Failed to create demo sign-in token:', err);
     return NextResponse.json({ error: 'Failed to start demo session' }, { status: 500 });

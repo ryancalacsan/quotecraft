@@ -27,6 +27,7 @@ export function DemoBanner() {
 
   function handleDismiss() {
     document.cookie = 'demo_mode=; path=/; max-age=0';
+    document.cookie = 'demo_session_id=; path=/; max-age=0';
     window.location.reload();
   }
 

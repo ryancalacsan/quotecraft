@@ -1,26 +1,31 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
 import { db } from './db';
 import { quotes, lineItems } from './db/schema';
 
 /**
- * Resets and re-seeds demo data for the given user.
- * Deletes all existing quotes (cascade deletes line items), then creates
- * 4 sample quotes with realistic line items in various states.
+ * Seeds demo data for a specific session.
+ * Deletes any existing quotes for this session (cascade deletes line items),
+ * then creates 4 sample quotes with realistic line items in various states.
  */
-export async function seedDemoData(demoUserId: string) {
-  // Delete all existing quotes for demo user (cascade deletes line items)
-  await db.delete(quotes).where(eq(quotes.userId, demoUserId));
+export async function seedDemoData(demoUserId: string, demoSessionId: string) {
+  // Delete existing quotes for this session only (cascade deletes line items)
+  await db
+    .delete(quotes)
+    .where(and(eq(quotes.userId, demoUserId), eq(quotes.demoSessionId, demoSessionId)));
 
   const year = new Date().getFullYear();
-  const prefix = `DEMO-${year}`;
+  // Use first 6 chars of session ID to make quote numbers unique per session
+  const sessionSnippet = demoSessionId.slice(0, 6);
+  const prefix = `DEMO-${sessionSnippet}-${year}`;
 
   // Quote 1: Draft — editable
   const [draftQuote] = await db
     .insert(quotes)
     .values({
       userId: demoUserId,
+      demoSessionId,
       quoteNumber: `${prefix}-0001`,
       shareToken: nanoid(),
       title: 'Brand Identity Package',
@@ -68,6 +73,7 @@ export async function seedDemoData(demoUserId: string) {
     .insert(quotes)
     .values({
       userId: demoUserId,
+      demoSessionId,
       quoteNumber: `${prefix}-0002`,
       shareToken: nanoid(),
       title: 'Website Redesign',
@@ -117,6 +123,7 @@ export async function seedDemoData(demoUserId: string) {
     .insert(quotes)
     .values({
       userId: demoUserId,
+      demoSessionId,
       quoteNumber: `${prefix}-0003`,
       shareToken: nanoid(),
       title: 'E-Commerce Integration',
@@ -165,6 +172,7 @@ export async function seedDemoData(demoUserId: string) {
     .insert(quotes)
     .values({
       userId: demoUserId,
+      demoSessionId,
       quoteNumber: `${prefix}-0004`,
       shareToken: nanoid(),
       title: 'SEO Audit & Optimization',

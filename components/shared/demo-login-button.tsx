@@ -41,6 +41,7 @@ export function DemoLoginButton({ variant = 'default', size = 'default' }: DemoL
       if (attempt.status === 'complete') {
         await setActive({ session: attempt.createdSessionId });
         document.cookie = 'demo_mode=true; path=/; max-age=86400';
+        document.cookie = `demo_session_id=${data.sessionId}; path=/; max-age=86400`;
         router.push('/dashboard');
       }
     } catch (err) {

@@ -2,13 +2,15 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
 import { getQuotesByUserId } from '@/lib/db/queries';
+import { getDemoSessionId } from '@/lib/demo-session';
 import { QuoteList } from '@/components/dashboard/quote-list';
 
 export default async function DashboardPage() {
   const { userId } = await auth();
   if (!userId) redirect('/sign-in');
 
-  const quotes = await getQuotesByUserId(userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const quotes = await getQuotesByUserId(userId, demoSessionId);
 
   return (
     <div className="space-y-6">

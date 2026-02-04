@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { notFound, redirect } from 'next/navigation';
 
 import { getQuoteById, getLineItemsByQuoteId } from '@/lib/db/queries';
+import { getDemoSessionId } from '@/lib/demo-session';
 import { EditQuoteClient } from '@/components/quote-builder/edit-quote-client';
 import { Breadcrumbs } from '@/components/shared/breadcrumbs';
 
@@ -10,7 +11,8 @@ export default async function EditQuotePage({ params }: { params: Promise<{ id: 
   const { userId } = await auth();
   if (!userId) redirect('/sign-in');
 
-  const quote = await getQuoteById(id, userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const quote = await getQuoteById(id, userId, demoSessionId);
   if (!quote) notFound();
 
   if (quote.status !== 'draft') {

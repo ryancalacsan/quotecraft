@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Edit } from 'lucide-react';
 
 import { getQuoteById, getLineItemsByQuoteId } from '@/lib/db/queries';
+import { getDemoSessionId } from '@/lib/demo-session';
 import { calculateQuotePricing } from '@/lib/pricing';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,7 +34,8 @@ export async function generateMetadata({
   const { userId } = await auth();
   if (!userId) return { title: 'Quote' };
 
-  const quote = await getQuoteById(id, userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const quote = await getQuoteById(id, userId, demoSessionId);
   if (!quote) return { title: 'Quote Not Found' };
 
   return {
@@ -46,7 +48,8 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
   const { userId } = await auth();
   if (!userId) redirect('/sign-in');
 
-  const quote = await getQuoteById(id, userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const quote = await getQuoteById(id, userId, demoSessionId);
   if (!quote) notFound();
 
   const items = await getLineItemsByQuoteId(id);
