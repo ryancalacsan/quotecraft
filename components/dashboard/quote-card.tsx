@@ -20,12 +20,15 @@ import { formatDate } from '@/lib/utils';
 import { deleteQuote, duplicateQuote } from '@/app/actions/quotes';
 import type { Quote } from '@/lib/db/schema';
 
-const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+const statusVariant: Record<
+  string,
+  'default' | 'secondary' | 'destructive' | 'outline' | 'gold' | 'jade' | 'ember' | 'sent'
+> = {
   draft: 'secondary',
-  sent: 'default',
-  accepted: 'default',
-  declined: 'destructive',
-  paid: 'default',
+  sent: 'sent',
+  accepted: 'jade',
+  declined: 'ember',
+  paid: 'jade',
 };
 
 export function QuoteCard({ quote }: { quote: Quote }) {
@@ -59,7 +62,7 @@ export function QuoteCard({ quote }: { quote: Quote }) {
   }
 
   return (
-    <Card>
+    <Card className="card-hover">
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
         <div className="space-y-1">
           <CardTitle className="text-base">
@@ -75,7 +78,7 @@ export function QuoteCard({ quote }: { quote: Quote }) {
           </Badge>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Quote actions">
+              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Actions for ${quote.title}`}>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -119,7 +122,7 @@ export function QuoteCard({ quote }: { quote: Quote }) {
       </CardHeader>
       <CardContent>
         <div className="text-muted-foreground flex items-center justify-between text-sm">
-          <span>{quote.quoteNumber}</span>
+          <span className="font-mono text-xs">{quote.quoteNumber}</span>
           <span>{formatDate(quote.createdAt!)}</span>
         </div>
       </CardContent>

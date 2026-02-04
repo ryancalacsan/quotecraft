@@ -10,12 +10,15 @@ import { QUOTE_STATUS_LABELS, PRICING_TYPE_LABELS } from '@/lib/constants';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { PublicQuoteActions } from './public-quote-actions';
 
-const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+const statusVariant: Record<
+  string,
+  'default' | 'secondary' | 'destructive' | 'outline' | 'gold' | 'jade' | 'ember' | 'sent'
+> = {
   draft: 'secondary',
-  sent: 'default',
-  accepted: 'default',
-  declined: 'destructive',
-  paid: 'default',
+  sent: 'sent',
+  accepted: 'jade',
+  declined: 'ember',
+  paid: 'jade',
 };
 
 export default async function PublicQuotePage({

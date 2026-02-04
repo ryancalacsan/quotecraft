@@ -1,20 +1,32 @@
 import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Instrument_Serif, DM_Sans, JetBrains_Mono } from 'next/font/google';
 
 import { Toaster } from '@/components/ui/sonner';
 
 import { DemoBanner } from '@/components/shared/demo-banner';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+// Display font - elegant serifs for headings and quote titles
+const instrumentSerif = Instrument_Serif({
+  weight: '400',
   subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+// Body font - modern, geometric, highly legible
+const dmSans = DM_Sans({
   subsets: ['latin'],
+  variable: '--font-body',
+  display: 'swap',
+});
+
+// Monospace font - for currency, quote numbers, dates (ledger feel)
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -56,7 +68,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body
+          className={`${instrumentSerif.variable} ${dmSans.variable} ${jetbrainsMono.variable} font-body antialiased`}
+        >
           <DemoBanner />
           {children}
           <Toaster />
