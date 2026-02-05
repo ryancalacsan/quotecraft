@@ -5,7 +5,13 @@ import Link from 'next/link';
 import { LayoutDashboard, Menu, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -19,6 +25,10 @@ export function MobileNav() {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-64 p-0">
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        <SheetDescription className="sr-only">
+          Main navigation links for QuoteCraft
+        </SheetDescription>
         <div className="flex h-16 items-center px-6">
           <Link href="/dashboard" className="text-xl font-bold" onClick={() => setOpen(false)}>
             QuoteCraft

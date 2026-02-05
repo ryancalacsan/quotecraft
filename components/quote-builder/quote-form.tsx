@@ -1,7 +1,9 @@
 'use client';
 
-import { useActionState, useId, useState } from 'react';
+import { useActionState, useEffect, useId, useState } from 'react';
+import Link from 'next/link';
 import { HelpCircle, ListPlus, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import { Button } from '@/components/ui/button';
@@ -58,6 +60,24 @@ export function QuoteForm({
 
   const [state, formAction, isPending] = useActionState(handleSubmit, null);
 
+  // Show toast on successful save (edit mode only)
+  useEffect(() => {
+    const stateWithSuccess = state as { success?: boolean; quoteId?: string } | null;
+    if (stateWithSuccess?.success && stateWithSuccess?.quoteId) {
+      toast.success(
+        <div className="flex items-center gap-2">
+          <span>Quote saved</span>
+          <Link
+            href={`/quotes/${stateWithSuccess.quoteId}`}
+            className="underline hover:no-underline"
+          >
+            View
+          </Link>
+        </div>,
+      );
+    }
+  }, [state]);
+
   const fieldErrors = state?.error as Record<string, string[]> | undefined;
 
   return (
@@ -70,7 +90,9 @@ export function QuoteForm({
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor={`${formId}-title`}>Title</Label>
+              <Label htmlFor={`${formId}-title`}>
+                Title <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id={`${formId}-title`}
                 name="title"
@@ -87,7 +109,9 @@ export function QuoteForm({
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor={`${formId}-clientName`}>Client Name</Label>
+              <Label htmlFor={`${formId}-clientName`}>
+                Client Name <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id={`${formId}-clientName`}
                 name="clientName"

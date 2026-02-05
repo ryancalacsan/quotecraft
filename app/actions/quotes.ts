@@ -120,6 +120,7 @@ export async function updateQuote(quoteId: string, formData: FormData) {
 
     revalidatePath('/dashboard');
     revalidatePath(`/quotes/${quoteId}`);
+    return { success: true, quoteId };
   } catch (error) {
     console.error('Failed to update quote:', error);
     return { error: { _form: ['Failed to save changes. Please try again.'] } };

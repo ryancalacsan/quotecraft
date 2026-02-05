@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-16 items-center justify-between border-b px-4 md:px-6">
           <div className="flex items-center gap-3">
             <MobileNav />
