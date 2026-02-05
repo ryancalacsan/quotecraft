@@ -32,8 +32,8 @@ export function DemoBanner() {
   }
 
   return (
-    <div className="relative z-50 bg-[#C9A96E] px-4 py-2 text-center text-sm font-medium text-[#1a1a1a]">
-      <span className="inline-flex items-center gap-1">
+    <div className="relative z-50 flex min-h-[40px] items-center justify-center bg-[#C9A96E] px-10 py-2 text-center text-sm font-medium text-[#1a1a1a]">
+      <span className="inline-flex flex-wrap items-center justify-center gap-1">
         You&apos;re in demo mode. Data resets nightly.
         <Tooltip>
           <TooltipTrigger asChild>
@@ -50,7 +50,7 @@ export function DemoBanner() {
       </span>
       <button
         onClick={handleDismiss}
-        className="absolute top-1/2 right-3 -translate-y-1/2 rounded-sm p-0.5 hover:bg-black/10"
+        className="absolute top-1/2 right-2 -translate-y-1/2 rounded-sm p-1 hover:bg-black/10"
         aria-label="Dismiss banner"
       >
         <X className="h-4 w-4" />
