@@ -3,8 +3,10 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { DM_Sans, JetBrains_Mono } from 'next/font/google';
 
 import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 import { DemoBanner } from '@/components/shared/demo-banner';
+import { ThemeProvider } from '@/components/shared/theme-provider';
 import './globals.css';
 
 // Primary font - modern, geometric, highly legible
@@ -60,11 +62,15 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body className={`${dmSans.variable} ${jetbrainsMono.variable} font-body antialiased`}>
-          <DemoBanner />
-          {children}
-          <Toaster />
+          <ThemeProvider>
+            <TooltipProvider>
+              <DemoBanner />
+              {children}
+              <Toaster />
+            </TooltipProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
