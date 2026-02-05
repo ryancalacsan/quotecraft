@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -19,7 +20,7 @@ const getServerSnapshot = () => false;
 
 export function ThemeToggle() {
   const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   if (!mounted) {
     return (
@@ -36,22 +37,26 @@ export function ThemeToggle() {
         <Button variant="ghost" size="icon" className="h-9 w-9">
           <Sun className="h-4 w-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
           <Moon className="absolute h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          <span className="sr-only">Toggle theme</span>
+          <span className="sr-only">
+            Toggle theme, current: {theme === 'system' ? 'system' : theme}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme('light')}>
-          <Sun className="mr-2 h-4 w-4" />
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
-          <Moon className="mr-2 h-4 w-4" />
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
-          <Monitor className="mr-2 h-4 w-4" />
-          System
-        </DropdownMenuItem>
+        <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+          <DropdownMenuRadioItem value="light">
+            <Sun className="mr-2 h-4 w-4" />
+            Light
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="dark">
+            <Moon className="mr-2 h-4 w-4" />
+            Dark
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="system">
+            <Monitor className="mr-2 h-4 w-4" />
+            System
+          </DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
