@@ -167,8 +167,8 @@ export async function seedDemoData(demoUserId: string, demoSessionId: string) {
     },
   ]);
 
-  // Quote 4: Paid — completed
-  const [paidQuote] = await db
+  // Quote 4: Paid — completed (recent)
+  const [paidQuote1] = await db
     .insert(quotes)
     .values({
       userId: demoUserId,
@@ -181,14 +181,14 @@ export async function seedDemoData(demoUserId: string, demoSessionId: string) {
       status: 'paid',
       notes: 'Monthly SEO reporting included for 3 months.',
       depositPercent: 0,
-      validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-      paidAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Paid 7 days ago
+      validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      paidAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // Paid 2 days ago
     })
     .returning();
 
   await db.insert(lineItems).values([
     {
-      quoteId: paidQuote.id,
+      quoteId: paidQuote1.id,
       description: 'Technical SEO Audit',
       pricingType: 'fixed' as const,
       rate: '1200.00',
@@ -197,7 +197,7 @@ export async function seedDemoData(demoUserId: string, demoSessionId: string) {
       sortOrder: 0,
     },
     {
-      quoteId: paidQuote.id,
+      quoteId: paidQuote1.id,
       description: 'On-Page Optimization',
       pricingType: 'per_unit' as const,
       unit: 'pages',
@@ -207,7 +207,7 @@ export async function seedDemoData(demoUserId: string, demoSessionId: string) {
       sortOrder: 1,
     },
     {
-      quoteId: paidQuote.id,
+      quoteId: paidQuote1.id,
       description: 'Keyword Research',
       pricingType: 'hourly' as const,
       unit: 'hours',
@@ -218,5 +218,155 @@ export async function seedDemoData(demoUserId: string, demoSessionId: string) {
     },
   ]);
 
-  return { draftQuote, sentQuote, acceptedQuote, paidQuote };
+  // Quote 5: Paid — completed (1 week ago)
+  const [paidQuote2] = await db
+    .insert(quotes)
+    .values({
+      userId: demoUserId,
+      demoSessionId,
+      quoteNumber: `${prefix}-0005`,
+      shareToken: nanoid(),
+      title: 'Mobile App UI Design',
+      clientName: 'FitTrack Health',
+      clientEmail: 'design@fittrack.io',
+      status: 'paid',
+      notes: 'iOS and Android designs included.',
+      depositPercent: 50,
+      validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      paidAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Paid 7 days ago
+    })
+    .returning();
+
+  await db.insert(lineItems).values([
+    {
+      quoteId: paidQuote2.id,
+      description: 'UI/UX Design - 12 Screens',
+      pricingType: 'fixed' as const,
+      rate: '4800.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 0,
+    },
+    {
+      quoteId: paidQuote2.id,
+      description: 'Interactive Prototype',
+      pricingType: 'fixed' as const,
+      rate: '1200.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 1,
+    },
+  ]);
+
+  // Quote 6: Paid — completed (2 weeks ago)
+  const [paidQuote3] = await db
+    .insert(quotes)
+    .values({
+      userId: demoUserId,
+      demoSessionId,
+      quoteNumber: `${prefix}-0006`,
+      shareToken: nanoid(),
+      title: 'Landing Page Development',
+      clientName: 'CloudSync Solutions',
+      clientEmail: 'web@cloudsync.com',
+      status: 'paid',
+      notes: 'Includes responsive design and contact form.',
+      depositPercent: 25,
+      validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      paidAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // Paid 14 days ago
+    })
+    .returning();
+
+  await db.insert(lineItems).values([
+    {
+      quoteId: paidQuote3.id,
+      description: 'Landing Page Design & Development',
+      pricingType: 'fixed' as const,
+      rate: '2500.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 0,
+    },
+    {
+      quoteId: paidQuote3.id,
+      description: 'SEO Setup',
+      pricingType: 'fixed' as const,
+      rate: '500.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 1,
+    },
+  ]);
+
+  // Quote 7: Paid — completed (3 weeks ago)
+  const [paidQuote4] = await db
+    .insert(quotes)
+    .values({
+      userId: demoUserId,
+      demoSessionId,
+      quoteNumber: `${prefix}-0007`,
+      shareToken: nanoid(),
+      title: 'Email Marketing Setup',
+      clientName: 'Artisan Bakery Co.',
+      clientEmail: 'info@artisanbakery.com',
+      status: 'paid',
+      notes: 'Mailchimp integration with 3 email templates.',
+      depositPercent: 0,
+      validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      paidAt: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000), // Paid 21 days ago
+    })
+    .returning();
+
+  await db.insert(lineItems).values([
+    {
+      quoteId: paidQuote4.id,
+      description: 'Mailchimp Account Setup',
+      pricingType: 'fixed' as const,
+      rate: '400.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 0,
+    },
+    {
+      quoteId: paidQuote4.id,
+      description: 'Email Template Design',
+      pricingType: 'fixed' as const,
+      rate: '350.00',
+      quantity: '3',
+      discount: '0',
+      sortOrder: 1,
+    },
+  ]);
+
+  // Quote 8: Declined — lost opportunity
+  const [declinedQuote] = await db
+    .insert(quotes)
+    .values({
+      userId: demoUserId,
+      demoSessionId,
+      quoteNumber: `${prefix}-0008`,
+      shareToken: nanoid(),
+      title: 'Corporate Video Production',
+      clientName: 'Nexus Financial',
+      clientEmail: 'marketing@nexusfinancial.com',
+      status: 'declined',
+      notes: 'Full production including scripting, filming, and editing.',
+      depositPercent: 50,
+      validUntil: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Expired
+    })
+    .returning();
+
+  await db.insert(lineItems).values([
+    {
+      quoteId: declinedQuote.id,
+      description: 'Video Production (2 min)',
+      pricingType: 'fixed' as const,
+      rate: '8000.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 0,
+    },
+  ]);
+
+  return { draftQuote, sentQuote, acceptedQuote, paidQuote: paidQuote1, declinedQuote };
 }
