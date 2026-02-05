@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { MobileNav } from '@/components/dashboard/mobile-nav';
 import { UserMenu } from '@/components/shared/user-menu';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -31,8 +32,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Button>
           </Link>
         </nav>
-        <div className="border-t p-4">
+        <div className="flex items-center justify-between border-t p-4">
           <UserMenu />
+          <ThemeToggle />
         </div>
       </aside>
 
@@ -43,13 +45,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <MobileNav />
             <UserMenu />
           </div>
-          <Link href="/quotes/new">
-            <Button size="sm" className="gap-2">
-              <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">New Quote</span>
-              <span className="sm:hidden">New</span>
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link href="/quotes/new">
+              <Button size="sm" className="gap-2">
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">New Quote</span>
+                <span className="sm:hidden">New</span>
+              </Button>
+            </Link>
+          </div>
         </header>
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
