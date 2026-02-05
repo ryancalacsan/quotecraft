@@ -16,7 +16,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "prepare": "husky"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.37.1",
@@ -53,6 +54,10 @@
       "unrs-resolver"
     ]
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,md,json,css}": "prettier --write",
+    "*.{js,jsx,ts,tsx}": "eslint --fix"
+  },
   "devDependencies": {
     "@playwright/test": "^1.58.1",
     "@tailwindcss/postcss": "^4",
@@ -65,6 +70,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4",
