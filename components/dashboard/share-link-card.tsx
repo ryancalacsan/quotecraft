@@ -1,12 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { Check, Copy, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+
+// Get window origin safely (empty string on server, actual origin on client)
+const emptySubscribe = () => () => {};
+function useWindowOrigin() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => window.location.origin,
+    () => '', // Server fallback
+  );
+}
 
 interface ShareLinkCardProps {
   shareToken: string;
@@ -15,11 +25,8 @@ interface ShareLinkCardProps {
 export function ShareLinkCard({ shareToken }: ShareLinkCardProps) {
   const [copied, setCopied] = useState(false);
   const sharePath = `/q/${shareToken}`;
-  const [shareUrl, setShareUrl] = useState(sharePath);
-
-  useEffect(() => {
-    setShareUrl(`${window.location.origin}${sharePath}`);
-  }, [sharePath]);
+  const origin = useWindowOrigin();
+  const shareUrl = origin ? `${origin}${sharePath}` : sharePath;
 
   async function handleCopy() {
     await navigator.clipboard.writeText(shareUrl);

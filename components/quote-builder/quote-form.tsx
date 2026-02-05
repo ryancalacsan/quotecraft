@@ -182,7 +182,7 @@ export function QuoteForm({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle>Line Items</CardTitle>
-            <Button type="button" variant="outline" size="sm" onClick={onLineItemAdd}>
+            <Button type="button" variant="gold" size="sm" onClick={onLineItemAdd}>
               <Plus className="mr-2 h-4 w-4" />
               Add Item
             </Button>
@@ -191,10 +191,10 @@ export function QuoteForm({
             {/* Column headers */}
             {lineItems.length > 0 && (
               <>
-                <div className="text-muted-foreground hidden grid-cols-12 gap-2 text-xs font-medium lg:grid">
+                <div className="text-muted-foreground hidden grid-cols-12 gap-2 text-xs font-medium xl:grid">
                   <span className="col-span-3">Description</span>
                   <span className="col-span-2 flex items-center gap-1">
-                    Pricing Type
+                    Type
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
@@ -222,8 +222,8 @@ export function QuoteForm({
                   </span>
                   <span className="col-span-2">Rate</span>
                   <span className="col-span-1">Qty</span>
-                  <span className="col-span-1">Discount</span>
-                  <span className="col-span-1 text-right">Total</span>
+                  <span className="col-span-1">Disc %</span>
+                  <span className="col-span-2 text-right">Total</span>
                   <span className="col-span-1" />
                 </div>
                 <Separator />
@@ -282,7 +282,7 @@ export function QuoteForm({
 
       {/* Submit */}
       <div className="flex justify-end gap-3">
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" variant="gold" disabled={isPending}>
           {isPending
             ? isEditing
               ? 'Saving...'

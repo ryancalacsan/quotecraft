@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useTransition } from 'react';
+import { useCallback, useState, useSyncExternalStore, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
@@ -20,6 +20,16 @@ import type { LineItemData } from './line-item-row';
 import { addLineItem, updateLineItem, removeLineItem } from '@/app/actions/line-items';
 import type { Quote } from '@/lib/db/schema';
 
+// Client-only state to detect hydration completion (React 18+ pattern)
+const emptySubscribe = () => () => {};
+function useIsMounted() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true, // Client: always true after hydration
+    () => false, // Server: always false
+  );
+}
+
 interface EditQuoteClientProps {
   quote: Quote;
   initialLineItems: LineItemData[];
@@ -29,6 +39,7 @@ export function EditQuoteClient({ quote, initialLineItems }: EditQuoteClientProp
   const router = useRouter();
   const [lineItems, setLineItems] = useState<LineItemData[]>(initialLineItems);
   const [isPending, startTransition] = useTransition();
+  const isMounted = useIsMounted();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -121,17 +132,26 @@ export function EditQuoteClient({ quote, initialLineItems }: EditQuoteClientProp
     });
   }, [lineItems, quote.id, router]);
 
+  // Render without DndContext on server, with DndContext after hydration
+  const formContent = (
+    <QuoteForm
+      quote={quote}
+      lineItems={lineItems}
+      onLineItemChange={handleLineItemChange}
+      onLineItemRemove={handleLineItemRemove}
+      onLineItemAdd={handleLineItemAdd}
+    />
+  );
+
   return (
     <div className="space-y-6">
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <QuoteForm
-          quote={quote}
-          lineItems={lineItems}
-          onLineItemChange={handleLineItemChange}
-          onLineItemRemove={handleLineItemRemove}
-          onLineItemAdd={handleLineItemAdd}
-        />
-      </DndContext>
+      {isMounted ? (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          {formContent}
+        </DndContext>
+      ) : (
+        formContent
+      )}
       {lineItems.length > 0 && (
         <div className="flex justify-end">
           <Button type="button" onClick={handleSaveLineItems} disabled={isPending}>

@@ -17,12 +17,15 @@ import { QuoteStatusActions } from '@/components/quote-builder/quote-status-acti
 import { ShareLinkCard } from '@/components/dashboard/share-link-card';
 import { Breadcrumbs } from '@/components/shared/breadcrumbs';
 
-const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+const statusVariant: Record<
+  string,
+  'default' | 'secondary' | 'destructive' | 'outline' | 'gold' | 'jade' | 'ember' | 'sent'
+> = {
   draft: 'secondary',
-  sent: 'default',
-  accepted: 'default',
-  declined: 'destructive',
-  paid: 'default',
+  sent: 'sent',
+  accepted: 'jade',
+  declined: 'ember',
+  paid: 'jade',
 };
 
 export async function generateMetadata({

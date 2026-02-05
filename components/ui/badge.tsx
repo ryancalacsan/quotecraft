@@ -17,6 +17,12 @@ const badgeVariants = cva(
           'border-border text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
         ghost: '[a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 [a&]:hover:underline',
+        // Refined Finance variants
+        gold: 'bg-gold/15 text-gold border-gold/30 [a&]:hover:bg-gold/25',
+        jade: 'bg-jade/15 text-jade border-jade/30 [a&]:hover:bg-jade/25',
+        ember: 'bg-ember/15 text-ember border-ember/30 [a&]:hover:bg-ember/25',
+        // Sent status with subtle pulse animation
+        sent: 'bg-primary/10 text-primary border-primary/20 animate-pulse',
       },
     },
     defaultVariants: {

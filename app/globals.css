@@ -6,8 +6,17 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Typography - Simplified 2-font system */
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+  --font-sans: var(--font-body);
+  /* Gold accent colors */
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-jade: var(--jade);
+  --color-jade-foreground: var(--jade-foreground);
+  --color-ember: var(--ember);
+  --color-ember-foreground: var(--ember-foreground);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,71 +57,95 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Refined Finance palette - Light mode */
+  --background: oklch(0.985 0.005 80); /* Warm off-white, like premium paper */
+  --foreground: oklch(0.15 0.01 260); /* Near-black with subtle blue (ink) */
+  --card: oklch(0.99 0.003 80); /* Slightly warmer than background */
+  --card-foreground: oklch(0.15 0.01 260);
+  --popover: oklch(0.99 0.003 80);
+  --popover-foreground: oklch(0.15 0.01 260);
+  --primary: oklch(0.18 0.01 260); /* Deep ink for primary actions */
+  --primary-foreground: oklch(0.985 0.005 80);
+  --secondary: oklch(0.96 0.005 260); /* Cloud - subtle blue-gray */
+  --secondary-foreground: oklch(0.18 0.01 260);
+  --muted: oklch(0.96 0.005 260);
+  --muted-foreground: oklch(0.55 0.02 260); /* Slate - secondary text */
+  --accent: oklch(0.96 0.005 260);
+  --accent-foreground: oklch(0.18 0.01 260);
+  --destructive: oklch(0.6 0.18 25); /* Ember - warm red */
+  --border: oklch(0.9 0.01 80); /* Warm border */
+  --input: oklch(0.92 0.01 80);
+  --ring: oklch(0.75 0.12 85); /* Gold for focus rings */
+  /* Gold accent - signature differentiator */
+  --gold: oklch(0.75 0.12 85);
+  --gold-foreground: oklch(0.18 0.01 260);
+  /* Jade - success/paid state */
+  --jade: oklch(0.65 0.13 165);
+  --jade-foreground: oklch(0.98 0.01 165);
+  /* Ember - error/declined state */
+  --ember: oklch(0.6 0.18 25);
+  --ember-foreground: oklch(0.98 0.01 25);
+  /* Chart colors */
+  --chart-1: oklch(0.75 0.12 85); /* Gold */
+  --chart-2: oklch(0.65 0.13 165); /* Jade */
+  --chart-3: oklch(0.55 0.02 260); /* Slate */
+  --chart-4: oklch(0.6 0.18 25); /* Ember */
+  --chart-5: oklch(0.7 0.1 260); /* Muted blue */
+  /* Sidebar */
+  --sidebar: oklch(0.98 0.003 80);
+  --sidebar-foreground: oklch(0.15 0.01 260);
+  --sidebar-primary: oklch(0.18 0.01 260);
+  --sidebar-primary-foreground: oklch(0.985 0.005 80);
+  --sidebar-accent: oklch(0.96 0.005 260);
+  --sidebar-accent-foreground: oklch(0.18 0.01 260);
+  --sidebar-border: oklch(0.9 0.01 80);
+  --sidebar-ring: oklch(0.75 0.12 85);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
+  /* Refined Finance palette - Dark mode */
+  --background: oklch(0.14 0.01 260); /* Deep ink background */
+  --foreground: oklch(0.95 0.005 80); /* Warm off-white text */
+  --card: oklch(0.18 0.01 260); /* Slightly lighter than bg */
+  --card-foreground: oklch(0.95 0.005 80);
+  --popover: oklch(0.18 0.01 260);
+  --popover-foreground: oklch(0.95 0.005 80);
+  --primary: oklch(0.92 0.005 80); /* Light for dark mode primary */
+  --primary-foreground: oklch(0.14 0.01 260);
+  --secondary: oklch(0.24 0.01 260);
+  --secondary-foreground: oklch(0.95 0.005 80);
+  --muted: oklch(0.24 0.01 260);
+  --muted-foreground: oklch(0.65 0.02 260);
+  --accent: oklch(0.24 0.01 260);
+  --accent-foreground: oklch(0.95 0.005 80);
+  --destructive: oklch(0.65 0.18 25); /* Brighter ember for dark mode */
+  --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --ring: oklch(0.8 0.12 85); /* Brighter gold for dark mode */
+  /* Gold accent */
+  --gold: oklch(0.8 0.12 85);
+  --gold-foreground: oklch(0.14 0.01 260);
+  /* Jade */
+  --jade: oklch(0.7 0.13 165);
+  --jade-foreground: oklch(0.14 0.01 260);
+  /* Ember */
+  --ember: oklch(0.65 0.18 25);
+  --ember-foreground: oklch(0.98 0.01 25);
+  /* Chart colors - adjusted for dark mode */
+  --chart-1: oklch(0.8 0.12 85); /* Gold */
+  --chart-2: oklch(0.7 0.13 165); /* Jade */
+  --chart-3: oklch(0.65 0.02 260); /* Slate */
+  --chart-4: oklch(0.65 0.18 25); /* Ember */
+  --chart-5: oklch(0.75 0.1 260); /* Muted blue */
+  /* Sidebar */
+  --sidebar: oklch(0.16 0.01 260);
+  --sidebar-foreground: oklch(0.95 0.005 80);
+  --sidebar-primary: oklch(0.8 0.12 85); /* Gold accent */
+  --sidebar-primary-foreground: oklch(0.14 0.01 260);
+  --sidebar-accent: oklch(0.24 0.01 260);
+  --sidebar-accent-foreground: oklch(0.95 0.005 80);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.8 0.12 85);
 }
 
 @layer base {
@@ -121,5 +154,84 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Typography utilities */
+@layer utilities {
+  /* font-display now uses DM Sans with semibold weight for emphasis */
+  .font-display {
+    font-family: var(--font-body), system-ui, sans-serif;
+    font-weight: 600;
+  }
+  .font-body {
+    font-family: var(--font-body), system-ui, sans-serif;
+  }
+  .font-mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+  }
+  /* Monospace numbers for financial data */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Paper texture for cards
+     Note: Uses inline SVG data URL. If adding CSP, include: img-src 'self' data:; */
+  .paper-texture {
+    position: relative;
+  }
+  .paper-texture::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  /* Gold accent text */
+  .text-gold {
+    color: var(--gold);
+  }
+  /* Tracking for display text */
+  .tracking-display {
+    letter-spacing: 0.05em;
+  }
+  /* Animation fill mode for staggered animations */
+  .fill-mode-both {
+    animation-fill-mode: both;
+  }
+  .fill-mode-forwards {
+    animation-fill-mode: forwards;
+  }
+}
+
+/* Card hover transition */
+@layer components {
+  .card-hover {
+    transition:
+      transform 150ms ease-out,
+      box-shadow 150ms ease-out;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 8px 25px -5px rgb(0 0 0 / 0.08),
+      0 4px 10px -6px rgb(0 0 0 / 0.05);
+  }
+}
+
+/* Accessibility: Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card-hover:hover {
+    transform: none;
   }
 }
