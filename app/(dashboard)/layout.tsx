@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { UserButton } from '@clerk/nextjs';
 import { FileText, LayoutDashboard, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { MobileNav } from '@/components/dashboard/mobile-nav';
+import { UserMenu } from '@/components/shared/user-menu';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -32,10 +32,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Link>
         </nav>
         <div className="border-t p-4">
-          <div className="flex items-center gap-3">
-            <UserButton />
-            <span className="text-muted-foreground text-sm">Account</span>
-          </div>
+          <UserMenu />
         </div>
       </aside>
 
@@ -44,7 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="flex h-16 items-center justify-between border-b px-4 md:px-6">
           <div className="flex items-center gap-3">
             <MobileNav />
-            <UserButton />
+            <UserMenu />
           </div>
           <Link href="/quotes/new">
             <Button size="sm" className="gap-2">
