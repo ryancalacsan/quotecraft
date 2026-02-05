@@ -60,18 +60,18 @@ function StatCard({
 }) {
   return (
     <div
-      className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both rounded-lg border border-border/60 bg-card p-4 paper-texture"
+      className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both rounded-lg border border-border/60 bg-card p-3 sm:p-4 paper-texture"
       style={{ animationDelay: `${delay}ms`, animationDuration: '400ms' }}
     >
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <Icon className="h-4 w-4" />
-        <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
+      <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground">
+        <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+        <span className="text-[10px] sm:text-xs font-medium text-muted-foreground leading-tight">{label}</span>
       </div>
-      <div className="mt-2 flex items-baseline gap-2">
-        <span className="font-display text-2xl">{value}</span>
-        {trend === 'up' && <TrendingUp className="h-4 w-4 text-jade" />}
+      <div className="mt-1.5 sm:mt-2 flex items-baseline gap-2">
+        <span className="text-xl sm:text-2xl font-semibold">{value}</span>
+        {trend === 'up' && <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-jade" />}
       </div>
-      <p className="mt-1 text-xs text-muted-foreground">{subtext}</p>
+      <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-muted-foreground">{subtext}</p>
     </div>
   );
 }
@@ -116,7 +116,7 @@ export function StatsRow({ quotes }: StatsRowProps) {
       />
       <StatCard
         icon={Clock}
-        label="Awaiting Response"
+        label="Awaiting"
         value={animatedPending.toString()}
         subtext={pendingQuotes === 1 ? 'quote pending' : 'quotes pending'}
         delay={50}

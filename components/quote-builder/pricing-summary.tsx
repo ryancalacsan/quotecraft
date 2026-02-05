@@ -11,9 +11,9 @@ export function PricingSummary({ subtotal, depositPercent, depositAmount }: Pric
   const balanceDue = subtotal - depositAmount;
 
   return (
-    <div className="ml-auto w-72 rounded-lg border border-border/60 bg-card/50 p-4 paper-texture">
+    <div className="ml-auto w-72 rounded-lg border border-border/60 bg-card/50 p-4">
       {/* Receipt header */}
-      <p className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-muted-foreground">
+      <p className="mb-3 text-center text-sm font-medium text-muted-foreground">
         Quote Summary
       </p>
 
@@ -43,7 +43,7 @@ export function PricingSummary({ subtotal, depositPercent, depositAmount }: Pric
 
         {/* Total - prominent */}
         <div className="flex items-baseline justify-between pt-1">
-          <span className="font-display text-base">Total</span>
+          <span className="text-base font-semibold">Total</span>
           <span className="font-mono tabular-nums text-xl font-semibold">
             {formatCurrency(subtotal)}
           </span>

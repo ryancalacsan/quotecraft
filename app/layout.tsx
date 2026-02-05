@@ -1,28 +1,21 @@
 import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
-import { Instrument_Serif, DM_Sans, JetBrains_Mono } from 'next/font/google';
+import { DM_Sans, JetBrains_Mono } from 'next/font/google';
 
 import { Toaster } from '@/components/ui/sonner';
 
 import { DemoBanner } from '@/components/shared/demo-banner';
 import './globals.css';
 
-// Display font - elegant serifs for headings and quote titles
-const instrumentSerif = Instrument_Serif({
-  weight: '400',
-  subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-// Body font - modern, geometric, highly legible
+// Primary font - modern, geometric, highly legible
+// Use weight variations for hierarchy (400, 500, 600, 700)
 const dmSans = DM_Sans({
   subsets: ['latin'],
   variable: '--font-body',
   display: 'swap',
 });
 
-// Monospace font - for currency, quote numbers, dates (ledger feel)
+// Monospace font - strictly for financial numbers and quote IDs
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
@@ -69,7 +62,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body
-          className={`${instrumentSerif.variable} ${dmSans.variable} ${jetbrainsMono.variable} font-body antialiased`}
+          className={`${dmSans.variable} ${jetbrainsMono.variable} font-body antialiased`}
         >
           <DemoBanner />
           {children}

@@ -91,7 +91,7 @@ export default async function PublicQuotePage({
           <p className="text-xs font-medium tracking-[0.4em] uppercase text-muted-foreground">
             Quote
           </p>
-          <h1 className="font-display text-3xl tracking-tight">{quote.title}</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">{quote.title}</h1>
           <p className="font-mono text-sm text-muted-foreground">
             {quote.quoteNumber}
           </p>
@@ -109,7 +109,7 @@ export default async function PublicQuotePage({
       {/* Client info */}
       <Card className="paper-texture">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
             Prepared For
           </CardTitle>
         </CardHeader>
@@ -117,7 +117,7 @@ export default async function PublicQuotePage({
           <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-3">
             <div className="space-y-1">
               <dt className="text-xs text-muted-foreground">Client</dt>
-              <dd className="font-display text-lg">{quote.clientName}</dd>
+              <dd className="text-base font-semibold">{quote.clientName}</dd>
             </div>
             {quote.clientEmail && (
               <div className="space-y-1">
@@ -140,7 +140,7 @@ export default async function PublicQuotePage({
       {/* Line items */}
       <Card className="paper-texture">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
             Line Items
           </CardTitle>
         </CardHeader>
@@ -214,8 +214,8 @@ export default async function PublicQuotePage({
               <Separator />
 
               {/* Pricing summary - receipt style */}
-              <div className="ml-auto w-72 rounded-lg border border-border/60 bg-card/50 p-4 paper-texture">
-                <p className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <div className="ml-auto w-72 rounded-lg border border-border/60 bg-card/50 p-4">
+                <p className="mb-3 text-center text-sm font-medium text-muted-foreground">
                   Quote Summary
                 </p>
                 <div className="space-y-2">
@@ -242,7 +242,7 @@ export default async function PublicQuotePage({
                   )}
                   <Separator className="my-2" />
                   <div className="flex items-baseline justify-between pt-1">
-                    <span className="font-display text-base">
+                    <span className="text-base font-semibold">
                       {quote.depositPercent > 0 ? 'Amount Due' : 'Total'}
                     </span>
                     <span className="font-mono tabular-nums text-xl font-semibold">
@@ -262,7 +262,7 @@ export default async function PublicQuotePage({
       {quote.notes && (
         <Card className="paper-texture">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xs font-medium tracking-[0.15em] uppercase text-muted-foreground">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Notes & Terms
             </CardTitle>
           </CardHeader>

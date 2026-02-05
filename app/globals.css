@@ -6,8 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  /* Typography - Refined Finance */
-  --font-display: var(--font-display);
+  /* Typography - Simplified 2-font system */
   --font-body: var(--font-body);
   --font-mono: var(--font-mono);
   --font-sans: var(--font-body);
@@ -160,8 +159,10 @@
 
 /* Typography utilities */
 @layer utilities {
+  /* font-display now uses DM Sans with semibold weight for emphasis */
   .font-display {
-    font-family: var(--font-display), Georgia, serif;
+    font-family: var(--font-body), system-ui, sans-serif;
+    font-weight: 600;
   }
   .font-body {
     font-family: var(--font-body), system-ui, sans-serif;
