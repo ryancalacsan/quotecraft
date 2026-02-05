@@ -11,7 +11,9 @@ export default async function NewQuotePage() {
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
         <h2 className="text-2xl font-bold tracking-tight">New Quote</h2>
-        <p className="text-muted-foreground">Fill in the details to create a new quote.</p>
+        <p className="text-muted-foreground">
+          Enter the basic details first. You&apos;ll add line items in the next step.
+        </p>
       </div>
       <QuoteForm />
     </div>

@@ -1,18 +1,24 @@
 'use client';
 
 import { useTransition } from 'react';
-import { CheckCircle, Loader2, Send, XCircle } from 'lucide-react';
+import { CheckCircle, Loader2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { updateQuoteStatus } from '@/app/actions/quotes';
+import { SendQuoteModal } from './send-quote-modal';
 
 interface QuoteStatusActionsProps {
   quoteId: string;
   currentStatus: string;
+  shareToken: string;
 }
 
-export function QuoteStatusActions({ quoteId, currentStatus }: QuoteStatusActionsProps) {
+export function QuoteStatusActions({
+  quoteId,
+  currentStatus,
+  shareToken,
+}: QuoteStatusActionsProps) {
   const [isPending, startTransition] = useTransition();
 
   function handleStatusChange(newStatus: string) {
@@ -24,16 +30,7 @@ export function QuoteStatusActions({ quoteId, currentStatus }: QuoteStatusAction
 
   return (
     <>
-      {currentStatus === 'draft' && (
-        <Button size="sm" disabled={isPending} onClick={() => handleStatusChange('sent')}>
-          {isPending ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Send className="mr-2 h-4 w-4" />
-          )}
-          {isPending ? 'Sending...' : 'Mark as Sent'}
-        </Button>
-      )}
+      {currentStatus === 'draft' && <SendQuoteModal quoteId={quoteId} shareToken={shareToken} />}
       {currentStatus === 'sent' && (
         <div className="flex gap-2">
           <Button size="sm" disabled={isPending} onClick={() => handleStatusChange('accepted')}>

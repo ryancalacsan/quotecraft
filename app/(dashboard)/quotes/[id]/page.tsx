@@ -89,7 +89,11 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
               </Button>
             </Link>
           )}
-          <QuoteStatusActions quoteId={quote.id} currentStatus={quote.status} />
+          <QuoteStatusActions
+            quoteId={quote.id}
+            currentStatus={quote.status}
+            shareToken={quote.shareToken}
+          />
         </div>
       </div>
 
