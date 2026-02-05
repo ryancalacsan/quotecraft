@@ -174,7 +174,8 @@
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
-  /* Paper texture for cards */
+  /* Paper texture for cards
+     Note: Uses inline SVG data URL. If adding CSP, include: img-src 'self' data:; */
   .paper-texture {
     position: relative;
   }
@@ -212,5 +213,21 @@
   .card-hover:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px -5px rgb(0 0 0 / 0.08), 0 4px 10px -6px rgb(0 0 0 / 0.05);
+  }
+}
+
+/* Accessibility: Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card-hover:hover {
+    transform: none;
   }
 }

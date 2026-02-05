@@ -1,26 +1,34 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { TrendingUp, Clock, Calendar, Target } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
 import type { Quote } from '@/lib/db/schema';
 
 interface StatsRowProps {
   quotes: Quote[];
 }
 
-// Animated counter hook
+// Check if user prefers reduced motion (SSR-safe)
+const emptySubscribe = () => () => {};
+function usePrefersReducedMotion() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    () => true // Server: assume reduced motion for SSR
+  );
+}
+
+// Animated counter hook with reduced-motion support
 function useAnimatedCounter(target: number, duration = 500): number {
   const [count, setCount] = useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (target === 0) {
-      setCount(0);
-      return;
-    }
+    // Skip animation if target is 0 or user prefers reduced motion
+    if (target === 0 || prefersReducedMotion) return;
 
-    let startTime: number;
-    let animationFrame: number;
+    let startTime: number | undefined;
+    let animationFrame: number | undefined;
 
     const animate = (currentTime: number) => {
       if (!startTime) startTime = currentTime;
@@ -36,9 +44,15 @@ function useAnimatedCounter(target: number, duration = 500): number {
     };
 
     animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [target, duration]);
+    return () => {
+      if (animationFrame !== undefined) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, [target, duration, prefersReducedMotion]);
 
+  // Return target directly if reduced motion or target is 0
+  if (target === 0 || prefersReducedMotion) return target;
   return count;
 }
 

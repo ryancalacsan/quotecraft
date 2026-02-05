@@ -76,6 +76,11 @@ export function PublicQuoteActions({
                         toast.error(data.error);
                         return;
                       }
+                      // Validate Stripe checkout URL for security
+                      if (!data.url || !data.url.startsWith('https://checkout.stripe.com/')) {
+                        toast.error('Invalid checkout URL received');
+                        return;
+                      }
                       window.location.href = data.url;
                     });
                   }}

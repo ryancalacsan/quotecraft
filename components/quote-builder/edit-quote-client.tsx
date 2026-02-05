@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState, useTransition } from 'react';
+import { useCallback, useState, useSyncExternalStore, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
@@ -20,6 +20,16 @@ import type { LineItemData } from './line-item-row';
 import { addLineItem, updateLineItem, removeLineItem } from '@/app/actions/line-items';
 import type { Quote } from '@/lib/db/schema';
 
+// Client-only state to detect hydration completion (React 18+ pattern)
+const emptySubscribe = () => () => {};
+function useIsMounted() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,  // Client: always true after hydration
+    () => false  // Server: always false
+  );
+}
+
 interface EditQuoteClientProps {
   quote: Quote;
   initialLineItems: LineItemData[];
@@ -29,12 +39,7 @@ export function EditQuoteClient({ quote, initialLineItems }: EditQuoteClientProp
   const router = useRouter();
   const [lineItems, setLineItems] = useState<LineItemData[]>(initialLineItems);
   const [isPending, startTransition] = useTransition();
-  const [isMounted, setIsMounted] = useState(false);
-
-  // Delay mounting dnd-kit until after hydration to prevent ID mismatch
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const isMounted = useIsMounted();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
