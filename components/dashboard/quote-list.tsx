@@ -21,13 +21,14 @@ export function QuoteList({ quotes }: { quotes: Quote[] }) {
   return (
     <div className="space-y-6">
       {/* Status filter tabs */}
-      <div className="flex gap-2 overflow-x-auto">
+      <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
         {FILTER_OPTIONS.map((status) => (
           <Button
             key={status}
             variant={filter === status ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter(status)}
+            className="w-full sm:w-auto"
           >
             {status === 'all' ? 'All' : QUOTE_STATUS_LABELS[status]}
             {status === 'all'
