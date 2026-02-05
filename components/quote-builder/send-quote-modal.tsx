@@ -42,30 +42,48 @@ export function SendQuoteModal({ quoteId, shareToken }: SendQuoteModalProps) {
   const shareUrl = origin ? `${origin}${sharePath}` : sharePath;
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    toast.success('Link copied to clipboard');
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      toast.success('Link copied to clipboard');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+      toast.error('Failed to copy link. Please copy manually.');
+    }
   }
 
   function handleSend() {
     startTransition(async () => {
-      // Copy link to clipboard first
-      await navigator.clipboard.writeText(shareUrl);
+      try {
+        // Update status first - this is the critical action
+        await updateQuoteStatus(quoteId, 'sent');
 
-      // Update status
-      await updateQuoteStatus(quoteId, 'sent');
+        // Then try to copy (best effort)
+        let clipboardSuccess = true;
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+        } catch (clipboardError) {
+          console.warn('Clipboard copy failed:', clipboardError);
+          clipboardSuccess = false;
+        }
 
-      // Close modal and show success
-      setOpen(false);
-      toast.success(
-        <div className="flex flex-col gap-1">
-          <span className="font-medium">Quote marked as sent</span>
-          <span className="text-muted-foreground text-xs">
-            Link copied — share it with your client
-          </span>
-        </div>,
-      );
+        // Close modal and show success
+        setOpen(false);
+        toast.success(
+          <div className="flex flex-col gap-1">
+            <span className="font-medium">Quote marked as sent</span>
+            <span className="text-muted-foreground text-xs">
+              {clipboardSuccess
+                ? 'Link copied — share it with your client'
+                : 'Copy the link from the quote page to share'}
+            </span>
+          </div>,
+        );
+      } catch (error) {
+        console.error('Failed to send quote:', error);
+        toast.error('Failed to mark quote as sent. Please try again.');
+      }
     });
   }
 
@@ -95,6 +113,7 @@ export function SendQuoteModal({ quoteId, shareToken }: SendQuoteModalProps) {
                 variant="outline"
                 size="icon"
                 onClick={handleCopy}
+                aria-label={copied ? 'Link copied' : 'Copy share link'}
                 className={copied ? 'border-green-500 text-green-600' : ''}
               >
                 {copied ? (
@@ -103,8 +122,8 @@ export function SendQuoteModal({ quoteId, shareToken }: SendQuoteModalProps) {
                   <Copy className="h-4 w-4" />
                 )}
               </Button>
-              <Button variant="outline" size="icon" asChild>
-                <a href={sharePath} target="_blank" rel="noopener noreferrer" title="Preview quote">
+              <Button variant="outline" size="icon" asChild aria-label="Preview quote in new tab">
+                <a href={sharePath} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="h-4 w-4" />
                 </a>
               </Button>
