@@ -1,4 +1,5 @@
 import { and, eq, gte, isNull, sql } from 'drizzle-orm';
+import Decimal from 'decimal.js';
 
 import { db } from '..';
 import { quotes, lineItems } from '../schema';
@@ -28,18 +29,27 @@ export async function getAnalytics(userId: string, demoSessionId: string | null 
     .where(and(eq(quotes.userId, userId), sessionFilter))
     .groupBy(quotes.id);
 
-  // Calculate metrics
+  // Calculate metrics using Decimal.js for monetary precision
   const paidQuotes = quotesWithTotals.filter((q) => q.status === 'paid');
   const acceptedQuotes = quotesWithTotals.filter(
     (q) => q.status === 'accepted' || q.status === 'paid',
   );
 
-  const totalRevenue = paidQuotes.reduce((sum, q) => sum + parseFloat(q.total || '0'), 0);
-  const acceptedValue = acceptedQuotes.reduce((sum, q) => sum + parseFloat(q.total || '0'), 0);
+  const totalRevenue = paidQuotes
+    .reduce((sum, q) => sum.plus(q.total || '0'), new Decimal(0))
+    .toDecimalPlaces(2)
+    .toNumber();
+  const acceptedValue = acceptedQuotes
+    .reduce((sum, q) => sum.plus(q.total || '0'), new Decimal(0))
+    .toDecimalPlaces(2)
+    .toNumber();
   const averageQuoteValue =
     quotesWithTotals.length > 0
-      ? quotesWithTotals.reduce((sum, q) => sum + parseFloat(q.total || '0'), 0) /
-        quotesWithTotals.length
+      ? quotesWithTotals
+          .reduce((sum, q) => sum.plus(q.total || '0'), new Decimal(0))
+          .dividedBy(quotesWithTotals.length)
+          .toDecimalPlaces(2)
+          .toNumber()
       : 0;
 
   // This month vs last month revenue
@@ -49,7 +59,9 @@ export async function getAnalytics(userId: string, demoSessionId: string | null 
 
   const thisMonthRevenue = paidQuotes
     .filter((q) => q.paidAt && new Date(q.paidAt) >= thisMonthStart)
-    .reduce((sum, q) => sum + parseFloat(q.total || '0'), 0);
+    .reduce((sum, q) => sum.plus(q.total || '0'), new Decimal(0))
+    .toDecimalPlaces(2)
+    .toNumber();
 
   const lastMonthRevenue = paidQuotes
     .filter((q) => {
@@ -57,7 +69,9 @@ export async function getAnalytics(userId: string, demoSessionId: string | null 
       const paidDate = new Date(q.paidAt);
       return paidDate >= lastMonthStart && paidDate < thisMonthStart;
     })
-    .reduce((sum, q) => sum + parseFloat(q.total || '0'), 0);
+    .reduce((sum, q) => sum.plus(q.total || '0'), new Decimal(0))
+    .toDecimalPlaces(2)
+    .toNumber();
 
   return {
     totalRevenue,
@@ -106,30 +120,30 @@ export async function getRevenueTimeSeries(userId: string, demoSessionId: string
     )
     .groupBy(quotes.id, quotes.paidAt);
 
-  // Create a map of date -> revenue
-  const revenueByDate = new Map<string, number>();
+  // Create a map of date -> revenue (using Decimal.js for precision)
+  const revenueByDate = new Map<string, Decimal>();
 
   // Initialize all 30 days with 0
   for (let i = 29; i >= 0; i--) {
     const date = new Date();
     date.setDate(date.getDate() - i);
     const dateStr = date.toISOString().split('T')[0];
-    revenueByDate.set(dateStr, 0);
+    revenueByDate.set(dateStr, new Decimal(0));
   }
 
   // Fill in actual revenue
   for (const quote of recentPaidQuotes) {
     if (quote.paidAt) {
       const dateStr = new Date(quote.paidAt).toISOString().split('T')[0];
-      const existing = revenueByDate.get(dateStr) || 0;
-      revenueByDate.set(dateStr, existing + parseFloat(quote.total || '0'));
+      const existing = revenueByDate.get(dateStr) || new Decimal(0);
+      revenueByDate.set(dateStr, existing.plus(quote.total || '0'));
     }
   }
 
   // Convert to array for chart
   return Array.from(revenueByDate.entries()).map(([date, revenue]) => ({
     date,
-    revenue: Math.round(revenue * 100) / 100,
+    revenue: revenue.toDecimalPlaces(2).toNumber(),
   }));
 }
 
