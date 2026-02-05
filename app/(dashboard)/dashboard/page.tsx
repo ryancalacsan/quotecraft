@@ -2,7 +2,9 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
 import { getQuotesByUserId } from '@/lib/db/queries';
+import { getAnalytics, getRevenueTimeSeries } from '@/lib/db/queries/analytics';
 import { getDemoSessionId } from '@/lib/demo-session';
+import { AnalyticsSection } from '@/components/dashboard/analytics-section';
 import { QuoteList } from '@/components/dashboard/quote-list';
 import { StatsRow } from '@/components/dashboard/stats-row';
 
@@ -11,7 +13,13 @@ export default async function DashboardPage() {
   if (!userId) redirect('/sign-in');
 
   const demoSessionId = await getDemoSessionId(userId);
-  const quotes = await getQuotesByUserId(userId, demoSessionId);
+
+  // Fetch data in parallel
+  const [quotes, analytics, revenueTimeSeries] = await Promise.all([
+    getQuotesByUserId(userId, demoSessionId),
+    getAnalytics(userId, demoSessionId),
+    getRevenueTimeSeries(userId, demoSessionId),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -23,6 +31,17 @@ export default async function DashboardPage() {
 
       {/* Stats overview row */}
       <StatsRow quotes={quotes} />
+
+      {/* Analytics charts */}
+      {quotes.length > 0 && (
+        <AnalyticsSection
+          revenueData={revenueTimeSeries}
+          totalRevenue={analytics.totalRevenue}
+          thisMonthRevenue={analytics.thisMonthRevenue}
+          revenueChange={analytics.revenueChange}
+          quotes={quotes}
+        />
+      )}
 
       {/* Quote list */}
       <QuoteList quotes={quotes} />
