@@ -68,7 +68,7 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
   const dragHandle = (
     <button
       type="button"
-      className="flex h-8 w-6 items-center justify-center rounded text-muted-foreground/50 transition-colors hover:bg-muted hover:text-foreground cursor-grab touch-none active:cursor-grabbing"
+      className="text-muted-foreground/50 hover:bg-muted hover:text-foreground flex h-8 w-6 cursor-grab touch-none items-center justify-center rounded transition-colors active:cursor-grabbing"
       aria-label="Drag to reorder line item"
       {...attributes}
       {...listeners}
@@ -100,8 +100,10 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
           >
             <SelectTrigger>
               <div className="flex items-center gap-1.5">
-                <PricingIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                <span className="truncate">{PRICING_TYPE_LABELS[item.pricingType as PricingType]}</span>
+                <PricingIcon className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">
+                  {PRICING_TYPE_LABELS[item.pricingType as PricingType]}
+                </span>
               </div>
             </SelectTrigger>
             <SelectContent>
@@ -110,7 +112,7 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
                 return (
                   <SelectItem key={type} value={type}>
                     <div className="flex items-center gap-2">
-                      <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+                      <Icon className="text-muted-foreground h-3.5 w-3.5" />
                       {PRICING_TYPE_LABELS[type]}
                     </div>
                   </SelectItem>

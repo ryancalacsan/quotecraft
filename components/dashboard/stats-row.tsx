@@ -14,7 +14,7 @@ function usePrefersReducedMotion() {
   return useSyncExternalStore(
     emptySubscribe,
     () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-    () => true // Server: assume reduced motion for SSR
+    () => true, // Server: assume reduced motion for SSR
   );
 }
 
@@ -74,18 +74,20 @@ function StatCard({
 }) {
   return (
     <div
-      className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both rounded-lg border border-border/60 bg-card p-3 sm:p-4 paper-texture"
+      className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both border-border/60 bg-card paper-texture rounded-lg border p-3 sm:p-4"
       style={{ animationDelay: `${delay}ms`, animationDuration: '400ms' }}
     >
-      <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground">
-        <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-        <span className="text-[10px] sm:text-xs font-medium text-muted-foreground leading-tight">{label}</span>
+      <div className="text-muted-foreground flex items-center gap-1.5 sm:gap-2">
+        <Icon className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+        <span className="text-muted-foreground text-[10px] leading-tight font-medium sm:text-xs">
+          {label}
+        </span>
       </div>
-      <div className="mt-1.5 sm:mt-2 flex items-baseline gap-2">
-        <span className="text-xl sm:text-2xl font-semibold">{value}</span>
-        {trend === 'up' && <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-jade" />}
+      <div className="mt-1.5 flex items-baseline gap-2 sm:mt-2">
+        <span className="text-xl font-semibold sm:text-2xl">{value}</span>
+        {trend === 'up' && <TrendingUp className="text-jade h-3.5 w-3.5 sm:h-4 sm:w-4" />}
       </div>
-      <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-muted-foreground">{subtext}</p>
+      <p className="text-muted-foreground mt-0.5 text-[10px] sm:mt-1 sm:text-xs">{subtext}</p>
     </div>
   );
 }
@@ -94,7 +96,9 @@ export function StatsRow({ quotes }: StatsRowProps) {
   // Calculate stats
   const totalQuotes = quotes.length;
   const pendingQuotes = quotes.filter((q) => q.status === 'sent').length;
-  const acceptedQuotes = quotes.filter((q) => q.status === 'accepted' || q.status === 'paid').length;
+  const acceptedQuotes = quotes.filter(
+    (q) => q.status === 'accepted' || q.status === 'paid',
+  ).length;
 
   // This month's quotes
   const now = new Date();
@@ -105,9 +109,10 @@ export function StatsRow({ quotes }: StatsRowProps) {
 
   // Conversion rate (accepted+paid / total sent+accepted+paid+declined)
   const actionedQuotes = quotes.filter((q) =>
-    ['sent', 'accepted', 'declined', 'paid'].includes(q.status)
+    ['sent', 'accepted', 'declined', 'paid'].includes(q.status),
   ).length;
-  const conversionRate = actionedQuotes > 0 ? Math.round((acceptedQuotes / actionedQuotes) * 100) : 0;
+  const conversionRate =
+    actionedQuotes > 0 ? Math.round((acceptedQuotes / actionedQuotes) * 100) : 0;
 
   // Animated values
   const animatedTotal = useAnimatedCounter(totalQuotes);

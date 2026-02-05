@@ -33,7 +33,7 @@ export default async function EditQuotePage({ params }: { params: Promise<{ id: 
 
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
         <h2 className="font-display text-2xl tracking-tight">Edit Quote</h2>
-        <p className="font-mono text-sm text-muted-foreground">{quote.quoteNumber}</p>
+        <p className="text-muted-foreground font-mono text-sm">{quote.quoteNumber}</p>
       </div>
       <EditQuoteClient
         quote={quote}

@@ -32,10 +32,10 @@ export function PublicQuoteActions({
   if (currentStatus === 'paid') {
     return (
       <Card className="border-jade/30 bg-jade/5">
-        <CardContent className="py-6 text-center space-y-2">
-          <CheckCircle className="h-8 w-8 mx-auto text-jade" />
+        <CardContent className="space-y-2 py-6 text-center">
+          <CheckCircle className="text-jade mx-auto h-8 w-8" />
           <p className="text-jade font-medium">Payment Received</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             This quote has been paid in full. Thank you for your business!
           </p>
         </CardContent>
@@ -48,13 +48,15 @@ export function PublicQuoteActions({
       <div className="space-y-3">
         <Card className="border-jade/30 bg-jade/5">
           <CardContent className="py-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
               <div className="flex items-center gap-3 text-center sm:text-left">
-                <CheckCircle className="h-6 w-6 text-jade shrink-0" />
+                <CheckCircle className="text-jade h-6 w-6 shrink-0" />
                 <div>
-                  <p className="font-medium text-jade">Quote Accepted</p>
-                  <p className="text-sm text-muted-foreground">
-                    {paymentAmount ? 'Proceed with payment to complete your order.' : 'Thank you for accepting this quote.'}
+                  <p className="text-jade font-medium">Quote Accepted</p>
+                  <p className="text-muted-foreground text-sm">
+                    {paymentAmount
+                      ? 'Proceed with payment to complete your order.'
+                      : 'Thank you for accepting this quote.'}
                   </p>
                 </div>
               </div>
@@ -93,9 +95,9 @@ export function PublicQuoteActions({
           </CardContent>
         </Card>
         {testCardInfo && paymentAmount && (
-          <div className="rounded-lg border border-border/60 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+          <div className="border-border/60 bg-muted/30 text-muted-foreground rounded-lg border px-4 py-3 text-sm">
             <span className="font-medium">Test mode</span> — use card{' '}
-            <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
+            <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs">
               4242 4242 4242 4242
             </code>
             , any future expiry, any CVC.
@@ -108,10 +110,10 @@ export function PublicQuoteActions({
   if (currentStatus === 'declined') {
     return (
       <Card className="border-ember/30 bg-ember/5">
-        <CardContent className="py-6 text-center space-y-2">
-          <XCircle className="h-8 w-8 mx-auto text-ember/70" />
+        <CardContent className="space-y-2 py-6 text-center">
+          <XCircle className="text-ember/70 mx-auto h-8 w-8" />
           <p className="text-ember font-medium">Quote Declined</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             This quote has been declined. Contact the sender if you have any questions.
           </p>
         </CardContent>
@@ -150,17 +152,12 @@ export function PublicQuoteActions({
   return (
     <Card className="paper-texture border-gold/30">
       <CardContent className="py-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-muted-foreground text-sm text-center sm:text-left">
+        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <p className="text-muted-foreground text-center text-sm sm:text-left">
             Would you like to accept or decline this quote?
           </p>
           <div className="flex gap-3">
-            <Button
-              variant="gold"
-              size="lg"
-              disabled={isPending}
-              onClick={handleAccept}
-            >
+            <Button variant="gold" size="lg" disabled={isPending} onClick={handleAccept}>
               <CheckCircle className="mr-2 h-4 w-4" />
               {isPending ? 'Processing...' : 'Accept Quote'}
             </Button>

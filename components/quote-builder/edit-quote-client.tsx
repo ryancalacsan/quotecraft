@@ -25,8 +25,8 @@ const emptySubscribe = () => () => {};
 function useIsMounted() {
   return useSyncExternalStore(
     emptySubscribe,
-    () => true,  // Client: always true after hydration
-    () => false  // Server: always false
+    () => true, // Client: always true after hydration
+    () => false, // Server: always false
   );
 }
 

@@ -61,9 +61,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body
-          className={`${dmSans.variable} ${jetbrainsMono.variable} font-body antialiased`}
-        >
+        <body className={`${dmSans.variable} ${jetbrainsMono.variable} font-body antialiased`}>
           <DemoBanner />
           {children}
           <Toaster />

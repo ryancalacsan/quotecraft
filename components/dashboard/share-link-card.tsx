@@ -14,7 +14,7 @@ function useWindowOrigin() {
   return useSyncExternalStore(
     emptySubscribe,
     () => window.location.origin,
-    () => '' // Server fallback
+    () => '', // Server fallback
   );
 }
 

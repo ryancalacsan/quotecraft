@@ -61,7 +61,7 @@ export default async function PublicQuotePage({
       {/* Paid watermark overlay */}
       {isPaid && (
         <div className="pointer-events-none fixed inset-0 flex items-center justify-center">
-          <span className="select-none text-[120px] font-bold uppercase tracking-[0.3em] text-jade/[0.06] rotate-[-15deg]">
+          <span className="text-jade/[0.06] rotate-[-15deg] text-[120px] font-bold tracking-[0.3em] uppercase select-none">
             Paid
           </span>
         </div>
@@ -70,7 +70,7 @@ export default async function PublicQuotePage({
       {/* Expiration banner */}
       {isExpired && quote.validUntil && (
         <div
-          className="flex items-center gap-3 rounded-lg border border-ember/30 bg-ember/5 p-4 text-sm text-ember"
+          className="border-ember/30 bg-ember/5 text-ember flex items-center gap-3 rounded-lg border p-4 text-sm"
           role="alert"
         >
           <AlertTriangle className="h-5 w-5 shrink-0" aria-hidden="true" />
@@ -81,20 +81,18 @@ export default async function PublicQuotePage({
       )}
 
       {/* Digital Letterhead Header */}
-      <header className="text-center space-y-4 pb-6 border-b border-border/60">
+      <header className="border-border/60 space-y-4 border-b pb-6 text-center">
         {user?.businessName && (
           <p className="text-muted-foreground text-sm font-medium tracking-[0.2em] uppercase">
             {user.businessName}
           </p>
         )}
         <div className="space-y-2">
-          <p className="text-xs font-medium tracking-[0.4em] uppercase text-muted-foreground">
+          <p className="text-muted-foreground text-xs font-medium tracking-[0.4em] uppercase">
             Quote
           </p>
           <h1 className="text-3xl font-semibold tracking-tight">{quote.title}</h1>
-          <p className="font-mono text-sm text-muted-foreground">
-            {quote.quoteNumber}
-          </p>
+          <p className="text-muted-foreground font-mono text-sm">{quote.quoteNumber}</p>
         </div>
         <div className="flex items-center justify-center gap-4 pt-2">
           <span className="text-muted-foreground text-sm">
@@ -109,25 +107,23 @@ export default async function PublicQuotePage({
       {/* Client info */}
       <Card className="paper-texture">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Prepared For
-          </CardTitle>
+          <CardTitle className="text-muted-foreground text-sm font-medium">Prepared For</CardTitle>
         </CardHeader>
         <CardContent>
           <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-3">
             <div className="space-y-1">
-              <dt className="text-xs text-muted-foreground">Client</dt>
+              <dt className="text-muted-foreground text-xs">Client</dt>
               <dd className="text-base font-semibold">{quote.clientName}</dd>
             </div>
             {quote.clientEmail && (
               <div className="space-y-1">
-                <dt className="text-xs text-muted-foreground">Email</dt>
+                <dt className="text-muted-foreground text-xs">Email</dt>
                 <dd className="font-medium">{quote.clientEmail}</dd>
               </div>
             )}
             {quote.validUntil && (
               <div className="space-y-1">
-                <dt className="text-xs text-muted-foreground">Valid Until</dt>
+                <dt className="text-muted-foreground text-xs">Valid Until</dt>
                 <dd className={`font-mono font-medium ${isExpired ? 'text-ember' : ''}`}>
                   {formatDate(quote.validUntil)}
                 </dd>
@@ -140,9 +136,7 @@ export default async function PublicQuotePage({
       {/* Line items */}
       <Card className="paper-texture">
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Line Items
-          </CardTitle>
+          <CardTitle className="text-muted-foreground text-sm font-medium">Line Items</CardTitle>
         </CardHeader>
         <CardContent>
           {items.length === 0 ? (
@@ -152,7 +146,7 @@ export default async function PublicQuotePage({
           ) : (
             <div className="space-y-3">
               {/* Desktop table header */}
-              <div className="text-muted-foreground hidden grid-cols-12 gap-2 text-xs font-medium uppercase tracking-wide md:grid">
+              <div className="text-muted-foreground hidden grid-cols-12 gap-2 text-xs font-medium tracking-wide uppercase md:grid">
                 <span className="col-span-4">Description</span>
                 <span className="col-span-2">Type</span>
                 <span className="col-span-2 text-right">Rate</span>
@@ -167,7 +161,7 @@ export default async function PublicQuotePage({
                 return (
                   <div key={item.id}>
                     {/* Desktop row */}
-                    <div className="hidden grid-cols-12 gap-2 text-sm md:grid py-2 hover:bg-muted/30 rounded transition-colors">
+                    <div className="hover:bg-muted/30 hidden grid-cols-12 gap-2 rounded py-2 text-sm transition-colors md:grid">
                       <span className="col-span-4 font-medium">{item.description}</span>
                       <span className="text-muted-foreground col-span-2 flex items-center gap-1.5">
                         <PricingIcon className="h-3.5 w-3.5" />
@@ -177,19 +171,21 @@ export default async function PublicQuotePage({
                       <span className="col-span-2 text-right font-mono tabular-nums">
                         {formatCurrency(Number(item.rate))}
                       </span>
-                      <span className="col-span-1 text-right font-mono tabular-nums">{item.quantity}</span>
-                      <span className="col-span-1 text-right font-mono tabular-nums text-muted-foreground">
+                      <span className="col-span-1 text-right font-mono tabular-nums">
+                        {item.quantity}
+                      </span>
+                      <span className="text-muted-foreground col-span-1 text-right font-mono tabular-nums">
                         {Number(item.discount) > 0 ? `${item.discount}%` : '\u2014'}
                       </span>
-                      <span className="col-span-2 text-right font-mono tabular-nums font-semibold">
+                      <span className="col-span-2 text-right font-mono font-semibold tabular-nums">
                         {formatCurrency(pricing.lineItemTotals[index])}
                       </span>
                     </div>
                     {/* Mobile card */}
-                    <div className="space-y-2 rounded-lg border border-border/60 p-4 text-sm md:hidden">
+                    <div className="border-border/60 space-y-2 rounded-lg border p-4 text-sm md:hidden">
                       <div className="flex items-start justify-between">
                         <span className="font-medium">{item.description}</span>
-                        <span className="font-mono tabular-nums font-semibold">
+                        <span className="font-mono font-semibold tabular-nums">
                           {formatCurrency(pricing.lineItemTotals[index])}
                         </span>
                       </div>
@@ -214,21 +210,25 @@ export default async function PublicQuotePage({
               <Separator />
 
               {/* Pricing summary - receipt style */}
-              <div className="ml-auto w-72 rounded-lg border border-border/60 bg-card/50 p-4">
-                <p className="mb-3 text-center text-sm font-medium text-muted-foreground">
+              <div className="border-border/60 bg-card/50 ml-auto w-72 rounded-lg border p-4">
+                <p className="text-muted-foreground mb-3 text-center text-sm font-medium">
                   Quote Summary
                 </p>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-mono tabular-nums">{formatCurrency(pricing.subtotal)}</span>
+                    <span className="font-mono tabular-nums">
+                      {formatCurrency(pricing.subtotal)}
+                    </span>
                   </div>
                   {quote.depositPercent > 0 && (
                     <>
                       <Separator className="my-2" />
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Deposit ({quote.depositPercent}%)</span>
-                        <span className="font-mono tabular-nums text-gold font-medium">
+                        <span className="text-muted-foreground">
+                          Deposit ({quote.depositPercent}%)
+                        </span>
+                        <span className="text-gold font-mono font-medium tabular-nums">
                           {formatCurrency(pricing.depositAmount)}
                         </span>
                       </div>
@@ -245,7 +245,7 @@ export default async function PublicQuotePage({
                     <span className="text-base font-semibold">
                       {quote.depositPercent > 0 ? 'Amount Due' : 'Total'}
                     </span>
-                    <span className="font-mono tabular-nums text-xl font-semibold">
+                    <span className="font-mono text-xl font-semibold tabular-nums">
                       {formatCurrency(
                         quote.depositPercent > 0 ? pricing.depositAmount : pricing.subtotal,
                       )}
@@ -262,12 +262,12 @@ export default async function PublicQuotePage({
       {quote.notes && (
         <Card className="paper-texture">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardTitle className="text-muted-foreground text-sm font-medium">
               Notes & Terms
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap">
               {quote.notes}
             </p>
           </CardContent>
