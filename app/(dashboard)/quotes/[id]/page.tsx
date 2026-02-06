@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Edit } from 'lucide-react';
+import { Edit, Download } from 'lucide-react';
 
 import { getQuoteById, getLineItemsByQuoteId } from '@/lib/db/queries';
 import { getDemoSessionId } from '@/lib/demo-session';
@@ -81,6 +81,12 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
           <p className="text-muted-foreground">{quote.quoteNumber}</p>
         </div>
         <div className="flex items-center gap-2">
+          <a href={`/api/quotes/${quote.id}/pdf`} target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              Download PDF
+            </Button>
+          </a>
           {quote.status === 'draft' && (
             <Link href={`/quotes/${quote.id}/edit`}>
               <Button variant="outline" size="sm">

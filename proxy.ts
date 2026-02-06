@@ -9,6 +9,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/checkout', // Stripe checkout session creation (public clients pay)
   '/api/demo/login', // Demo sign-in token endpoint
   '/api/cron/(.*)', // Cron jobs (authenticated via CRON_SECRET header)
+  '/api/quotes/(.*)/pdf', // PDF export (auth checked in route)
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
