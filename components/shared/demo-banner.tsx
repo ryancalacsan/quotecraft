@@ -1,10 +1,12 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { HelpCircle, X } from 'lucide-react';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+
+const BANNER_HIDDEN_KEY = 'demo_banner_hidden';
 
 function subscribeToCookie() {
   // No real subscription needed - cookie only changes on user action
@@ -22,13 +24,16 @@ function getServerSnapshot() {
 export function DemoBanner() {
   const { user } = useUser();
   const isDemoMode = useSyncExternalStore(subscribeToCookie, getSnapshot, getServerSnapshot);
+  const [isHidden, setIsHidden] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem(BANNER_HIDDEN_KEY) === 'true';
+  });
 
-  if (!isDemoMode || !user) return null;
+  if (!isDemoMode || !user || isHidden) return null;
 
   function handleDismiss() {
-    document.cookie = 'demo_mode=; path=/; max-age=0';
-    document.cookie = 'demo_session_id=; path=/; max-age=0';
-    window.location.reload();
+    sessionStorage.setItem(BANNER_HIDDEN_KEY, 'true');
+    setIsHidden(true);
   }
 
   return (
