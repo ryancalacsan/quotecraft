@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation';
-import { AlertTriangle, Clock, Tag, Package } from 'lucide-react';
+import { AlertTriangle, Clock, Tag, Package, Download } from 'lucide-react';
 
 import { getQuoteByShareToken, getUserById, getLineItemsByQuoteId } from '@/lib/db/queries';
 import { calculateQuotePricing } from '@/lib/pricing';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { QUOTE_STATUS_LABELS, PRICING_TYPE_LABELS, type PricingType } from '@/lib/constants';
@@ -101,6 +102,18 @@ export default async function PublicQuotePage({
           <Badge variant={statusVariant[quote.status] ?? 'secondary'} className="text-sm">
             {QUOTE_STATUS_LABELS[quote.status]}
           </Badge>
+        </div>
+        <div className="pt-4">
+          <a
+            href={`/api/quotes/${quote.id}/pdf?token=${shareToken}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              Download PDF
+            </Button>
+          </a>
         </div>
       </header>
 

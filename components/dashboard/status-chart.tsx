@@ -1,6 +1,6 @@
 'use client';
 
-import { Pie, PieChart, Cell, ResponsiveContainer } from 'recharts';
+import { Pie, PieChart, Cell } from 'recharts';
 import { PieChart as PieChartIcon } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
