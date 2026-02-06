@@ -84,7 +84,9 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
     <div ref={setNodeRef} style={style}>
       {/* Desktop: grid layout */}
       <div className="hidden items-start gap-2 xl:grid xl:grid-cols-12">
-        <div className="col-span-3 flex items-center gap-1">
+        <div
+          className={`flex items-center gap-1 ${item.pricingType === 'per_unit' ? 'col-span-2' : 'col-span-3'}`}
+        >
           {dragHandle}
           <Input
             placeholder="Description"
@@ -130,7 +132,7 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
             />
           </div>
         )}
-        <div className={item.pricingType === 'per_unit' ? 'col-span-1' : 'col-span-2'}>
+        <div className="col-span-2">
           <Input
             type="number"
             placeholder="Rate"

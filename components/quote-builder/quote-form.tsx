@@ -81,7 +81,7 @@ export function QuoteForm({
   const fieldErrors = state?.error as Record<string, string[]> | undefined;
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} className="space-y-6" noValidate>
       {/* Quote details */}
       <Card>
         <CardHeader>
@@ -98,7 +98,6 @@ export function QuoteForm({
                 name="title"
                 placeholder="e.g. Website Redesign"
                 defaultValue={quote?.title ?? ''}
-                required
                 aria-invalid={!!fieldErrors?.title}
                 aria-describedby={fieldErrors?.title ? `${formId}-title-error` : undefined}
               />
@@ -117,7 +116,6 @@ export function QuoteForm({
                 name="clientName"
                 placeholder="e.g. Acme Corp"
                 defaultValue={quote?.clientName ?? ''}
-                required
                 aria-invalid={!!fieldErrors?.clientName}
                 aria-describedby={
                   fieldErrors?.clientName ? `${formId}-clientName-error` : undefined
