@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { AlertTriangle, Clock, Tag, Package, Download } from 'lucide-react';
+import Decimal from 'decimal.js';
 
 import { getQuoteByShareToken, getUserById, getLineItemsByQuoteId } from '@/lib/db/queries';
 import { calculateQuotePricing } from '@/lib/pricing';
@@ -248,7 +249,9 @@ export default async function PublicQuotePage({
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Balance Due</span>
                         <span className="font-mono tabular-nums">
-                          {formatCurrency(pricing.subtotal - pricing.depositAmount)}
+                          {formatCurrency(
+                            new Decimal(pricing.subtotal).minus(pricing.depositAmount).toNumber(),
+                          )}
                         </span>
                       </div>
                     </>

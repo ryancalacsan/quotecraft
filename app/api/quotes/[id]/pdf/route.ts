@@ -68,6 +68,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       getUserById(quote.userId),
     ]);
 
+    // Validate quote has line items
+    if (lineItems.length === 0) {
+      return NextResponse.json(
+        { error: 'Cannot generate PDF for quote with no line items' },
+        { status: 400 },
+      );
+    }
+
     // Calculate pricing
     const pricing = calculateQuotePricing(
       lineItems.map((item) => ({
