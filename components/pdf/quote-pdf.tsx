@@ -1,4 +1,5 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import Decimal from 'decimal.js';
 
 import { QUOTE_STATUS_LABELS, PRICING_TYPE_LABELS, type PricingType } from '@/lib/constants';
 import type { Quote, LineItem, User } from '@/lib/db/schema';
@@ -408,7 +409,9 @@ export function QuotePDF({ quote, lineItems, pricing, user }: QuotePDFProps) {
                   <View style={styles.summaryRow}>
                     <Text style={styles.summaryLabel}>Balance Due</Text>
                     <Text style={styles.summaryValue}>
-                      {formatCurrency(pricing.subtotal - pricing.depositAmount)}
+                      {formatCurrency(
+                        new Decimal(pricing.subtotal).minus(pricing.depositAmount).toNumber(),
+                      )}
                     </Text>
                   </View>
                 </>

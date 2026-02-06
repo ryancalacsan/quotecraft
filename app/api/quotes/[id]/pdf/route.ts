@@ -1,50 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { auth } from '@clerk/nextjs/server';
-import { eq } from 'drizzle-orm';
+import { z } from 'zod';
 
-import { db } from '@/lib/db';
-import { quotes } from '@/lib/db/schema';
-import { getLineItemsByQuoteId, getUserById } from '@/lib/db/queries';
+import {
+  getQuoteById,
+  getLineItemsByQuoteId,
+  getUserById,
+  getQuoteByShareToken,
+} from '@/lib/db/queries';
+import { getDemoSessionId } from '@/lib/demo-session';
 import { calculateQuotePricing } from '@/lib/pricing';
 import { QuotePDF } from '@/components/pdf/quote-pdf';
+
+// Validation schemas
+const uuidSchema = z.string().uuid();
+const shareTokenSchema = z
+  .string()
+  .min(1)
+  .max(30)
+  .regex(/^[A-Za-z0-9_-]+$/);
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: quoteId } = await params;
 
-    // Check for share token in query params (for public access)
-    const shareToken = request.nextUrl.searchParams.get('token');
-
-    // Fetch the quote directly (authorization checked separately)
-    const quote = await db.query.quotes.findFirst({
-      where: eq(quotes.id, quoteId),
-    });
-
-    if (!quote) {
-      return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
+    // Validate quote ID format
+    const idResult = uuidSchema.safeParse(quoteId);
+    if (!idResult.success) {
+      return NextResponse.json({ error: 'Invalid quote ID' }, { status: 400 });
     }
 
-    // Authorization: either authenticated owner or valid share token
-    if (shareToken) {
-      // Validate share token
-      if (quote.shareToken !== shareToken) {
-        return NextResponse.json({ error: 'Invalid share token' }, { status: 403 });
+    // Check for share token in query params (for public access)
+    const tokenParam = request.nextUrl.searchParams.get('token');
+
+    let quote;
+
+    if (tokenParam) {
+      // Validate share token format
+      const tokenResult = shareTokenSchema.safeParse(tokenParam);
+      if (!tokenResult.success) {
+        return NextResponse.json({ error: 'Invalid token format' }, { status: 400 });
+      }
+
+      // Public access via share token
+      quote = await getQuoteByShareToken(tokenResult.data);
+      if (!quote || quote.id !== quoteId) {
+        return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
       }
     } else {
-      // Require authentication
+      // Authenticated access - require login and demo session isolation
       const { userId } = await auth();
       if (!userId) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
-      if (quote.userId !== userId) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+      const demoSessionId = await getDemoSessionId(userId);
+      quote = await getQuoteById(quoteId, userId, demoSessionId);
+      if (!quote) {
+        return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
       }
     }
 
     // Fetch related data
     const [lineItems, user] = await Promise.all([
-      getLineItemsByQuoteId(quoteId),
+      getLineItemsByQuoteId(quote.id),
       getUserById(quote.userId),
     ]);
 
@@ -67,7 +87,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const filename = `QuoteCraft-${quote.quoteNumber}.pdf`;
 
     // Return PDF with proper headers
-    // Convert Buffer to Uint8Array for NextResponse compatibility
     return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
@@ -78,12 +97,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
   } catch (error) {
     console.error('PDF generation error:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to generate PDF',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 });
   }
 }
