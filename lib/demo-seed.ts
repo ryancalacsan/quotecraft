@@ -2,7 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
 import { db } from './db';
-import { quotes, lineItems } from './db/schema';
+import { quotes, lineItems, templates, templateItems } from './db/schema';
 
 /**
  * Seeds demo data for a specific session.
@@ -365,6 +365,159 @@ export async function seedDemoData(demoUserId: string, demoSessionId: string) {
       quantity: '1',
       discount: '0',
       sortOrder: 0,
+    },
+  ]);
+
+  // Delete existing templates for this user (templates are not session-scoped)
+  // Only delete if this is a demo user seeding
+  await db.delete(templates).where(eq(templates.userId, demoUserId));
+
+  // Template 1: Web Development Project
+  const [webDevTemplate] = await db
+    .insert(templates)
+    .values({
+      userId: demoUserId,
+      name: 'Web Development Project',
+      description:
+        'Standard template for website development projects with design, development, and testing phases.',
+      defaultTitle: 'Website Development',
+      defaultNotes:
+        'Payment terms: 50% deposit, 50% upon completion. Includes 30 days of post-launch support.',
+      defaultValidDays: 30,
+      defaultDepositPercent: 50,
+    })
+    .returning();
+
+  await db.insert(templateItems).values([
+    {
+      templateId: webDevTemplate.id,
+      description: 'Discovery & Planning',
+      pricingType: 'fixed' as const,
+      rate: '1500.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 0,
+    },
+    {
+      templateId: webDevTemplate.id,
+      description: 'UI/UX Design',
+      pricingType: 'fixed' as const,
+      rate: '3000.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 1,
+    },
+    {
+      templateId: webDevTemplate.id,
+      description: 'Frontend Development',
+      pricingType: 'hourly' as const,
+      unit: 'hours',
+      rate: '150.00',
+      quantity: '40',
+      discount: '0',
+      sortOrder: 2,
+    },
+    {
+      templateId: webDevTemplate.id,
+      description: 'Testing & QA',
+      pricingType: 'hourly' as const,
+      unit: 'hours',
+      rate: '100.00',
+      quantity: '10',
+      discount: '0',
+      sortOrder: 3,
+    },
+  ]);
+
+  // Template 2: Brand Identity Package
+  const [brandTemplate] = await db
+    .insert(templates)
+    .values({
+      userId: demoUserId,
+      name: 'Brand Identity Package',
+      description:
+        'Complete branding package including logo, guidelines, and marketing collateral.',
+      defaultTitle: 'Brand Identity Design',
+      defaultNotes:
+        'Includes 3 initial concepts and 2 rounds of revisions. Additional revisions billed at hourly rate.',
+      defaultValidDays: 14,
+      defaultDepositPercent: 50,
+    })
+    .returning();
+
+  await db.insert(templateItems).values([
+    {
+      templateId: brandTemplate.id,
+      description: 'Logo Design',
+      pricingType: 'fixed' as const,
+      rate: '2000.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 0,
+    },
+    {
+      templateId: brandTemplate.id,
+      description: 'Brand Guidelines Document',
+      pricingType: 'fixed' as const,
+      rate: '1000.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 1,
+    },
+    {
+      templateId: brandTemplate.id,
+      description: 'Business Card Design',
+      pricingType: 'fixed' as const,
+      rate: '300.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 2,
+    },
+    {
+      templateId: brandTemplate.id,
+      description: 'Social Media Templates',
+      pricingType: 'fixed' as const,
+      rate: '500.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 3,
+    },
+  ]);
+
+  // Template 3: Consulting Retainer
+  const [consultingTemplate] = await db
+    .insert(templates)
+    .values({
+      userId: demoUserId,
+      name: 'Monthly Consulting Retainer',
+      description: 'Ongoing consulting services billed monthly with dedicated hours.',
+      defaultTitle: 'Consulting Services',
+      defaultNotes:
+        'Monthly retainer. Unused hours do not roll over. Additional hours billed at standard rate.',
+      defaultValidDays: 7,
+      defaultDepositPercent: 100,
+    })
+    .returning();
+
+  await db.insert(templateItems).values([
+    {
+      templateId: consultingTemplate.id,
+      description: 'Strategy Consulting',
+      pricingType: 'hourly' as const,
+      unit: 'hours',
+      rate: '200.00',
+      quantity: '10',
+      discount: '0',
+      sortOrder: 0,
+    },
+    {
+      templateId: consultingTemplate.id,
+      description: 'Weekly Check-in Calls',
+      pricingType: 'fixed' as const,
+      rate: '400.00',
+      quantity: '1',
+      discount: '0',
+      sortOrder: 1,
     },
   ]);
 

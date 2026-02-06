@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { quoteFormSchema } from '@/lib/validations/quote';
 import { lineItemSchema } from '@/lib/validations/line-item';
+import { templateFormSchema, templateItemSchema } from '@/lib/validations/template';
 
 describe('quoteFormSchema', () => {
   const validQuote = {
@@ -148,6 +149,207 @@ describe('lineItemSchema', () => {
 
   it('coerces string numbers', () => {
     const result = lineItemSchema.safeParse({
+      ...validItem,
+      rate: '99.99',
+      quantity: '5',
+      discount: '10',
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.rate).toBe(99.99);
+      expect(result.data.quantity).toBe(5);
+      expect(result.data.discount).toBe(10);
+    }
+  });
+});
+
+describe('templateFormSchema', () => {
+  const validTemplate = {
+    name: 'Standard Web Project',
+    description: 'Template for standard web development projects',
+    defaultTitle: 'Web Development',
+    defaultNotes: 'Payment terms apply',
+    defaultValidDays: 30,
+    defaultDepositPercent: 25,
+  };
+
+  it('accepts valid template data', () => {
+    const result = templateFormSchema.safeParse(validTemplate);
+    expect(result.success).toBe(true);
+  });
+
+  it('requires name', () => {
+    const result = templateFormSchema.safeParse({ ...validTemplate, name: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('enforces name max length', () => {
+    const result = templateFormSchema.safeParse({ ...validTemplate, name: 'a'.repeat(101) });
+    expect(result.success).toBe(false);
+  });
+
+  it('allows empty description', () => {
+    const result = templateFormSchema.safeParse({ ...validTemplate, description: '' });
+    expect(result.success).toBe(true);
+  });
+
+  it('enforces description max length', () => {
+    const result = templateFormSchema.safeParse({ ...validTemplate, description: 'a'.repeat(501) });
+    expect(result.success).toBe(false);
+  });
+
+  it('allows empty defaultTitle', () => {
+    const result = templateFormSchema.safeParse({ ...validTemplate, defaultTitle: '' });
+    expect(result.success).toBe(true);
+  });
+
+  it('enforces defaultTitle max length', () => {
+    const result = templateFormSchema.safeParse({
+      ...validTemplate,
+      defaultTitle: 'a'.repeat(101),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('enforces defaultNotes max length', () => {
+    const result = templateFormSchema.safeParse({
+      ...validTemplate,
+      defaultNotes: 'a'.repeat(2001),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('enforces defaultValidDays range', () => {
+    expect(templateFormSchema.safeParse({ ...validTemplate, defaultValidDays: 0 }).success).toBe(
+      false,
+    );
+    expect(templateFormSchema.safeParse({ ...validTemplate, defaultValidDays: 366 }).success).toBe(
+      false,
+    );
+    expect(templateFormSchema.safeParse({ ...validTemplate, defaultValidDays: 1 }).success).toBe(
+      true,
+    );
+    expect(templateFormSchema.safeParse({ ...validTemplate, defaultValidDays: 365 }).success).toBe(
+      true,
+    );
+  });
+
+  it('allows null defaultValidDays', () => {
+    const result = templateFormSchema.safeParse({ ...validTemplate, defaultValidDays: null });
+    expect(result.success).toBe(true);
+  });
+
+  it('enforces defaultDepositPercent range', () => {
+    expect(
+      templateFormSchema.safeParse({ ...validTemplate, defaultDepositPercent: -1 }).success,
+    ).toBe(false);
+    expect(
+      templateFormSchema.safeParse({ ...validTemplate, defaultDepositPercent: 101 }).success,
+    ).toBe(false);
+    expect(
+      templateFormSchema.safeParse({ ...validTemplate, defaultDepositPercent: 0 }).success,
+    ).toBe(true);
+    expect(
+      templateFormSchema.safeParse({ ...validTemplate, defaultDepositPercent: 100 }).success,
+    ).toBe(true);
+  });
+
+  it('coerces string numbers', () => {
+    const result = templateFormSchema.safeParse({
+      ...validTemplate,
+      defaultValidDays: '30',
+      defaultDepositPercent: '25',
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.defaultValidDays).toBe(30);
+      expect(result.data.defaultDepositPercent).toBe(25);
+    }
+  });
+
+  it('accepts minimal template with only name', () => {
+    const result = templateFormSchema.safeParse({ name: 'Minimal Template' });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('templateItemSchema', () => {
+  const validItem = {
+    description: 'Design work',
+    pricingType: 'fixed' as const,
+    rate: 100,
+    quantity: 1,
+    discount: 0,
+  };
+
+  it('accepts valid fixed-price template item', () => {
+    const result = templateItemSchema.safeParse(validItem);
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts valid hourly template item', () => {
+    const result = templateItemSchema.safeParse({
+      ...validItem,
+      pricingType: 'hourly',
+      unit: 'hours',
+      rate: 150,
+      quantity: 10,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('requires unit for per_unit pricing', () => {
+    const result = templateItemSchema.safeParse({
+      ...validItem,
+      pricingType: 'per_unit',
+      unit: '',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts per_unit with unit provided', () => {
+    const result = templateItemSchema.safeParse({
+      ...validItem,
+      pricingType: 'per_unit',
+      unit: 'pages',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('does not require unit for fixed pricing', () => {
+    const result = templateItemSchema.safeParse({ ...validItem, pricingType: 'fixed' });
+    expect(result.success).toBe(true);
+  });
+
+  it('requires description', () => {
+    const result = templateItemSchema.safeParse({ ...validItem, description: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('enforces rate >= 0', () => {
+    expect(templateItemSchema.safeParse({ ...validItem, rate: -1 }).success).toBe(false);
+    expect(templateItemSchema.safeParse({ ...validItem, rate: 0 }).success).toBe(true);
+  });
+
+  it('enforces quantity > 0', () => {
+    expect(templateItemSchema.safeParse({ ...validItem, quantity: 0 }).success).toBe(false);
+    expect(templateItemSchema.safeParse({ ...validItem, quantity: -1 }).success).toBe(false);
+    expect(templateItemSchema.safeParse({ ...validItem, quantity: 0.5 }).success).toBe(true);
+  });
+
+  it('enforces discount 0-100', () => {
+    expect(templateItemSchema.safeParse({ ...validItem, discount: -1 }).success).toBe(false);
+    expect(templateItemSchema.safeParse({ ...validItem, discount: 101 }).success).toBe(false);
+    expect(templateItemSchema.safeParse({ ...validItem, discount: 50 }).success).toBe(true);
+  });
+
+  it('rejects invalid pricing type', () => {
+    const result = templateItemSchema.safeParse({ ...validItem, pricingType: 'monthly' });
+    expect(result.success).toBe(false);
+  });
+
+  it('coerces string numbers', () => {
+    const result = templateItemSchema.safeParse({
       ...validItem,
       rate: '99.99',
       quantity: '5',

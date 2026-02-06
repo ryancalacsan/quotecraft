@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FileText, LayoutDashboard, Plus } from 'lucide-react';
+import { FileText, FolderOpen, LayoutDashboard, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -29,6 +29,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Button variant="ghost" className="w-full justify-start gap-2">
               <Plus className="h-4 w-4" />
               New Quote
+            </Button>
+          </Link>
+          <Link href="/templates">
+            <Button variant="ghost" className="w-full justify-start gap-2">
+              <FolderOpen className="h-4 w-4" />
+              Templates
             </Button>
           </Link>
         </nav>
