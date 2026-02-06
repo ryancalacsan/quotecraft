@@ -8,7 +8,17 @@ export const templateFormSchema = z.object({
   description: z.string().max(500, 'Description must be 500 characters or less').optional(),
   defaultTitle: z.string().max(100, 'Title must be 100 characters or less').optional(),
   defaultNotes: z.string().max(2000, 'Notes must be 2000 characters or less').optional(),
-  defaultValidDays: z.coerce.number().int().min(1).max(365).optional().nullable(),
+  defaultValidDays: z
+    .union([
+      z.literal('').transform(() => null),
+      z.coerce
+        .number()
+        .int('Valid days must be a whole number')
+        .min(1, 'Valid days must be at least 1')
+        .max(365, 'Valid days cannot exceed 365'),
+    ])
+    .nullable()
+    .optional(),
   defaultDepositPercent: z.coerce.number().int().min(0).max(100).default(0),
 });
 

@@ -239,6 +239,14 @@ describe('templateFormSchema', () => {
     expect(result.success).toBe(true);
   });
 
+  it('transforms empty string to null for defaultValidDays', () => {
+    const result = templateFormSchema.safeParse({ ...validTemplate, defaultValidDays: '' });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.defaultValidDays).toBe(null);
+    }
+  });
+
   it('enforces defaultDepositPercent range', () => {
     expect(
       templateFormSchema.safeParse({ ...validTemplate, defaultDepositPercent: -1 }).success,

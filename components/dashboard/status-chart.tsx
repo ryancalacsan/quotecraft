@@ -78,10 +78,16 @@ export function StatusChart({ statusCounts }: StatusChartProps) {
               <ChartTooltip
                 content={
                   <ChartTooltipContent
-                    formatter={(value, name) => [
-                      `${value} quote${value === 1 ? '' : 's'}`,
-                      statusConfig[name as QuoteStatus]?.label || name,
-                    ]}
+                    formatter={(value, name) => (
+                      <div className="flex w-full items-center justify-between gap-4">
+                        <span className="text-muted-foreground">
+                          {statusConfig[name as QuoteStatus]?.label || name}
+                        </span>
+                        <span className="font-mono font-medium tabular-nums">
+                          {value} quote{value === 1 ? '' : 's'}
+                        </span>
+                      </div>
+                    )}
                   />
                 }
               />

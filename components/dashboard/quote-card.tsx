@@ -28,7 +28,7 @@ const statusVariant: Record<
   sent: 'sent',
   accepted: 'jade',
   declined: 'ember',
-  paid: 'jade',
+  paid: 'gold',
 };
 
 export function QuoteCard({ quote }: { quote: Quote }) {

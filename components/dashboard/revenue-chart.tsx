@@ -107,7 +107,11 @@ export function RevenueChart({
                         year: 'numeric',
                       });
                     }}
-                    formatter={(value) => [formatCurrency(value as number), 'Revenue']}
+                    formatter={(value) => (
+                      <span className="font-mono font-medium tabular-nums">
+                        {formatCurrency(value as number)}
+                      </span>
+                    )}
                   />
                 }
               />
