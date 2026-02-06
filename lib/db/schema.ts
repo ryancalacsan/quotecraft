@@ -103,6 +103,65 @@ export const lineItems = pgTable(
   ],
 );
 
+// Templates table
+export const templates = pgTable(
+  'templates',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id),
+
+    name: text('name').notNull(),
+    description: text('description'),
+
+    // Default values for quotes created from this template
+    defaultTitle: text('default_title'),
+    defaultNotes: text('default_notes'),
+    defaultValidDays: integer('default_valid_days'),
+    defaultDepositPercent: integer('default_deposit_percent').default(0),
+
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    check(
+      'template_deposit_percent_range',
+      sql`${table.defaultDepositPercent} >= 0 AND ${table.defaultDepositPercent} <= 100`,
+    ),
+    index('templates_user_id_idx').on(table.userId),
+  ],
+);
+
+// Template line items table
+export const templateItems = pgTable(
+  'template_items',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    templateId: uuid('template_id')
+      .notNull()
+      .references(() => templates.id, { onDelete: 'cascade' }),
+
+    description: text('description').notNull(),
+    pricingType: text('pricing_type', {
+      enum: ['hourly', 'fixed', 'per_unit'],
+    }).notNull(),
+    unit: text('unit'),
+
+    rate: numeric('rate', { precision: 10, scale: 2 }).notNull(),
+    quantity: numeric('quantity', { precision: 10, scale: 2 }).default('1').notNull(),
+    discount: numeric('discount', { precision: 5, scale: 2 }).default('0').notNull(),
+
+    sortOrder: integer('sort_order').default(0).notNull(),
+  },
+  (table) => [
+    check('template_item_discount_range', sql`${table.discount} >= 0 AND ${table.discount} <= 100`),
+    check('template_item_quantity_positive', sql`${table.quantity} > 0`),
+    check('template_item_rate_non_negative', sql`${table.rate} >= 0`),
+    index('template_items_template_id_idx').on(table.templateId),
+  ],
+);
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -114,3 +173,9 @@ export type QuoteStatus = Quote['status'];
 export type LineItem = typeof lineItems.$inferSelect;
 export type NewLineItem = typeof lineItems.$inferInsert;
 export type PricingType = LineItem['pricingType'];
+
+export type Template = typeof templates.$inferSelect;
+export type NewTemplate = typeof templates.$inferInsert;
+
+export type TemplateItem = typeof templateItems.$inferSelect;
+export type NewTemplateItem = typeof templateItems.$inferInsert;

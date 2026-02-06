@@ -16,6 +16,7 @@ import { formatCurrency, formatDate } from '@/lib/utils';
 import { QuoteStatusActions } from '@/components/quote-builder/quote-status-actions';
 import { ShareLinkCard } from '@/components/dashboard/share-link-card';
 import { Breadcrumbs } from '@/components/shared/breadcrumbs';
+import { SaveTemplateModal } from '@/components/templates/save-template-modal';
 
 const statusVariant: Record<
   string,
@@ -87,6 +88,7 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
               Download PDF
             </Button>
           </a>
+          <SaveTemplateModal quoteId={quote.id} quoteTitle={quote.title} />
           {quote.status === 'draft' && (
             <Link href={`/quotes/${quote.id}/edit`}>
               <Button variant="outline" size="sm">

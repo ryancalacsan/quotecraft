@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Menu, Plus } from 'lucide-react';
+import { FolderOpen, LayoutDashboard, Menu, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -45,6 +45,12 @@ export function MobileNav() {
             <Button variant="ghost" className="w-full justify-start gap-2">
               <Plus className="h-4 w-4" />
               New Quote
+            </Button>
+          </Link>
+          <Link href="/templates" onClick={() => setOpen(false)}>
+            <Button variant="ghost" className="w-full justify-start gap-2">
+              <FolderOpen className="h-4 w-4" />
+              Templates
             </Button>
           </Link>
         </nav>
