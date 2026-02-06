@@ -1,6 +1,18 @@
-import { FileText, Share2, CreditCard, Zap, Shield, BarChart3 } from 'lucide-react';
+'use client';
+
+import {
+  FileText,
+  Share2,
+  CreditCard,
+  Moon,
+  FolderOpen,
+  FileDown,
+  BarChart3,
+  GripVertical,
+} from 'lucide-react';
 
 import { DemoLoginButton } from '@/components/shared/demo-login-button';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
 
 export default function LandingPage() {
   return (
@@ -8,8 +20,16 @@ export default function LandingPage() {
       {/* Nav */}
       <header className="border-b">
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <span className="text-xl font-bold">QuoteCraft</span>
-          <DemoLoginButton />
+          <div className="flex items-center gap-2">
+            <div className="bg-foreground flex h-8 w-8 items-center justify-center rounded-lg">
+              <span className="text-background font-serif text-lg font-semibold italic">Q</span>
+            </div>
+            <span className="text-xl font-bold">QuoteCraft</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <DemoLoginButton />
+          </div>
         </nav>
       </header>
 
@@ -23,8 +43,8 @@ export default function LandingPage() {
               <span className="text-muted-foreground">in minutes, not hours</span>
             </h1>
             <p className="text-muted-foreground mx-auto max-w-xl text-lg">
-              Create polished quotes with real-time pricing, share them with a link, and get paid —
-              all in one place. Built for freelancers and contractors.
+              Create polished quotes with real-time pricing, save templates for repeat clients,
+              export to PDF, and get paid via Stripe — all in one place.
             </p>
             <div className="flex flex-col items-center justify-center gap-4">
               <DemoLoginButton size="lg" />
@@ -38,39 +58,52 @@ export default function LandingPage() {
         {/* Features */}
         <section className="bg-muted/30 border-t px-6 py-24">
           <div className="mx-auto max-w-6xl">
-            <h2 className="mb-12 text-center text-2xl font-bold tracking-tight sm:text-3xl">
+            <h2 className="mb-4 text-center text-2xl font-bold tracking-tight sm:text-3xl">
               Everything you need to quote with confidence
             </h2>
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <p className="text-muted-foreground mx-auto mb-12 max-w-2xl text-center">
+              From quick estimates to detailed proposals, QuoteCraft handles the entire workflow.
+            </p>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               <FeatureCard
-                icon={<FileText className="h-6 w-6" />}
+                icon={<FileText className="h-5 w-5" />}
                 title="Quote Builder"
-                description="Add line items with hourly, fixed, or per-unit pricing. Real-time totals powered by precise decimal math."
+                description="Add line items with hourly, fixed, or per-unit pricing. Real-time totals with precise decimal math."
               />
               <FeatureCard
-                icon={<Share2 className="h-6 w-6" />}
+                icon={<FolderOpen className="h-5 w-5" />}
+                title="Quote Templates"
+                description="Save quotes as reusable templates. Start new projects in seconds with pre-filled line items."
+              />
+              <FeatureCard
+                icon={<Share2 className="h-5 w-5" />}
                 title="Shareable Links"
                 description="Send a link to your client. They can view, accept, or decline — no account needed."
               />
               <FeatureCard
-                icon={<CreditCard className="h-6 w-6" />}
+                icon={<CreditCard className="h-5 w-5" />}
                 title="Stripe Payments"
-                description="Collect deposits or full payments via Stripe Checkout. Status updates automatically on payment."
+                description="Collect deposits or full payments via Stripe Checkout. Status updates automatically."
               />
               <FeatureCard
-                icon={<Zap className="h-6 w-6" />}
-                title="Real-Time Pricing"
-                description="Subtotals, discounts, and deposits calculated instantly as you build your quote."
+                icon={<FileDown className="h-5 w-5" />}
+                title="PDF Export"
+                description="Download professional PDF quotes to attach to emails or print for in-person meetings."
               />
               <FeatureCard
-                icon={<Shield className="h-6 w-6" />}
-                title="Quote Locking"
-                description="Quotes freeze when sent so clients see a consistent proposal. Revert to draft to make changes."
+                icon={<BarChart3 className="h-5 w-5" />}
+                title="Dashboard Analytics"
+                description="Track revenue trends, quote status breakdown, and conversion rates at a glance."
               />
               <FeatureCard
-                icon={<BarChart3 className="h-6 w-6" />}
-                title="Status Tracking"
-                description="Track quotes through draft, sent, accepted, and paid stages with a clear dashboard."
+                icon={<GripVertical className="h-5 w-5" />}
+                title="Drag & Drop"
+                description="Reorder line items with intuitive drag-and-drop. Keyboard accessible for all users."
+              />
+              <FeatureCard
+                icon={<Moon className="h-5 w-5" />}
+                title="Dark Mode"
+                description="Easy on the eyes with system-aware dark mode. Toggle manually or follow your device."
               />
             </div>
           </div>
@@ -83,7 +116,7 @@ export default function LandingPage() {
               Ready to see it in action?
             </h2>
             <p className="text-muted-foreground">
-              Try the interactive demo to explore quote creation, client sharing, and Stripe
+              Try the interactive demo to explore quote creation, templates, PDF export, and Stripe
               payments.
             </p>
             <DemoLoginButton size="lg" />
@@ -121,8 +154,8 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <article className="bg-background space-y-3 rounded-lg border p-6 transition-shadow duration-200 hover:shadow-md">
-      <div className="text-foreground">{icon}</div>
+    <article className="bg-background space-y-3 rounded-lg border p-5 transition-shadow duration-200 hover:shadow-md">
+      <div className="text-gold">{icon}</div>
       <h3 className="font-semibold">{title}</h3>
       <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
     </article>
