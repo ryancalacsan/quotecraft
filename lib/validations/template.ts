@@ -13,3 +13,20 @@ export const templateFormSchema = z.object({
 });
 
 export type TemplateFormData = z.infer<typeof templateFormSchema>;
+
+// Validation schema for template items (used in updateTemplateItems)
+export const templateItemSchema = z
+  .object({
+    description: z.string().min(1, 'Description is required').max(500),
+    pricingType: z.enum(['hourly', 'fixed', 'per_unit']),
+    unit: z.string().max(50).optional().nullable(),
+    rate: z.coerce.number().min(0, 'Rate must be 0 or greater'),
+    quantity: z.coerce.number().positive('Quantity must be greater than 0'),
+    discount: z.coerce.number().min(0).max(100, 'Discount must be between 0 and 100'),
+  })
+  .refine((data) => data.pricingType !== 'per_unit' || (data.unit && data.unit.length > 0), {
+    message: 'Unit is required for per-unit pricing',
+    path: ['unit'],
+  });
+
+export type TemplateItemData = z.infer<typeof templateItemSchema>;

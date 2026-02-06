@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
+import { ensureUserExists } from '@/lib/db/queries';
 import { getTemplatesByUserId } from '@/lib/db/queries/templates';
 import { TemplateList } from '@/components/templates/template-list';
 import { Breadcrumbs } from '@/components/shared/breadcrumbs';
@@ -12,6 +13,9 @@ export const metadata = {
 export default async function TemplatesPage() {
   const { userId } = await auth();
   if (!userId) redirect('/sign-in');
+
+  // Ensure user exists in DB before querying
+  await ensureUserExists(userId);
 
   const templates = await getTemplatesByUserId(userId);
 

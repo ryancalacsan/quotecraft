@@ -33,8 +33,20 @@ export async function getTemplateById(
   return result[0];
 }
 
-// Get template items by template ID
-export async function getTemplateItemsByTemplateId(templateId: string): Promise<TemplateItem[]> {
+// Get template items by template ID (with ownership verification)
+export async function getTemplateItemsByTemplateId(
+  templateId: string,
+  userId: string,
+): Promise<TemplateItem[]> {
+  // First verify template ownership (defense-in-depth)
+  const template = await db
+    .select({ id: templates.id })
+    .from(templates)
+    .where(and(eq(templates.id, templateId), eq(templates.userId, userId)))
+    .limit(1);
+
+  if (!template[0]) return [];
+
   return db
     .select()
     .from(templateItems)

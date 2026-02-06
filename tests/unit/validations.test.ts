@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { quoteFormSchema } from '@/lib/validations/quote';
 import { lineItemSchema } from '@/lib/validations/line-item';
-import { templateFormSchema } from '@/lib/validations/template';
+import { templateFormSchema, templateItemSchema } from '@/lib/validations/template';
 
 describe('quoteFormSchema', () => {
   const validQuote = {
@@ -270,5 +270,96 @@ describe('templateFormSchema', () => {
   it('accepts minimal template with only name', () => {
     const result = templateFormSchema.safeParse({ name: 'Minimal Template' });
     expect(result.success).toBe(true);
+  });
+});
+
+describe('templateItemSchema', () => {
+  const validItem = {
+    description: 'Design work',
+    pricingType: 'fixed' as const,
+    rate: 100,
+    quantity: 1,
+    discount: 0,
+  };
+
+  it('accepts valid fixed-price template item', () => {
+    const result = templateItemSchema.safeParse(validItem);
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts valid hourly template item', () => {
+    const result = templateItemSchema.safeParse({
+      ...validItem,
+      pricingType: 'hourly',
+      unit: 'hours',
+      rate: 150,
+      quantity: 10,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('requires unit for per_unit pricing', () => {
+    const result = templateItemSchema.safeParse({
+      ...validItem,
+      pricingType: 'per_unit',
+      unit: '',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts per_unit with unit provided', () => {
+    const result = templateItemSchema.safeParse({
+      ...validItem,
+      pricingType: 'per_unit',
+      unit: 'pages',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('does not require unit for fixed pricing', () => {
+    const result = templateItemSchema.safeParse({ ...validItem, pricingType: 'fixed' });
+    expect(result.success).toBe(true);
+  });
+
+  it('requires description', () => {
+    const result = templateItemSchema.safeParse({ ...validItem, description: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('enforces rate >= 0', () => {
+    expect(templateItemSchema.safeParse({ ...validItem, rate: -1 }).success).toBe(false);
+    expect(templateItemSchema.safeParse({ ...validItem, rate: 0 }).success).toBe(true);
+  });
+
+  it('enforces quantity > 0', () => {
+    expect(templateItemSchema.safeParse({ ...validItem, quantity: 0 }).success).toBe(false);
+    expect(templateItemSchema.safeParse({ ...validItem, quantity: -1 }).success).toBe(false);
+    expect(templateItemSchema.safeParse({ ...validItem, quantity: 0.5 }).success).toBe(true);
+  });
+
+  it('enforces discount 0-100', () => {
+    expect(templateItemSchema.safeParse({ ...validItem, discount: -1 }).success).toBe(false);
+    expect(templateItemSchema.safeParse({ ...validItem, discount: 101 }).success).toBe(false);
+    expect(templateItemSchema.safeParse({ ...validItem, discount: 50 }).success).toBe(true);
+  });
+
+  it('rejects invalid pricing type', () => {
+    const result = templateItemSchema.safeParse({ ...validItem, pricingType: 'monthly' });
+    expect(result.success).toBe(false);
+  });
+
+  it('coerces string numbers', () => {
+    const result = templateItemSchema.safeParse({
+      ...validItem,
+      rate: '99.99',
+      quantity: '5',
+      discount: '10',
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.rate).toBe(99.99);
+      expect(result.data.quantity).toBe(5);
+      expect(result.data.discount).toBe(10);
+    }
   });
 });
