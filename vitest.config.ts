@@ -13,6 +13,8 @@ export default defineConfig({
         'lib/db/index.ts', // DB client setup
         'lib/db/schema.ts', // Schema definitions
         'lib/db/queries.ts', // DB queries - integration test territory
+        'lib/db/queries/**/*.ts', // DB query modules - integration test territory
+        'lib/quote-number.ts', // DB-dependent quote number generation
         'lib/stripe.ts', // Stripe client setup
         'lib/demo-seed.ts', // Demo data - not business logic
         'lib/env.ts', // Runtime config validation
