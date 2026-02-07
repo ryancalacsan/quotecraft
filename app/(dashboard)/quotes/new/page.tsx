@@ -22,8 +22,9 @@ export default async function NewQuotePage() {
       <Breadcrumbs items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'New Quote' }]} />
 
       <div>
-        <h2 className="font-display text-2xl tracking-tight">New Quote</h2>
-        <p className="text-muted-foreground">
+        <h2 className="font-display text-2xl font-bold tracking-tight">New Quote</h2>
+        <div className="bg-gold mt-2 h-1 w-12 rounded-full" />
+        <p className="text-muted-foreground mt-3">
           Enter the basic details first. You&apos;ll add line items in the next step.
         </p>
       </div>

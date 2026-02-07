@@ -72,13 +72,14 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
 
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div className="space-y-1">
+        <div className="space-y-2">
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-bold tracking-tight">{quote.title}</h2>
             <Badge variant={statusVariant[quote.status] ?? 'secondary'}>
               {QUOTE_STATUS_LABELS[quote.status]}
             </Badge>
           </div>
+          <div className="bg-gold h-1 w-12 rounded-full" />
           <p className="text-muted-foreground">{quote.quoteNumber}</p>
         </div>
         <div className="flex items-center gap-2">

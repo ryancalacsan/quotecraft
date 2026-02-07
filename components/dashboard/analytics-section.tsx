@@ -37,17 +37,24 @@ export function AnalyticsSection({
   }
 
   return (
-    <div
-      className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both grid gap-4 md:grid-cols-2"
-      style={{ animationDelay: '200ms', animationDuration: '400ms' }}
-    >
-      <RevenueChart
-        data={revenueData}
-        totalRevenue={totalRevenue}
-        thisMonthRevenue={thisMonthRevenue}
-        revenueChange={revenueChange}
-      />
-      <StatusChart statusCounts={statusCounts} />
+    <div className="grid gap-4 md:grid-cols-2">
+      <div
+        className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both"
+        style={{ animationDelay: '200ms', animationDuration: '400ms' }}
+      >
+        <RevenueChart
+          data={revenueData}
+          totalRevenue={totalRevenue}
+          thisMonthRevenue={thisMonthRevenue}
+          revenueChange={revenueChange}
+        />
+      </div>
+      <div
+        className="animate-in fade-in slide-in-from-bottom-2 fill-mode-both"
+        style={{ animationDelay: '275ms', animationDuration: '400ms' }}
+      >
+        <StatusChart statusCounts={statusCounts} />
+      </div>
     </div>
   );
 }

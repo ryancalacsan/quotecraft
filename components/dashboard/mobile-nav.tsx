@@ -30,8 +30,15 @@ export function MobileNav() {
           Main navigation links for QuoteCraft
         </SheetDescription>
         <div className="flex h-16 items-center px-6">
-          <Link href="/dashboard" className="text-xl font-bold" onClick={() => setOpen(false)}>
-            QuoteCraft
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2"
+            onClick={() => setOpen(false)}
+          >
+            <div className="bg-foreground flex h-8 w-8 items-center justify-center rounded-lg">
+              <span className="text-background font-serif text-lg font-semibold italic">Q</span>
+            </div>
+            <span className="text-xl font-bold tracking-tight">QuoteCraft</span>
           </Link>
         </div>
         <nav className="space-y-1 px-3 py-4">
