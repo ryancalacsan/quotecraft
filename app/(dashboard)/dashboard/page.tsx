@@ -25,8 +25,9 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       {/* Header with fade-in animation */}
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-        <h2 className="font-display text-2xl tracking-tight">Quotes</h2>
-        <p className="text-muted-foreground">Manage your quotes and proposals.</p>
+        <h2 className="font-display text-2xl font-bold tracking-tight">Quotes</h2>
+        <div className="bg-gold mt-2 h-1 w-12 rounded-full" />
+        <p className="text-muted-foreground mt-3">Manage your quotes and proposals.</p>
       </div>
 
       {/* Stats overview row */}
