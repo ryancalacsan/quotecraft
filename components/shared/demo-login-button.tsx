@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useClerk, useSignIn } from '@clerk/nextjs';
 import { toast } from 'sonner';
 
@@ -15,7 +14,6 @@ interface DemoLoginButtonProps {
 export function DemoLoginButton({ variant = 'default', size = 'default' }: DemoLoginButtonProps) {
   const { signIn, setActive } = useSignIn();
   const { signOut, session } = useClerk();
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleDemo() {
@@ -42,7 +40,9 @@ export function DemoLoginButton({ variant = 'default', size = 'default' }: DemoL
         await setActive({ session: attempt.createdSessionId });
         document.cookie = 'demo_mode=true; path=/; max-age=86400';
         document.cookie = `demo_session_id=${data.sessionId}; path=/; max-age=86400`;
-        router.push('/dashboard');
+        // Use full page navigation to ensure cookies are included in the request
+        // router.push() can cause race conditions with newly-set cookies
+        window.location.href = '/dashboard';
       }
     } catch (err) {
       console.error('Demo login failed:', err);
