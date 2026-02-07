@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { getQuotesByUserId } from '@/lib/db/queries';
 import { getAnalytics, getRevenueTimeSeries } from '@/lib/db/queries/analytics';
 import { getDemoSessionId } from '@/lib/demo-session';
-import { AnalyticsSection } from '@/components/dashboard/analytics-section';
+import { LazyAnalyticsSection } from '@/components/dashboard/analytics-section-lazy';
 import { QuoteList } from '@/components/dashboard/quote-list';
 import { StatsRow } from '@/components/dashboard/stats-row';
 
@@ -33,9 +33,9 @@ export default async function DashboardPage() {
       {/* Stats overview row */}
       <StatsRow quotes={quotes} />
 
-      {/* Analytics charts */}
+      {/* Analytics charts - lazy loaded for faster initial render */}
       {quotes.length > 0 && (
-        <AnalyticsSection
+        <LazyAnalyticsSection
           revenueData={revenueTimeSeries}
           totalRevenue={analytics.totalRevenue}
           thisMonthRevenue={analytics.thisMonthRevenue}
