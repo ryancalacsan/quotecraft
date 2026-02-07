@@ -9,14 +9,19 @@ const loadingMessages = [
   'Almost ready...',
 ];
 
+// useSyncExternalStore callbacks extracted to module level for stable references
+const subscribe = () => () => {};
+const getSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 // SSR-safe way to check if we're in the browser
 function useIsMounted() {
-  return useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
+
+// Stagger delay for bouncing dots (150ms creates a pleasing wave effect)
+// Using 150ms instead of STAGGER_DELAY (50ms) for more pronounced visual separation
+const DOT_STAGGER_DELAY = 150;
 
 export function DemoLoadingOverlay() {
   const isMounted = useIsMounted();
@@ -34,10 +39,18 @@ export function DemoLoadingOverlay() {
   if (!isMounted) return null;
 
   return createPortal(
-    <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+    <div
+      className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      {/* Screen reader announcement */}
+      <span className="sr-only">Loading demo environment. {loadingMessages[messageIndex]}</span>
+
       <div className="flex flex-col items-center gap-6">
         {/* Animated Q Logo */}
-        <div className="relative">
+        <div className="relative" aria-hidden="true">
           {/* Outer glow ring */}
           <div className="bg-gold/20 absolute inset-0 animate-ping rounded-2xl" />
 
@@ -48,23 +61,18 @@ export function DemoLoadingOverlay() {
         </div>
 
         {/* Loading text */}
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2" aria-hidden="true">
           <p className="text-foreground text-lg font-medium">{loadingMessages[messageIndex]}</p>
 
           {/* Animated dots */}
           <div className="flex gap-1.5">
-            <span
-              className="bg-gold h-2 w-2 animate-bounce rounded-full"
-              style={{ animationDelay: '0ms' }}
-            />
-            <span
-              className="bg-gold h-2 w-2 animate-bounce rounded-full"
-              style={{ animationDelay: '150ms' }}
-            />
-            <span
-              className="bg-gold h-2 w-2 animate-bounce rounded-full"
-              style={{ animationDelay: '300ms' }}
-            />
+            {[0, 1, 2].map((index) => (
+              <span
+                key={index}
+                className="bg-gold h-2 w-2 animate-bounce rounded-full"
+                style={{ animationDelay: `${index * DOT_STAGGER_DELAY}ms` }}
+              />
+            ))}
           </div>
         </div>
       </div>
