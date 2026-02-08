@@ -67,6 +67,7 @@ export function DemoLoginButton({ variant = 'default', size = 'default' }: DemoL
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         toast.error(errorData.error || `Failed to start demo (${res.status})`);
+        setIsLoading(false);
         return;
       }
 
@@ -74,6 +75,7 @@ export function DemoLoginButton({ variant = 'default', size = 'default' }: DemoL
 
       if (data.error) {
         toast.error(data.error);
+        setIsLoading(false);
         return;
       }
 
@@ -98,9 +100,11 @@ export function DemoLoginButton({ variant = 'default', size = 'default' }: DemoL
     } catch (err) {
       console.error('Demo login failed:', err);
       toast.error('Failed to start demo. Please try again.');
-    } finally {
       setIsLoading(false);
     }
+    // Note: We intentionally don't reset isLoading on success because
+    // window.location.href navigation will unload the page. Keeping the
+    // overlay visible prevents a flash of the homepage before redirect.
   }
 
   return (
