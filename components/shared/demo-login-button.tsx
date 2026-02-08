@@ -35,8 +35,9 @@ async function waitForServerSession(): Promise<boolean> {
       if (res.ok) {
         return true;
       }
-    } catch {
-      // Ignore fetch errors, keep polling
+    } catch (err) {
+      // Log for debugging - errors here may indicate infrastructure issues
+      console.warn('Session check request failed:', err);
     }
 
     await new Promise((resolve) => setTimeout(resolve, SESSION_POLL_INTERVAL));
