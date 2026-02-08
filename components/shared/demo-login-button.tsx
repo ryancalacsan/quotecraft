@@ -5,6 +5,7 @@ import { useClerk, useSignIn } from '@clerk/nextjs';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
+import { DemoLoadingOverlay } from '@/components/shared/demo-loading-overlay';
 
 interface DemoLoginButtonProps {
   variant?: 'default' | 'outline';
@@ -53,8 +54,11 @@ export function DemoLoginButton({ variant = 'default', size = 'default' }: DemoL
   }
 
   return (
-    <Button variant={variant} size={size} onClick={handleDemo} disabled={isLoading}>
-      {isLoading ? 'Starting Demo...' : 'Try Demo'}
-    </Button>
+    <>
+      {isLoading && <DemoLoadingOverlay />}
+      <Button variant={variant} size={size} onClick={handleDemo} disabled={isLoading}>
+        {isLoading ? 'Starting Demo...' : 'Try Demo'}
+      </Button>
+    </>
   );
 }
