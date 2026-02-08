@@ -12,9 +12,42 @@ interface DemoLoginButtonProps {
   size?: 'default' | 'sm' | 'lg';
 }
 
+// Maximum time to wait for session verification (ms)
+const SESSION_VERIFY_TIMEOUT = 10000;
+// Polling interval for session check (ms)
+const SESSION_POLL_INTERVAL = 100;
+
+/**
+ * Waits for the session to be recognized server-side by making test requests.
+ * This ensures the HTTP-only session cookie is actually set before navigating.
+ */
+async function waitForServerSession(): Promise<boolean> {
+  const startTime = Date.now();
+
+  while (Date.now() - startTime < SESSION_VERIFY_TIMEOUT) {
+    try {
+      // Try to access a protected API endpoint
+      const res = await fetch('/api/session-check', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (res.ok) {
+        return true;
+      }
+    } catch {
+      // Ignore fetch errors, keep polling
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, SESSION_POLL_INTERVAL));
+  }
+
+  return false;
+}
+
 export function DemoLoginButton({ variant = 'default', size = 'default' }: DemoLoginButtonProps) {
   const { signIn, setActive } = useSignIn();
-  const { signOut, session } = useClerk();
+  const clerk = useClerk();
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleDemo() {
@@ -23,11 +56,19 @@ export function DemoLoginButton({ variant = 'default', size = 'default' }: DemoL
     setIsLoading(true);
     try {
       // Sign out existing session first to avoid "session_exists" error
-      if (session) {
-        await signOut();
+      if (clerk.session) {
+        await clerk.signOut();
       }
 
       const res = await fetch('/api/demo/login', { method: 'POST' });
+
+      // Handle non-OK responses
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData.error || `Failed to start demo (${res.status})`);
+        return;
+      }
+
       const data = await res.json();
 
       if (data.error) {
@@ -41,8 +82,16 @@ export function DemoLoginButton({ variant = 'default', size = 'default' }: DemoL
         await setActive({ session: attempt.createdSessionId });
         document.cookie = 'demo_mode=true; path=/; max-age=86400';
         document.cookie = `demo_session_id=${data.sessionId}; path=/; max-age=86400`;
+
+        // Wait for the session to be recognized server-side before navigating.
+        // On mobile devices, the HTTP-only session cookie may take time to propagate.
+        const sessionReady = await waitForServerSession();
+
+        if (!sessionReady) {
+          console.warn('Session verification timed out, navigating anyway');
+        }
+
         // Use full page navigation to ensure cookies are included in the request
-        // router.push() can cause race conditions with newly-set cookies
         window.location.href = '/dashboard';
       }
     } catch (err) {
