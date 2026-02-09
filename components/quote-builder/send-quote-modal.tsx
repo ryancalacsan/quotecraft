@@ -30,9 +30,10 @@ function useWindowOrigin() {
 interface SendQuoteModalProps {
   quoteId: string;
   shareToken: string;
+  fullWidthMobile?: boolean;
 }
 
-export function SendQuoteModal({ quoteId, shareToken }: SendQuoteModalProps) {
+export function SendQuoteModal({ quoteId, shareToken, fullWidthMobile }: SendQuoteModalProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -90,7 +91,7 @@ export function SendQuoteModal({ quoteId, shareToken }: SendQuoteModalProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">
+        <Button size="sm" className={fullWidthMobile ? 'w-full md:w-auto' : ''}>
           <Send className="mr-2 h-4 w-4" />
           Send Quote
         </Button>

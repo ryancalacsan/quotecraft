@@ -22,11 +22,16 @@ import { saveAsTemplate } from '@/app/actions/templates';
 interface SaveTemplateModalProps {
   quoteId: string;
   quoteTitle: string;
+  fullWidthMobile?: boolean;
 }
 
 type FieldErrors = Record<string, string[]>;
 
-export function SaveTemplateModal({ quoteId, quoteTitle }: SaveTemplateModalProps) {
+export function SaveTemplateModal({
+  quoteId,
+  quoteTitle,
+  fullWidthMobile,
+}: SaveTemplateModalProps) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +71,7 @@ export function SaveTemplateModal({ quoteId, quoteTitle }: SaveTemplateModalProp
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className={fullWidthMobile ? 'w-full md:w-auto' : ''}>
           <FolderPlus className="mr-2 h-4 w-4" />
           Save as Template
         </Button>
