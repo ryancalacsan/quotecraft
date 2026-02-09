@@ -36,7 +36,9 @@ export function MobileNav() {
             onClick={() => setOpen(false)}
           >
             <div className="bg-foreground flex h-8 w-8 items-center justify-center rounded-lg">
-              <span className="text-background font-serif text-lg font-semibold italic">Q</span>
+              <span className="text-background -translate-x-px font-serif text-lg font-semibold italic">
+                Q
+              </span>
             </div>
             <span className="text-xl font-bold tracking-tight">QuoteCraft</span>
           </Link>

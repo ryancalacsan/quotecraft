@@ -56,7 +56,9 @@ export function DemoLoadingOverlay() {
 
           {/* Logo container */}
           <div className="bg-foreground shadow-gold/20 relative flex h-20 w-20 animate-pulse items-center justify-center rounded-2xl shadow-lg">
-            <span className="text-background font-serif text-4xl font-semibold italic">Q</span>
+            <span className="text-background -translate-x-0.5 font-serif text-4xl font-semibold italic">
+              Q
+            </span>
           </div>
         </div>
 
