@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { AlertTriangle, Clock, Tag, Package, Download } from 'lucide-react';
+import { AlertTriangle, Clock, Tag, Package, ExternalLink } from 'lucide-react';
 import Decimal from 'decimal.js';
 
 import { getQuoteByShareToken, getUserById, getLineItemsByQuoteId } from '@/lib/db/queries';
@@ -111,8 +111,8 @@ export default async function PublicQuotePage({
             rel="noopener noreferrer"
           >
             <Button variant="outline" size="sm">
-              <Download className="mr-2 h-4 w-4" />
-              Download PDF
+              <ExternalLink className="mr-2 h-4 w-4" />
+              PDF
             </Button>
           </a>
         </div>
