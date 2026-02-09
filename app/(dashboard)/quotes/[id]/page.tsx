@@ -71,9 +71,9 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
       <Breadcrumbs items={[{ label: 'Dashboard', href: '/dashboard' }, { label: quote.title }]} />
 
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-2">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <h2 className="text-2xl font-bold tracking-tight">{quote.title}</h2>
             <Badge variant={statusVariant[quote.status] ?? 'secondary'}>
               {QUOTE_STATUS_LABELS[quote.status]}
@@ -82,26 +82,33 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
           <div className="bg-gold h-1 w-12 rounded-full" />
           <p className="text-muted-foreground">{quote.quoteNumber}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <a href={`/api/quotes/${quote.id}/pdf`} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="sm">
+        <div className="flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center">
+          <a
+            href={`/api/quotes/${quote.id}/pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full md:w-auto"
+          >
+            <Button variant="outline" size="sm" className="w-full md:w-auto">
               <Download className="mr-2 h-4 w-4" />
-              Download PDF
+              PDF
             </Button>
           </a>
-          <SaveTemplateModal quoteId={quote.id} quoteTitle={quote.title} />
+          <SaveTemplateModal quoteId={quote.id} quoteTitle={quote.title} fullWidthMobile />
           {quote.status === 'draft' && (
-            <Link href={`/quotes/${quote.id}/edit`}>
-              <Button variant="outline" size="sm">
+            <Link href={`/quotes/${quote.id}/edit`} className="w-full md:w-auto">
+              <Button variant="outline" size="sm" className="w-full md:w-auto">
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </Button>
             </Link>
           )}
+          {/* Primary action - full width on mobile, normal on desktop */}
           <QuoteStatusActions
             quoteId={quote.id}
             currentStatus={quote.status}
             shareToken={quote.shareToken}
+            fullWidthMobile
           />
         </div>
       </div>

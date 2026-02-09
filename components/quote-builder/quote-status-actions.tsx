@@ -12,12 +12,14 @@ interface QuoteStatusActionsProps {
   quoteId: string;
   currentStatus: string;
   shareToken: string;
+  fullWidthMobile?: boolean;
 }
 
 export function QuoteStatusActions({
   quoteId,
   currentStatus,
   shareToken,
+  fullWidthMobile,
 }: QuoteStatusActionsProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -30,10 +32,21 @@ export function QuoteStatusActions({
 
   return (
     <>
-      {currentStatus === 'draft' && <SendQuoteModal quoteId={quoteId} shareToken={shareToken} />}
+      {currentStatus === 'draft' && (
+        <SendQuoteModal
+          quoteId={quoteId}
+          shareToken={shareToken}
+          fullWidthMobile={fullWidthMobile}
+        />
+      )}
       {currentStatus === 'sent' && (
-        <div className="flex gap-2">
-          <Button size="sm" disabled={isPending} onClick={() => handleStatusChange('accepted')}>
+        <div className={`flex gap-2 ${fullWidthMobile ? 'w-full md:w-auto' : ''}`}>
+          <Button
+            size="sm"
+            disabled={isPending}
+            onClick={() => handleStatusChange('accepted')}
+            className={fullWidthMobile ? 'flex-1 md:flex-none' : ''}
+          >
             {isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
@@ -46,6 +59,7 @@ export function QuoteStatusActions({
             variant="destructive"
             disabled={isPending}
             onClick={() => handleStatusChange('declined')}
+            className={fullWidthMobile ? 'flex-1 md:flex-none' : ''}
           >
             {isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
