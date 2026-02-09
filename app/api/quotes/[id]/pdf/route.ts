@@ -94,12 +94,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Create filename from quote number
     const filename = `QuoteCraft-${quote.quoteNumber}.pdf`;
 
+    // Check if user wants to force download (default: inline view in browser)
+    const forceDownload = request.nextUrl.searchParams.get('download') === 'true';
+    const disposition = forceDownload ? 'attachment' : 'inline';
+
     // Return PDF with proper headers
     return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${filename}"`,
+        'Content-Disposition': `${disposition}; filename="${filename}"`,
         'Content-Length': pdfBuffer.length.toString(),
       },
     });

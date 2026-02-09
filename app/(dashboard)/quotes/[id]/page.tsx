@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Edit, Download } from 'lucide-react';
+import { Edit, ExternalLink } from 'lucide-react';
 
 import { getQuoteById, getLineItemsByQuoteId } from '@/lib/db/queries';
 import { getDemoSessionId } from '@/lib/demo-session';
@@ -90,7 +90,7 @@ export default async function QuoteViewPage({ params }: { params: Promise<{ id: 
             className="w-full md:w-auto"
           >
             <Button variant="outline" size="sm" className="w-full md:w-auto">
-              <Download className="mr-2 h-4 w-4" />
+              <ExternalLink className="mr-2 h-4 w-4" />
               PDF
             </Button>
           </a>
