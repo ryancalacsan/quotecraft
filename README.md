@@ -54,7 +54,7 @@ Built as a portfolio project demonstrating full-stack skills: complex form state
 | Drag & Drop    | @dnd-kit                 |
 | Theming        | next-themes              |
 | Unit Tests     | Vitest (181 tests)       |
-| E2E Tests      | Playwright (30 tests)    |
+| E2E Tests      | Playwright               |
 | CI/CD          | GitHub Actions           |
 | Deployment     | Vercel                   |
 
@@ -168,7 +168,7 @@ quotecraft/
 └── tests/
     ├── unit/                        # Vitest (181 tests)
     │   └── actions/                 # Server Action tests
-    ├── e2e/                         # Playwright (30 tests)
+    ├── e2e/                         # Playwright E2E tests
     └── helpers/                     # Test fixtures and mocks
 ```
 
