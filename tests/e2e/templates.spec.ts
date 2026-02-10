@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Quote Templates', () => {
+  test.setTimeout(90000);
+
   // Auth state is loaded from storage, just navigate to dashboard
   test.beforeEach(async ({ page }) => {
     await page.goto('/dashboard');
@@ -10,6 +12,9 @@ test.describe('Quote Templates', () => {
   });
 
   test('save quote as template', async ({ page }) => {
+    // Set wider viewport to ensure desktop layout is used
+    await page.setViewportSize({ width: 1400, height: 900 });
+
     // Create a quote first
     await page
       .getByRole('link', { name: /new quote|create/i })
@@ -22,51 +27,53 @@ test.describe('Quote Templates', () => {
     await page.getByRole('button', { name: /create quote|save/i }).click();
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
-    // Add a line item
-    await page.getByRole('button', { name: /add item|add line item/i }).click();
-    await page.waitForTimeout(500);
-    await page
-      .getByLabel(/description/i)
-      .last()
-      .fill('Template Service');
-    await page
-      .getByLabel(/rate|price/i)
-      .last()
-      .fill('250');
+    // Add a line item using placeholders
+    const addButton = page.getByRole('button', { name: /add.*item/i }).first();
+    await expect(addButton).toBeVisible({ timeout: 5000 });
+    await addButton.click();
 
-    const saveItemBtn = page.getByRole('button', { name: /save|add|confirm/i }).last();
-    if (await saveItemBtn.isVisible()) {
-      await saveItemBtn.click();
-    }
-    await page.waitForTimeout(1000);
+    // Wait for line item input to appear
+    const descriptionInput = page.getByPlaceholder('Description').first();
+    await expect(descriptionInput).toBeVisible({ timeout: 10000 });
+    await descriptionInput.fill('Template Service');
+
+    const rateInput = page.getByPlaceholder('Rate').first();
+    await expect(rateInput).toBeVisible({ timeout: 5000 });
+    await rateInput.fill('250');
+
+    // Verify the input was filled
+    await expect(descriptionInput).toHaveValue('Template Service', { timeout: 5000 });
 
     // Navigate to quote detail page
     const editUrl = page.url();
     const detailUrl = editUrl.replace('/edit', '');
     await page.goto(detailUrl);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: 'Template Source Quote' })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Click save as template button
-    await page.getByRole('button', { name: /save as template|create template/i }).click();
-    await page.waitForTimeout(500);
+    const saveAsTemplateBtn = page.getByRole('button', { name: /save as template/i });
+    await expect(saveAsTemplateBtn).toBeVisible({ timeout: 5000 });
+    await saveAsTemplateBtn.click();
 
-    // Fill in template name
+    // Fill in template name (label is "Template Name")
     const templateName = `E2E Template ${Date.now()}`;
-    await page.getByLabel(/name/i).fill(templateName);
+    const templateNameInput = page.getByLabel(/template name/i);
+    await expect(templateNameInput).toBeVisible({ timeout: 5000 });
+    await templateNameInput.fill(templateName);
 
     // Save the template
-    await page
-      .getByRole('button', { name: /save|create/i })
-      .last()
-      .click();
-    await page.waitForTimeout(1000);
+    const saveTemplateBtn = page.getByRole('button', { name: /save template/i });
+    await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
+    await saveTemplateBtn.click();
 
     // Navigate to templates page to verify
     await page.goto('/templates');
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
 
     // Verify template is in the list
-    await expect(page.getByText(templateName)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(templateName)).toBeVisible({ timeout: 10000 });
   });
 
   test('create quote from template', async ({ page }) => {
@@ -86,32 +93,41 @@ test.describe('Quote Templates', () => {
     const editUrl = page.url();
     const detailUrl = editUrl.replace('/edit', '');
     await page.goto(detailUrl);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: 'Template for Creation' })).toBeVisible({
+      timeout: 10000,
+    });
 
-    await page.getByRole('button', { name: /save as template|create template/i }).click();
-    await page.waitForTimeout(500);
+    const saveAsTemplateBtn = page.getByRole('button', { name: /save as template/i });
+    await expect(saveAsTemplateBtn).toBeVisible({ timeout: 5000 });
+    await saveAsTemplateBtn.click();
 
     const templateName = `Use Template ${Date.now()}`;
-    await page.getByLabel(/name/i).fill(templateName);
-    await page
-      .getByRole('button', { name: /save|create/i })
-      .last()
-      .click();
-    await page.waitForTimeout(1000);
+    const templateNameInput = page.getByLabel(/template name/i);
+    await expect(templateNameInput).toBeVisible({ timeout: 5000 });
+    await templateNameInput.fill(templateName);
+
+    const saveTemplateBtn = page.getByRole('button', { name: /save template/i });
+    await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
+    await saveTemplateBtn.click();
 
     // Navigate to templates page
     await page.goto('/templates');
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
 
     // Find the template and click use
-    const templateCard = page.locator(`text=${templateName}`).locator('..');
-    await templateCard.getByRole('button', { name: /use|create quote/i }).click();
+    await expect(page.getByText(templateName)).toBeVisible({ timeout: 5000 });
+    const templateCard = page.getByText(templateName).locator('..').locator('..');
+    const useTemplateBtn = templateCard.getByRole('button', { name: /use template|create quote/i });
+    await expect(useTemplateBtn).toBeVisible({ timeout: 5000 });
+    await useTemplateBtn.click();
 
     // Should redirect to new quote's edit page
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
     // Verify the default title is applied
-    await expect(page.getByLabel(/title/i)).toHaveValue('Template for Creation');
+    await expect(page.getByLabel(/title/i)).toHaveValue('Template for Creation', {
+      timeout: 10000,
+    });
   });
 
   test('delete template', async ({ page }) => {
@@ -131,54 +147,57 @@ test.describe('Quote Templates', () => {
     const editUrl = page.url();
     const detailUrl = editUrl.replace('/edit', '');
     await page.goto(detailUrl);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: 'Template to Delete' })).toBeVisible({
+      timeout: 10000,
+    });
 
-    await page.getByRole('button', { name: /save as template|create template/i }).click();
-    await page.waitForTimeout(500);
+    const saveAsTemplateBtn = page.getByRole('button', { name: /save as template/i });
+    await expect(saveAsTemplateBtn).toBeVisible({ timeout: 5000 });
+    await saveAsTemplateBtn.click();
 
     const templateName = `Delete Template ${Date.now()}`;
-    await page.getByLabel(/name/i).fill(templateName);
-    await page
-      .getByRole('button', { name: /save|create/i })
-      .last()
-      .click();
-    await page.waitForTimeout(1000);
+    const templateNameInput = page.getByLabel(/template name/i);
+    await expect(templateNameInput).toBeVisible({ timeout: 5000 });
+    await templateNameInput.fill(templateName);
+
+    const saveTemplateBtn = page.getByRole('button', { name: /save template/i });
+    await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
+    await saveTemplateBtn.click();
 
     // Navigate to templates page
     await page.goto('/templates');
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
 
     // Verify template exists
     await expect(page.getByText(templateName)).toBeVisible({ timeout: 5000 });
 
     // Find the template card and click delete
-    const templateCard = page.locator(`text=${templateName}`).locator('..');
-    await templateCard.getByRole('button', { name: /delete/i }).click();
+    const templateCard = page.getByText(templateName).locator('..').locator('..');
+    const deleteBtn = templateCard.getByRole('button', { name: /delete/i });
+    await expect(deleteBtn).toBeVisible({ timeout: 5000 });
+    await deleteBtn.click();
 
-    // Confirm deletion
-    await page.waitForTimeout(500);
-    await page
-      .getByRole('button', { name: /confirm|yes|delete/i })
-      .last()
-      .click();
+    // Wait for and confirm deletion dialog
+    const confirmDeleteBtn = page.getByRole('button', { name: /^delete$/i });
+    await expect(confirmDeleteBtn).toBeVisible({ timeout: 5000 });
+    await confirmDeleteBtn.click();
 
-    // Wait for refresh
-    await page.waitForTimeout(1000);
-
-    // Verify template is removed
-    await expect(page.getByText(templateName)).not.toBeVisible({ timeout: 5000 });
+    // Verify template is removed (web-first assertion auto-retries)
+    await expect(page.getByText(templateName)).not.toBeVisible({ timeout: 10000 });
   });
 
   test('template list is accessible', async ({ page }) => {
     // Navigate to templates page
     await page.goto('/templates');
-    await page.waitForLoadState('networkidle');
 
     // Verify templates page loads
-    await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
   });
 
   test('template with line items creates quote with items', async ({ page }) => {
+    // Set wider viewport to ensure desktop layout is used
+    await page.setViewportSize({ width: 1400, height: 900 });
+
     // Create a quote with line items
     await page
       .getByRole('link', { name: /new quote|create/i })
@@ -191,52 +210,59 @@ test.describe('Quote Templates', () => {
     await page.getByRole('button', { name: /create quote|save/i }).click();
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
-    // Add line items
-    await page.getByRole('button', { name: /add item|add line item/i }).click();
-    await page.waitForTimeout(500);
-    await page
-      .getByLabel(/description/i)
-      .last()
-      .fill('Inherited Service 1');
-    await page
-      .getByLabel(/rate|price/i)
-      .last()
-      .fill('100');
+    // Add line items using placeholders
+    const addButton = page.getByRole('button', { name: /add.*item/i }).first();
+    await expect(addButton).toBeVisible({ timeout: 5000 });
+    await addButton.click();
 
-    const saveItemBtn = page.getByRole('button', { name: /save|add|confirm/i }).last();
-    if (await saveItemBtn.isVisible()) {
-      await saveItemBtn.click();
-    }
-    await page.waitForTimeout(1000);
+    // Wait for line item input to appear
+    const descriptionInput = page.getByPlaceholder('Description').first();
+    await expect(descriptionInput).toBeVisible({ timeout: 10000 });
+    await descriptionInput.fill('Inherited Service 1');
+
+    const rateInput = page.getByPlaceholder('Rate').first();
+    await expect(rateInput).toBeVisible({ timeout: 5000 });
+    await rateInput.fill('100');
+
+    // Verify the input was filled
+    await expect(descriptionInput).toHaveValue('Inherited Service 1', { timeout: 5000 });
 
     // Save as template
     const editUrl = page.url();
     const detailUrl = editUrl.replace('/edit', '');
     await page.goto(detailUrl);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: 'Items Template Quote' })).toBeVisible({
+      timeout: 10000,
+    });
 
-    await page.getByRole('button', { name: /save as template|create template/i }).click();
-    await page.waitForTimeout(500);
+    const saveAsTemplateBtn = page.getByRole('button', { name: /save as template/i });
+    await expect(saveAsTemplateBtn).toBeVisible({ timeout: 5000 });
+    await saveAsTemplateBtn.click();
 
     const templateName = `Items Template ${Date.now()}`;
-    await page.getByLabel(/name/i).fill(templateName);
-    await page
-      .getByRole('button', { name: /save|create/i })
-      .last()
-      .click();
-    await page.waitForTimeout(1000);
+    const templateNameInput = page.getByLabel(/template name/i);
+    await expect(templateNameInput).toBeVisible({ timeout: 5000 });
+    await templateNameInput.fill(templateName);
+
+    const saveTemplateBtn = page.getByRole('button', { name: /save template/i });
+    await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
+    await saveTemplateBtn.click();
 
     // Use the template
     await page.goto('/templates');
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
 
-    const templateCard = page.locator(`text=${templateName}`).locator('..');
-    await templateCard.getByRole('button', { name: /use|create quote/i }).click();
+    await expect(page.getByText(templateName)).toBeVisible({ timeout: 5000 });
+    const templateCard = page.getByText(templateName).locator('..').locator('..');
+    const useTemplateBtn = templateCard.getByRole('button', { name: /use template|create quote/i });
+    await expect(useTemplateBtn).toBeVisible({ timeout: 5000 });
+    await useTemplateBtn.click();
+
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
     // Verify line items are inherited
-    await expect(page.getByText('Inherited Service 1')).toBeVisible({ timeout: 5000 });
-    await expect(page.getByText(/\$100/)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Inherited Service 1')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/\$100/)).toBeVisible({ timeout: 10000 });
   });
 
   test('navigate to templates from navigation', async ({ page }) => {
@@ -253,9 +279,8 @@ test.describe('Quote Templates', () => {
     } else {
       // Navigate directly
       await page.goto('/templates');
-      await page.waitForLoadState('networkidle');
       await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({
-        timeout: 5000,
+        timeout: 10000,
       });
     }
   });

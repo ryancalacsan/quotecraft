@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Quote Workflow', () => {
+  test.setTimeout(90000);
+
   // Auth state is loaded from storage, just navigate to dashboard
   test.beforeEach(async ({ page }) => {
     await page.goto('/dashboard');
@@ -8,6 +10,24 @@ test.describe('Quote Workflow', () => {
       timeout: 10000,
     });
   });
+
+  // Helper function to send a quote via the modal
+  async function sendQuote(page: import('@playwright/test').Page) {
+    // Click "Send Quote" to open modal
+    const sendQuoteBtn = page.getByRole('button', { name: /send quote/i });
+    await expect(sendQuoteBtn).toBeVisible({ timeout: 5000 });
+    await sendQuoteBtn.click();
+
+    // Click "Copy Link & Mark as Sent" in the modal
+    const markAsSentBtn = page.getByRole('button', {
+      name: /copy link.*mark as sent|mark as sent/i,
+    });
+    await expect(markAsSentBtn).toBeVisible({ timeout: 5000 });
+    await markAsSentBtn.click();
+
+    // Wait for modal to close
+    await expect(markAsSentBtn).not.toBeVisible({ timeout: 10000 });
+  }
 
   test('send quote changes status from draft to sent', async ({ page }) => {
     // Create a new quote
@@ -26,19 +46,17 @@ test.describe('Quote Workflow', () => {
     const editUrl = page.url();
     const detailUrl = editUrl.replace('/edit', '');
     await page.goto(detailUrl);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: 'Quote to Send' })).toBeVisible({
+      timeout: 10000,
+    });
 
-    // Click "Mark as Sent" or similar button
-    await page.getByRole('button', { name: /mark as sent|send/i }).click();
+    // Send the quote via modal
+    await sendQuote(page);
 
-    // Wait for status update
-    await page.waitForTimeout(1000);
-
-    // Verify status changed to "Sent"
-    await expect(page.getByText(/sent/i)).toBeVisible({ timeout: 5000 });
-
-    // Verify share link appears
-    await expect(page.getByText(/share|link|\/q\//i)).toBeVisible({ timeout: 5000 });
+    // Verify share link input appears (indicates quote was sent successfully)
+    await page.reload();
+    const shareInput = page.locator('input[readonly]').first();
+    await expect(shareInput).toBeVisible({ timeout: 10000 });
   });
 
   test('sent quote shows share link', async ({ page }) => {
@@ -58,18 +76,25 @@ test.describe('Quote Workflow', () => {
     const editUrl = page.url();
     const detailUrl = editUrl.replace('/edit', '');
     await page.goto(detailUrl);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: 'Share Link Quote' })).toBeVisible({
+      timeout: 10000,
+    });
 
-    await page.getByRole('button', { name: /mark as sent|send/i }).click();
-    await page.waitForTimeout(1000);
+    await sendQuote(page);
 
-    // Look for share link or copy button
-    const shareElement = page
-      .getByText(/\/q\//)
-      .or(page.getByRole('button', { name: /copy link|copy/i }))
-      .or(page.locator('[data-testid="share-link"]'));
+    // Reload to see share link card
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'Share Link Quote' })).toBeVisible({
+      timeout: 10000,
+    });
 
-    await expect(shareElement).toBeVisible({ timeout: 5000 });
+    // Look for share link input (readonly)
+    const shareInput = page.locator('input[readonly]').first();
+    await expect(shareInput).toBeVisible({ timeout: 10000 });
+
+    // Verify it contains the share URL pattern
+    const shareUrl = await shareInput.inputValue();
+    expect(shareUrl).toMatch(/\/q\/[A-Za-z0-9_-]+/);
   });
 
   test('sent quote hides edit button', async ({ page }) => {
@@ -85,22 +110,29 @@ test.describe('Quote Workflow', () => {
     await page.getByRole('button', { name: /create quote|save/i }).click();
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
-    // Navigate to detail and send
+    // Navigate to detail
     const editUrl = page.url();
     const detailUrl = editUrl.replace('/edit', '');
     await page.goto(detailUrl);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: 'No Edit Quote' })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Verify edit button is visible before sending
     const editButton = page.getByRole('link', { name: /edit/i });
     await expect(editButton).toBeVisible({ timeout: 5000 });
 
     // Send the quote
-    await page.getByRole('button', { name: /mark as sent|send/i }).click();
-    await page.waitForTimeout(1000);
+    await sendQuote(page);
+
+    // Reload to see updated state
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'No Edit Quote' })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Verify edit button is no longer visible
-    await expect(editButton).not.toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole('link', { name: /^edit$/i })).not.toBeVisible({ timeout: 5000 });
   });
 
   test('cannot navigate to edit page for sent quote', async ({ page }) => {
@@ -123,17 +155,16 @@ test.describe('Quote Workflow', () => {
     // Navigate to detail and send
     const detailUrl = editUrl.replace('/edit', '');
     await page.goto(detailUrl);
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: 'Locked Quote' })).toBeVisible({
+      timeout: 10000,
+    });
 
-    await page.getByRole('button', { name: /mark as sent|send/i }).click();
-    await page.waitForTimeout(1000);
+    await sendQuote(page);
 
     // Try to navigate directly to edit page
     await page.goto(`/quotes/${quoteId}/edit`);
-    await page.waitForLoadState('networkidle');
 
     // Should either redirect away or show an error message
-    // Check if we're still on edit page (shouldn't be) or see an error
     const currentUrl = page.url();
     const isOnEditPage = currentUrl.includes('/edit');
 

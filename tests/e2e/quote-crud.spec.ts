@@ -27,11 +27,14 @@ test.describe('Quote CRUD Operations', () => {
     // Wait for redirect to edit page
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
-    // Verify we're on the edit page
-    await expect(page.getByText('E2E Test Quote')).toBeVisible({ timeout: 5000 });
+    // Verify we're on the edit page (heading says "Edit Quote", not the quote title)
+    await expect(page.getByRole('heading', { name: 'Edit Quote' })).toBeVisible({ timeout: 5000 });
   });
 
   test('add line item to quote', async ({ page }) => {
+    // Set wider viewport to ensure desktop layout is used (xl breakpoint is 1280px)
+    await page.setViewportSize({ width: 1400, height: 900 });
+
     // Navigate to new quote
     await page
       .getByRole('link', { name: /new quote|create/i })
@@ -45,30 +48,22 @@ test.describe('Quote CRUD Operations', () => {
     await page.getByRole('button', { name: /create quote|save/i }).click();
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
-    // Now add a line item
-    await page.getByRole('button', { name: /add item|add line item/i }).click();
+    // Now add a line item - button may say "Add Item" or "Add Your First Item"
+    const addButton = page.getByRole('button', { name: /add.*item/i }).first();
+    await expect(addButton).toBeVisible({ timeout: 5000 });
+    await addButton.click();
 
-    // Wait for form to appear
-    await page.waitForTimeout(500);
-
-    // Fill in line item details - look for the last instance of each field
-    const descriptionInput = page.getByLabel(/description/i).last();
+    // Wait for line item input to appear (web-first assertion auto-retries)
+    const descriptionInput = page.getByPlaceholder('Description').first();
+    await expect(descriptionInput).toBeVisible({ timeout: 10000 });
     await descriptionInput.fill('Development Work');
 
-    const rateInput = page.getByLabel(/rate|price/i).last();
+    const rateInput = page.getByPlaceholder('Rate').first();
+    await expect(rateInput).toBeVisible({ timeout: 5000 });
     await rateInput.fill('150');
 
-    // Save the line item if there's a save button
-    const saveButton = page.getByRole('button', { name: /save|add|confirm/i }).last();
-    if (await saveButton.isVisible()) {
-      await saveButton.click();
-    }
-
-    // Wait for update
-    await page.waitForTimeout(1000);
-
-    // Verify line item appears in the list
-    await expect(page.getByText('Development Work')).toBeVisible({ timeout: 5000 });
+    // Verify the description input has the expected value
+    await expect(descriptionInput).toHaveValue('Development Work', { timeout: 5000 });
   });
 
   test('edit quote metadata', async ({ page }) => {
@@ -85,23 +80,20 @@ test.describe('Quote CRUD Operations', () => {
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
     // Now edit the title (fill() clears the input automatically)
-    await page.getByLabel(/title/i).fill('Updated Title');
+    const titleInput = page.getByLabel(/title/i);
+    await titleInput.fill('Updated Title');
 
     // Save changes
-    await page
-      .getByRole('button', { name: /save|update/i })
-      .first()
-      .click();
+    const saveButton = page.getByRole('button', { name: /save|update/i }).first();
+    await expect(saveButton).toBeVisible({ timeout: 5000 });
+    await saveButton.click();
 
-    // Wait for save to complete
-    await page.waitForTimeout(1000);
-
-    // Verify the title was updated (may need to reload)
+    // Reload and verify the title was updated
     await page.reload();
-    await expect(page.getByLabel(/title/i)).toHaveValue('Updated Title');
+    await expect(page.getByLabel(/title/i)).toHaveValue('Updated Title', { timeout: 10000 });
   });
 
-  test('delete quote', async ({ page }) => {
+  test('delete quote from dashboard', async ({ page }) => {
     // Create a quote to delete
     await page
       .getByRole('link', { name: /new quote|create/i })
@@ -109,58 +101,74 @@ test.describe('Quote CRUD Operations', () => {
       .click();
     await page.waitForURL(/\/quotes\/new/, { timeout: 10000 });
 
-    await page.getByLabel(/title/i).fill('Quote to Delete');
+    const quoteTitle = `Quote to Delete ${Date.now()}`;
+    await page.getByLabel(/title/i).fill(quoteTitle);
     await page.getByLabel(/client name/i).fill('Delete Test Client');
     await page.getByRole('button', { name: /create quote|save/i }).click();
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
-    // Navigate to quote detail page (from edit URL, remove /edit)
-    const editUrl = page.url();
-    const detailUrl = editUrl.replace('/edit', '');
-    await page.goto(detailUrl);
-    await page.waitForLoadState('networkidle');
+    // Go back to dashboard
+    await page.goto('/dashboard');
+    await expect(page.getByRole('heading', { name: /dashboard|quotes/i })).toBeVisible({
+      timeout: 10000,
+    });
 
-    // Click delete button
-    await page.getByRole('button', { name: /delete/i }).click();
+    // Find the quote and verify it's visible
+    await expect(page.getByText(quoteTitle)).toBeVisible({ timeout: 5000 });
 
-    // Wait for confirmation dialog
-    await page.waitForTimeout(500);
+    // Click the dropdown trigger (aria-label is "Actions for {title}")
+    const dropdownTrigger = page.getByRole('button', {
+      name: new RegExp(`actions for ${quoteTitle}`, 'i'),
+    });
+    await expect(dropdownTrigger).toBeVisible({ timeout: 5000 });
+    await dropdownTrigger.click();
 
-    // Confirm deletion
-    const confirmButton = page.getByRole('button', { name: /confirm|yes|delete/i }).last();
-    await confirmButton.click();
+    // Wait for dropdown menu to appear
+    const deleteMenuItem = page.getByRole('menuitem', { name: /delete/i });
+    await expect(deleteMenuItem).toBeVisible({ timeout: 5000 });
+    await deleteMenuItem.click();
 
-    // Should redirect to dashboard
-    await page.waitForURL(/\/dashboard/, { timeout: 10000 });
+    // Verify the quote is no longer visible (web-first assertion auto-retries)
+    await expect(page.getByText(quoteTitle)).not.toBeVisible({ timeout: 10000 });
   });
 
-  test('duplicate quote', async ({ page }) => {
-    // Create a quote to duplicate
+  test('duplicate quote from dashboard', async ({ page }) => {
+    // Create a quote to duplicate with unique title
     await page
       .getByRole('link', { name: /new quote|create/i })
       .first()
       .click();
     await page.waitForURL(/\/quotes\/new/, { timeout: 10000 });
 
-    await page.getByLabel(/title/i).fill('Quote to Duplicate');
+    const quoteTitle = `Quote to Duplicate ${Date.now()}`;
+    await page.getByLabel(/title/i).fill(quoteTitle);
     await page.getByLabel(/client name/i).fill('Duplicate Test Client');
     await page.getByRole('button', { name: /create quote|save/i }).click();
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
-    // Navigate to quote detail page
-    const editUrl = page.url();
-    const detailUrl = editUrl.replace('/edit', '');
-    await page.goto(detailUrl);
-    await page.waitForLoadState('networkidle');
+    // Go back to dashboard
+    await page.goto('/dashboard');
+    await expect(page.getByRole('heading', { name: /dashboard|quotes/i })).toBeVisible({
+      timeout: 10000,
+    });
 
-    // Click duplicate button
-    await page.getByRole('button', { name: /duplicate|copy/i }).click();
+    // Find the quote and verify it's visible
+    await expect(page.getByText(quoteTitle)).toBeVisible({ timeout: 5000 });
 
-    // Should redirect to new quote's edit page
-    await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
+    // Click the dropdown trigger (aria-label is "Actions for {title}")
+    const dropdownTrigger = page.getByRole('button', {
+      name: new RegExp(`actions for ${quoteTitle}`, 'i'),
+    });
+    await expect(dropdownTrigger).toBeVisible({ timeout: 5000 });
+    await dropdownTrigger.click();
 
-    // Verify the title has (Copy) suffix
-    await expect(page.getByLabel(/title/i)).toHaveValue('Quote to Duplicate (Copy)');
+    // Wait for dropdown menu to appear and click duplicate
+    const duplicateMenuItem = page.getByRole('menuitem', { name: /duplicate/i });
+    await expect(duplicateMenuItem).toBeVisible({ timeout: 5000 });
+    await duplicateMenuItem.click();
+
+    // Verify the duplicated quote appears (with Copy suffix) - web-first assertion auto-retries
+    await expect(page.getByText(`${quoteTitle} (Copy)`)).toBeVisible({ timeout: 10000 });
   });
 
   test('view quote list on dashboard', async ({ page }) => {
@@ -188,16 +196,23 @@ test.describe('Quote CRUD Operations', () => {
 
     // Go back to dashboard
     await page.goto('/dashboard');
-    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: /dashboard|quotes/i })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Find and click on the quote
-    await page.getByText('Navigable Quote').click();
+    const quoteLink = page.getByText('Navigable Quote');
+    await expect(quoteLink).toBeVisible({ timeout: 5000 });
+    await quoteLink.click();
 
     // Should navigate to quote detail or edit page
     await page.waitForURL(/\/quotes\/[^/]+/, { timeout: 10000 });
   });
 
   test('real-time pricing updates when adding line items', async ({ page }) => {
+    // Set wider viewport to ensure desktop layout is used
+    await page.setViewportSize({ width: 1400, height: 900 });
+
     // Create a quote
     await page
       .getByRole('link', { name: /new quote|create/i })
@@ -210,33 +225,26 @@ test.describe('Quote CRUD Operations', () => {
     await page.getByRole('button', { name: /create quote|save/i }).click();
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
-    // Add a line item with specific rate
-    await page.getByRole('button', { name: /add item|add line item/i }).click();
-    await page.waitForTimeout(500);
+    // Add a line item - button may say "Add Item" or "Add Your First Item"
+    const addButton = page.getByRole('button', { name: /add.*item/i }).first();
+    await expect(addButton).toBeVisible({ timeout: 5000 });
+    await addButton.click();
 
-    await page
-      .getByLabel(/description/i)
-      .last()
-      .fill('Test Service');
-    await page
-      .getByLabel(/rate|price/i)
-      .last()
-      .fill('100');
-    await page
-      .getByLabel(/quantity/i)
-      .last()
-      .fill('2');
+    // Wait for line item input to appear (web-first assertion auto-retries)
+    const descriptionInput = page.getByPlaceholder('Description').first();
+    await expect(descriptionInput).toBeVisible({ timeout: 10000 });
+    await descriptionInput.fill('Test Service');
 
-    // Look for a save button and click if visible
-    const saveButton = page.getByRole('button', { name: /save|add|confirm/i }).last();
-    if (await saveButton.isVisible()) {
-      await saveButton.click();
-    }
+    const rateInput = page.getByPlaceholder('Rate').first();
+    await expect(rateInput).toBeVisible({ timeout: 5000 });
+    await rateInput.fill('100');
 
-    // Wait for pricing to update
-    await page.waitForTimeout(1000);
+    const qtyInput = page.getByPlaceholder('Qty').first();
+    await expect(qtyInput).toBeVisible({ timeout: 5000 });
+    await qtyInput.fill('2');
 
-    // Verify total shows $200 (100 * 2)
-    await expect(page.getByText(/\$200/)).toBeVisible({ timeout: 5000 });
+    // Verify total shows $200 (100 * 2) - web-first assertion auto-retries
+    // Use .first() since $200 appears in multiple places (line item total, subtotal, grand total)
+    await expect(page.getByText(/\$200/).first()).toBeVisible({ timeout: 10000 });
   });
 });

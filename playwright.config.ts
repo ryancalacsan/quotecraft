@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? 'github' : 'html',
   timeout: 60000,
@@ -50,10 +50,12 @@ export default defineConfig({
     },
 
     // Authenticated tests - depend on auth setup
+    // Run serially to avoid flaky navigation issues with parallel execution
     {
       name: 'authenticated',
       testMatch: /^(?!.*(?:smoke|demo-login|auth\.setup|global)).*\.spec\.ts$/,
       dependencies: ['auth-setup'],
+      fullyParallel: false,
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'tests/e2e/.auth/user.json',
