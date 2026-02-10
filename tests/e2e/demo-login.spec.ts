@@ -8,20 +8,98 @@ import { expect, test } from '@playwright/test';
  * They use Clerk's testing token to bypass bot detection.
  */
 test.describe('Demo Login', () => {
-  test('demo login redirects to dashboard', async ({ page }) => {
+  // Increase timeout for demo login tests since Sign-In Tokens can be slow
+  test.setTimeout(90000);
+
+  /**
+   * Helper function to perform demo login with debugging
+   */
+  async function performDemoLogin(page: import('@playwright/test').Page): Promise<void> {
+    // Capture console messages for debugging
+    const consoleMessages: string[] = [];
+    page.on('console', (msg) => {
+      consoleMessages.push(`[${msg.type()}] ${msg.text()}`);
+    });
+
+    // Intercept the demo login API to capture response
+    let demoLoginResponse: { status: number; body: string } | null = null;
+    page.on('response', async (response) => {
+      if (response.url().includes('/api/demo/login')) {
+        demoLoginResponse = {
+          status: response.status(),
+          body: await response.text().catch(() => 'Failed to get response body'),
+        };
+      }
+    });
+
     // Setup Clerk testing token to bypass bot detection
     await setupClerkTestingToken({ page });
 
-    // Start from landing page
+    // Navigate and wait for Clerk to be fully loaded
     await page.goto('/');
 
-    // Click the first "Try Demo" button
+    // Wait for Clerk to initialize by checking for the Clerk-loaded class or script
+    // The button uses useSignIn() which returns undefined until Clerk is ready
+    await page.waitForFunction(
+      () => {
+        // Check if Clerk is loaded by looking for window.Clerk
+        return typeof window !== 'undefined' && (window as unknown as { Clerk?: unknown }).Clerk;
+      },
+      { timeout: 30000 },
+    );
+
+    // Additional wait for React hydration and Clerk hooks to be ready
+    await page.waitForTimeout(1000);
+
     const demoButton = page.getByRole('button', { name: /try demo/i }).first();
-    await expect(demoButton).toBeVisible();
-    await demoButton.click();
+    await expect(demoButton).toBeVisible({ timeout: 10000 });
+
+    // Retry clicking the button if the API call doesn't happen
+    // This handles race conditions where Clerk hooks aren't ready yet
+    let retries = 3;
+    while (retries > 0 && !demoLoginResponse) {
+      await demoButton.click();
+
+      // Wait for API call (shorter timeout for retries)
+      const waitStart = Date.now();
+      while (!demoLoginResponse && Date.now() - waitStart < 10000) {
+        await page.waitForTimeout(500);
+      }
+
+      if (demoLoginResponse) break;
+
+      retries--;
+      if (retries > 0) {
+        console.log(`Demo login API not called, retrying... (${retries} retries left)`);
+        await page.waitForTimeout(1000);
+      }
+    }
+
+    if (!demoLoginResponse) {
+      console.error('Demo login API was never called after retries');
+      console.error('Console messages:', consoleMessages.join('\n'));
+      throw new Error('Demo login API was never called');
+    }
+
+    if (demoLoginResponse.status !== 200) {
+      console.error(`Demo login API failed: ${demoLoginResponse.status}`);
+      console.error(`Response: ${demoLoginResponse.body}`);
+      throw new Error(`Demo login API failed: ${demoLoginResponse.status}`);
+    }
 
     // Wait for redirect to dashboard
-    await page.waitForURL(/\/dashboard/, { timeout: 45000 });
+    try {
+      await page.waitForURL(/\/dashboard/, { timeout: 60000 });
+    } catch (e) {
+      console.error('Failed to redirect to dashboard');
+      console.error('Current URL:', page.url());
+      console.error('Console messages:', consoleMessages.join('\n'));
+      throw e;
+    }
+  }
+
+  test('demo login redirects to dashboard', async ({ page }) => {
+    await performDemoLogin(page);
 
     // Verify we're on the dashboard
     await expect(page.getByRole('heading', { name: /dashboard|quotes/i })).toBeVisible({
@@ -30,14 +108,7 @@ test.describe('Demo Login', () => {
   });
 
   test('demo data is pre-seeded', async ({ page }) => {
-    await setupClerkTestingToken({ page });
-
-    await page.goto('/');
-    await page
-      .getByRole('button', { name: /try demo/i })
-      .first()
-      .click();
-    await page.waitForURL(/\/dashboard/, { timeout: 45000 });
+    await performDemoLogin(page);
 
     // Wait for dashboard content to load
     await expect(page.getByRole('heading', { name: /dashboard|quotes/i })).toBeVisible({
@@ -50,14 +121,7 @@ test.describe('Demo Login', () => {
   });
 
   test('demo session is isolated with cookie', async ({ page }) => {
-    await setupClerkTestingToken({ page });
-
-    await page.goto('/');
-    await page
-      .getByRole('button', { name: /try demo/i })
-      .first()
-      .click();
-    await page.waitForURL(/\/dashboard/, { timeout: 45000 });
+    await performDemoLogin(page);
 
     // Check that demo_session_id cookie is set
     const cookies = await page.context().cookies();
