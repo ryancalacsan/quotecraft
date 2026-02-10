@@ -1,19 +1,11 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Quote Templates', () => {
-  // Increase timeout for tests involving auth
-  test.setTimeout(90000);
-
-  // Login as demo user before each test
+  // Auth state is loaded from storage, just navigate to dashboard
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page
-      .getByRole('button', { name: /try demo/i })
-      .first()
-      .click();
-    await page.waitForURL(/\/dashboard/, { timeout: 45000 });
+    await page.goto('/dashboard');
     await expect(page.getByRole('heading', { name: /dashboard|quotes/i })).toBeVisible({
-      timeout: 15000,
+      timeout: 10000,
     });
   });
 

@@ -47,3 +47,6 @@ next-env.d.ts
 CLAUDE.md
 QuoteCraft-Project-Brief.md
 .claude/
+
+# Playwright auth state
+tests/e2e/.auth/

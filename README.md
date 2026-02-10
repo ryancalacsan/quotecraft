@@ -127,9 +127,14 @@ pnpm test
 # Unit tests in watch mode
 pnpm test:watch
 
-# E2E tests (requires dev server)
+# E2E tests (requires dev server + test user credentials)
 pnpm test:e2e
+
+# E2E smoke tests only (no auth required)
+pnpm playwright test --project=smoke
 ```
+
+**E2E Test Setup:** Authenticated E2E tests require a test user in Clerk with email/password. Set `E2E_CLERK_USER_USERNAME` and `E2E_CLERK_USER_PASSWORD` in `.env.local`.
 
 ## Project Structure
 

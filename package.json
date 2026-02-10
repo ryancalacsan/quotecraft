@@ -61,6 +61,7 @@
     "*.{js,jsx,ts,tsx}": "eslint --fix"
   },
   "devDependencies": {
+    "@clerk/testing": "^1.13.35",
     "@playwright/test": "^1.58.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
