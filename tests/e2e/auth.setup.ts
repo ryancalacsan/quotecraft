@@ -77,21 +77,22 @@ setup('authenticate', async ({ page }) => {
   }
 
   // Log debug info if API call failed or didn't happen
-  if (!demoLoginResponse) {
+  // Use type assertion because TypeScript can't track mutations inside async callbacks
+  const response = demoLoginResponse as { status: number; body: string } | null;
+
+  if (!response) {
     console.error('Demo login API was never called');
     console.error('Console messages:', consoleMessages.join('\n'));
     await page.screenshot({ path: 'tests/e2e/.auth/debug-no-api-call.png' });
     throw new Error('Demo login API was never called - check if button click worked');
   }
 
-  if (demoLoginResponse.status !== 200) {
-    console.error(`Demo login API failed with status ${demoLoginResponse.status}`);
-    console.error(`Response body: ${demoLoginResponse.body}`);
+  if (response.status !== 200) {
+    console.error(`Demo login API failed with status ${response.status}`);
+    console.error(`Response body: ${response.body}`);
     console.error('Console messages:', consoleMessages.join('\n'));
     await page.screenshot({ path: 'tests/e2e/.auth/debug-api-error.png' });
-    throw new Error(
-      `Demo login API failed: ${demoLoginResponse.status} - ${demoLoginResponse.body}`,
-    );
+    throw new Error(`Demo login API failed: ${response.status} - ${response.body}`);
   }
 
   console.log('Demo login API succeeded, waiting for redirect...');

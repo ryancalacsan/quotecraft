@@ -75,16 +75,19 @@ test.describe('Demo Login', () => {
       }
     }
 
-    if (!demoLoginResponse) {
+    // Use type assertion because TypeScript can't track mutations inside async callbacks
+    const response = demoLoginResponse as { status: number; body: string } | null;
+
+    if (!response) {
       console.error('Demo login API was never called after retries');
       console.error('Console messages:', consoleMessages.join('\n'));
       throw new Error('Demo login API was never called');
     }
 
-    if (demoLoginResponse.status !== 200) {
-      console.error(`Demo login API failed: ${demoLoginResponse.status}`);
-      console.error(`Response: ${demoLoginResponse.body}`);
-      throw new Error(`Demo login API failed: ${demoLoginResponse.status}`);
+    if (response.status !== 200) {
+      console.error(`Demo login API failed: ${response.status}`);
+      console.error(`Response: ${response.body}`);
+      throw new Error(`Demo login API failed: ${response.status}`);
     }
 
     // Wait for redirect to dashboard
@@ -116,7 +119,8 @@ test.describe('Demo Login', () => {
     });
 
     // Demo data should include pre-seeded quotes
-    const quoteStats = page.getByText(/total quotes/i);
+    // Look for the stats row which contains "Total Quotes" label
+    const quoteStats = page.getByText('Total Quotes');
     await expect(quoteStats).toBeVisible({ timeout: 10000 });
   });
 
