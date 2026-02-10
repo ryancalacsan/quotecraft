@@ -1,23 +1,18 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Public Quote View', () => {
-  // Increase timeout for tests involving auth and quote setup
-  test.setTimeout(120000);
+  // Increase timeout for quote setup
+  test.setTimeout(60000);
 
   let shareToken: string;
   let quoteTitle: string;
 
   // Create a sent quote and get its share token before tests
+  // Auth state is loaded from storage
   test.beforeEach(async ({ page }) => {
-    // Login as demo user
-    await page.goto('/');
-    await page
-      .getByRole('button', { name: /try demo/i })
-      .first()
-      .click();
-    await page.waitForURL(/\/dashboard/, { timeout: 45000 });
+    await page.goto('/dashboard');
     await expect(page.getByRole('heading', { name: /dashboard|quotes/i })).toBeVisible({
-      timeout: 15000,
+      timeout: 10000,
     });
 
     // Create a unique quote for each test
@@ -106,12 +101,8 @@ test.describe('Public Quote View', () => {
 
   test('decline quote changes status', async ({ page }) => {
     // Need to create a new quote for this test since the beforeEach one might be accepted
-    await page.goto('/');
-    await page
-      .getByRole('button', { name: /try demo/i })
-      .first()
-      .click();
-    await page.waitForURL(/\/dashboard/, { timeout: 30000 });
+    // Auth state is loaded from storage
+    await page.goto('/dashboard');
 
     // Create another quote
     const declineTitle = `Decline Quote ${Date.now()}`;
@@ -186,17 +177,9 @@ test.describe('Public Quote View', () => {
 });
 
 test.describe('Expired Quote', () => {
-  // Increase timeout for tests involving auth
-  test.setTimeout(120000);
-
   test('expired quote shows warning', async ({ page }) => {
-    // Login as demo user
-    await page.goto('/');
-    await page
-      .getByRole('button', { name: /try demo/i })
-      .first()
-      .click();
-    await page.waitForURL(/\/dashboard/, { timeout: 45000 });
+    // Auth state is loaded from storage
+    await page.goto('/dashboard');
 
     // Create a quote with past valid until date
     await page

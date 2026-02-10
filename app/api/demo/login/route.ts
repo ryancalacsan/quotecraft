@@ -7,11 +7,18 @@ import { users } from '@/lib/db/schema';
 import { seedDemoData } from '@/lib/demo-seed';
 
 // In-memory rate limiter: 10 requests per IP per hour
+// Skip rate limiting in E2E test mode (when PLAYWRIGHT_TEST_BASE_URL is set)
 const RATE_LIMIT = 10;
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(ip: string): boolean {
+  // Skip rate limiting in development/test mode and CI
+  // Rate limiting is only active in production
+  if (process.env.NODE_ENV !== 'production' || process.env.CI) {
+    return false;
+  }
+
   const now = Date.now();
 
   // Purge expired entries to prevent unbounded memory growth

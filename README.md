@@ -54,7 +54,7 @@ Built as a portfolio project demonstrating full-stack skills: complex form state
 | Drag & Drop    | @dnd-kit                 |
 | Theming        | next-themes              |
 | Unit Tests     | Vitest (181 tests)       |
-| E2E Tests      | Playwright (30 tests)    |
+| E2E Tests      | Playwright               |
 | CI/CD          | GitHub Actions           |
 | Deployment     | Vercel                   |
 
@@ -127,9 +127,14 @@ pnpm test
 # Unit tests in watch mode
 pnpm test:watch
 
-# E2E tests (requires dev server)
+# E2E tests (requires dev server + test user credentials)
 pnpm test:e2e
+
+# E2E smoke tests only (no auth required)
+pnpm playwright test --project=smoke
 ```
+
+**E2E Test Setup:** Authenticated E2E tests require a test user in Clerk with email/password. Set `E2E_CLERK_USER_USERNAME` and `E2E_CLERK_USER_PASSWORD` in `.env.local`.
 
 ## Project Structure
 
@@ -163,7 +168,7 @@ quotecraft/
 └── tests/
     ├── unit/                        # Vitest (181 tests)
     │   └── actions/                 # Server Action tests
-    ├── e2e/                         # Playwright (30 tests)
+    ├── e2e/                         # Playwright E2E tests
     └── helpers/                     # Test fixtures and mocks
 ```
 
