@@ -53,8 +53,8 @@ Built as a portfolio project demonstrating full-stack skills: complex form state
 | Charts         | Recharts                 |
 | Drag & Drop    | @dnd-kit                 |
 | Theming        | next-themes              |
-| Unit Tests     | Vitest (99 tests)        |
-| E2E Tests      | Playwright               |
+| Unit Tests     | Vitest (181 tests)       |
+| E2E Tests      | Playwright (30 tests)    |
 | CI/CD          | GitHub Actions           |
 | Deployment     | Vercel                   |
 
@@ -161,8 +161,10 @@ quotecraft/
 │   ├── stripe.ts                    # Stripe client
 │   └── utils.ts                     # Formatting helpers
 └── tests/
-    ├── unit/                        # Vitest (99 tests, 100% coverage)
-    └── e2e/                         # Playwright (smoke tests)
+    ├── unit/                        # Vitest (181 tests)
+    │   └── actions/                 # Server Action tests
+    ├── e2e/                         # Playwright (30 tests)
+    └── helpers/                     # Test fixtures and mocks
 ```
 
 ## Note
