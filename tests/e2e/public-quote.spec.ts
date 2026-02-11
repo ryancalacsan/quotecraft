@@ -71,12 +71,14 @@ test.describe('Public Quote View', () => {
     await expect(markAsSentBtn).toBeVisible({ timeout: 5000 });
     await markAsSentBtn.click();
 
-    // Wait for modal to close and network to settle before reload
-    await expect(markAsSentBtn).not.toBeVisible({ timeout: 10000 });
-    await page.waitForLoadState('networkidle');
+    // Wait for success toast confirming status update
+    await expect(page.getByText(/quote marked as sent/i)).toBeVisible({ timeout: 10000 });
+
+    // Reload to get the updated page with share link
     await page.reload();
     await expect(page.getByRole('heading', { name: title })).toBeVisible({ timeout: 10000 });
 
+    // ShareLinkCard uses Input with readOnly prop
     const shareInput = page.locator('input[readonly]').first();
     await expect(shareInput).toBeVisible({ timeout: 10000 });
     const shareUrl = await shareInput.inputValue();
@@ -150,8 +152,8 @@ test.describe('Public Quote View', () => {
     await expect(declineBtn).toBeVisible({ timeout: 5000 });
     await declineBtn.click();
 
-    // Verify status changed
-    await expect(page.getByText(/declined/i)).toBeVisible({ timeout: 10000 });
+    // Verify status changed - use specific text to avoid matching multiple elements
+    await expect(page.getByText('Quote Declined', { exact: true })).toBeVisible({ timeout: 10000 });
   });
 
   test('accepted quote shows payment option', async ({ page }) => {
