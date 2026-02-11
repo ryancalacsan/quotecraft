@@ -10,6 +10,9 @@ export const metadata = {
   title: 'Templates',
 };
 
+// Force dynamic rendering to ensure fresh data on every request
+export const dynamic = 'force-dynamic';
+
 export default async function TemplatesPage() {
   const { userId } = await auth();
   if (!userId) redirect('/sign-in');
