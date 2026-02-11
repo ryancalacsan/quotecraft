@@ -54,7 +54,7 @@ Built as a portfolio project demonstrating full-stack skills: complex form state
 | Drag & Drop    | @dnd-kit                 |
 | Theming        | next-themes              |
 | Unit Tests     | Vitest (181 tests)       |
-| E2E Tests      | Playwright               |
+| E2E Tests      | Playwright (30 tests)    |
 | CI/CD          | GitHub Actions           |
 | Deployment     | Vercel                   |
 
@@ -120,12 +120,20 @@ stripe listen --forward-to localhost:3000/api/webhooks/stripe
 
 ### Testing
 
+**Test Coverage: 211 tests total**
+
+| Category              | Tests | Coverage            |
+| --------------------- | ----- | ------------------- |
+| Unit Tests (lib/)     | 99    | 100%                |
+| Unit Tests (actions/) | 82    | Server Actions      |
+| E2E Tests             | 30    | Critical user flows |
+
 ```bash
 # Unit tests
 pnpm test
 
-# Unit tests in watch mode
-pnpm test:watch
+# Unit tests with coverage report
+pnpm test:coverage
 
 # E2E tests (requires dev server + test user credentials)
 pnpm test:e2e
@@ -134,7 +142,7 @@ pnpm test:e2e
 pnpm playwright test --project=smoke
 ```
 
-**E2E Test Setup:** Authenticated E2E tests require a test user in Clerk with email/password. Set `E2E_CLERK_USER_USERNAME` and `E2E_CLERK_USER_PASSWORD` in `.env.local`.
+**E2E Test Setup:** Authenticated E2E tests use the demo login flow with Clerk Sign-In Tokens. Set `E2E_CLERK_USER_USERNAME` and `E2E_CLERK_USER_PASSWORD` in `.env.local` for local runs. CI uses GitHub secrets.
 
 ## Project Structure
 
