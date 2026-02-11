@@ -42,7 +42,7 @@ export async function saveAsTemplate(quoteId: string, formData: FormData) {
     name: formData.get('name'),
     description: formData.get('description'),
     defaultTitle: quote.title,
-    defaultNotes: quote.notes,
+    defaultNotes: quote.notes ?? undefined, // Convert null to undefined for Zod schema
     defaultValidDays: formData.get('defaultValidDays'),
     defaultDepositPercent: quote.depositPercent,
   };

@@ -9,6 +9,9 @@ import {
   hourlyLineItem,
 } from '../../helpers/fixtures';
 
+// Type for field-level validation errors
+type FieldErrors = Record<string, string[] | undefined>;
+
 // Set DATABASE_URL before any imports that might need it
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
 
@@ -72,7 +75,7 @@ describe('quotes actions', () => {
       const result = await createQuote(formData);
 
       expect(result.error).toBeDefined();
-      expect(result.error?.title).toBeDefined();
+      expect((result.error as FieldErrors)?.title).toBeDefined();
     });
 
     it('should return validation errors for missing clientName', async () => {
@@ -91,7 +94,7 @@ describe('quotes actions', () => {
       const result = await createQuote(formData);
 
       expect(result.error).toBeDefined();
-      expect(result.error?.clientName).toBeDefined();
+      expect((result.error as FieldErrors)?.clientName).toBeDefined();
     });
 
     it('should return validation errors for invalid email format', async () => {
@@ -111,7 +114,7 @@ describe('quotes actions', () => {
       const result = await createQuote(formData);
 
       expect(result.error).toBeDefined();
-      expect(result.error?.clientEmail).toBeDefined();
+      expect((result.error as FieldErrors)?.clientEmail).toBeDefined();
     });
 
     it('should return validation errors for deposit percent out of range', async () => {
@@ -131,7 +134,7 @@ describe('quotes actions', () => {
       const result = await createQuote(formData);
 
       expect(result.error).toBeDefined();
-      expect(result.error?.depositPercent).toBeDefined();
+      expect((result.error as FieldErrors)?.depositPercent).toBeDefined();
     });
 
     it('should create quote and redirect on valid data', async () => {

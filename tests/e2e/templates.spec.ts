@@ -78,11 +78,15 @@ test.describe('Quote Templates', () => {
     await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
     await saveTemplateBtn.click();
 
-    // Wait for save to complete before navigating
-    await page.waitForLoadState('networkidle');
+    // Wait for modal to close (confirms server action completed)
+    await expect(saveTemplateBtn).not.toBeVisible({ timeout: 10000 });
 
     // Navigate to templates page to verify
     await page.goto('/templates');
+    await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
+
+    // Force reload to bypass any cached data
+    await page.reload();
     await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
 
     // Verify template is in the list
@@ -123,17 +127,21 @@ test.describe('Quote Templates', () => {
     await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
     await saveTemplateBtn.click();
 
-    // Wait for save to complete before navigating
-    await page.waitForLoadState('networkidle');
+    // Wait for modal to close (confirms server action completed)
+    await expect(saveTemplateBtn).not.toBeVisible({ timeout: 10000 });
 
     // Navigate to templates page
     await page.goto('/templates');
     await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
 
+    // Force reload to bypass any cached data
+    await page.reload();
+    await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
+
     // Find the template and click use
     await expect(page.getByText(templateName)).toBeVisible({ timeout: 10000 });
     const templateCard = page.getByText(templateName).locator('..').locator('..');
-    const useTemplateBtn = templateCard.getByRole('button', { name: /use template|create quote/i });
+    const useTemplateBtn = templateCard.getByRole('button', { name: 'Use Template', exact: true });
     await expect(useTemplateBtn).toBeVisible({ timeout: 5000 });
     await useTemplateBtn.click();
 
@@ -180,26 +188,31 @@ test.describe('Quote Templates', () => {
     await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
     await saveTemplateBtn.click();
 
-    // Wait for save to complete before navigating
-    await page.waitForLoadState('networkidle');
+    // Wait for modal to close (confirms server action completed)
+    await expect(saveTemplateBtn).not.toBeVisible({ timeout: 10000 });
 
     // Navigate to templates page
     await page.goto('/templates');
     await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
 
+    // Force reload to bypass any cached data
+    await page.reload();
+    await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
+
     // Verify template exists
     await expect(page.getByText(templateName)).toBeVisible({ timeout: 10000 });
 
-    // Find the template card and click delete
+    // Find the template card and open actions dropdown
     const templateCard = page.getByText(templateName).locator('..').locator('..');
-    const deleteBtn = templateCard.getByRole('button', { name: /delete/i });
-    await expect(deleteBtn).toBeVisible({ timeout: 5000 });
-    await deleteBtn.click();
+    const actionsBtn = templateCard.getByRole('button', { name: `Actions for ${templateName}` });
+    await expect(actionsBtn).toBeVisible({ timeout: 5000 });
+    await actionsBtn.click();
 
-    // Wait for and confirm deletion dialog
-    const confirmDeleteBtn = page.getByRole('button', { name: /^delete$/i });
-    await expect(confirmDeleteBtn).toBeVisible({ timeout: 5000 });
-    await confirmDeleteBtn.click();
+    // Click the delete menu item (handles browser confirm dialog automatically)
+    page.on('dialog', (dialog) => dialog.accept());
+    const deleteMenuItem = page.getByRole('menuitem', { name: /delete/i });
+    await expect(deleteMenuItem).toBeVisible({ timeout: 5000 });
+    await deleteMenuItem.click();
 
     // Verify template is removed (web-first assertion auto-retries)
     await expect(page.getByText(templateName)).not.toBeVisible({ timeout: 10000 });
@@ -275,24 +288,30 @@ test.describe('Quote Templates', () => {
     await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
     await saveTemplateBtn.click();
 
-    // Wait for save to complete before navigating
-    await page.waitForLoadState('networkidle');
+    // Wait for modal to close (confirms server action completed)
+    await expect(saveTemplateBtn).not.toBeVisible({ timeout: 10000 });
 
     // Use the template
     await page.goto('/templates');
     await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
 
+    // Force reload to bypass any cached data
+    await page.reload();
+    await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
+
     await expect(page.getByText(templateName)).toBeVisible({ timeout: 10000 });
     const templateCard = page.getByText(templateName).locator('..').locator('..');
-    const useTemplateBtn = templateCard.getByRole('button', { name: /use template|create quote/i });
+    const useTemplateBtn = templateCard.getByRole('button', { name: 'Use Template', exact: true });
     await expect(useTemplateBtn).toBeVisible({ timeout: 5000 });
     await useTemplateBtn.click();
 
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
 
-    // Verify line items are inherited
-    await expect(page.getByText('Inherited Service 1')).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/\$100/)).toBeVisible({ timeout: 10000 });
+    // Verify line items are inherited (on edit page, items are in input fields)
+    const inheritedDescription = page.getByPlaceholder('Description').first();
+    await expect(inheritedDescription).toHaveValue('Inherited Service 1', { timeout: 10000 });
+    // Verify total shows correct amount (use first() as total appears multiple places)
+    await expect(page.getByText('$100.00').first()).toBeVisible({ timeout: 10000 });
   });
 
   test('navigate to templates from navigation', async ({ page }) => {
