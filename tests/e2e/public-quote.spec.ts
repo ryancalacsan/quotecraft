@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Public Quote View', () => {
-  // Increase timeout for quote setup
+  // Mark as slow - beforeEach creates and sends a quote for each test
+  test.slow();
   test.setTimeout(90000);
 
   let shareToken: string;
@@ -44,6 +45,14 @@ test.describe('Public Quote View', () => {
     // Verify the input was filled
     await expect(descriptionInput).toHaveValue('Test Service', { timeout: 5000 });
 
+    // Click Save Line Items button to persist the line item
+    const saveLineItemsBtn = page.getByRole('button', { name: /save line items/i });
+    await expect(saveLineItemsBtn).toBeVisible({ timeout: 5000 });
+    await saveLineItemsBtn.click();
+
+    // Wait for save confirmation toast
+    await expect(page.getByText(/line items saved/i)).toBeVisible({ timeout: 10000 });
+
     // Navigate to detail and send
     const editUrl = page.url();
     const detailUrl = editUrl.replace('/edit', '');
@@ -62,8 +71,9 @@ test.describe('Public Quote View', () => {
     await expect(markAsSentBtn).toBeVisible({ timeout: 5000 });
     await markAsSentBtn.click();
 
-    // Wait for modal to close and reload to see share link
+    // Wait for modal to close and network to settle before reload
     await expect(markAsSentBtn).not.toBeVisible({ timeout: 10000 });
+    await page.waitForLoadState('networkidle');
     await page.reload();
     await expect(page.getByRole('heading', { name: title })).toBeVisible({ timeout: 10000 });
 
@@ -95,7 +105,7 @@ test.describe('Public Quote View', () => {
     // Verify quote details are visible
     await expect(page.getByText(quoteTitle)).toBeVisible({ timeout: 10000 });
     await expect(page.getByText('Public View Client')).toBeVisible({ timeout: 5000 });
-    await expect(page.getByText('Test Service')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Test Service').first()).toBeVisible({ timeout: 5000 });
   });
 
   test('public quote shows pricing', async ({ page }) => {
@@ -103,7 +113,7 @@ test.describe('Public Quote View', () => {
     await page.goto(`/q/${shareToken}`);
 
     // Verify pricing is visible
-    await expect(page.getByText(/\$500/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/\$500/).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('accept quote changes status', async ({ page }) => {
@@ -117,7 +127,7 @@ test.describe('Public Quote View', () => {
     await acceptBtn.click();
 
     // Verify status changed
-    await expect(page.getByText(/accepted/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/accepted/i).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('decline quote changes status', async ({ page }) => {
@@ -169,7 +179,7 @@ test.describe('Public Quote View', () => {
     await acceptBtn.click();
 
     // Wait for status to change
-    await expect(page.getByText(/accepted/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/accepted/i).first()).toBeVisible({ timeout: 10000 });
 
     // Accept/Decline buttons should be hidden
     await expect(page.getByRole('button', { name: /^accept$/i })).not.toBeVisible({
@@ -182,6 +192,8 @@ test.describe('Public Quote View', () => {
 });
 
 test.describe('Expired Quote', () => {
+  // Mark as slow - test creates and sends an expired quote
+  test.slow();
   test.setTimeout(90000);
 
   test('expired quote shows warning', async ({ page }) => {

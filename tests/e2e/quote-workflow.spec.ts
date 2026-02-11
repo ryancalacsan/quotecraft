@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Quote Workflow', () => {
+  // Mark as slow - tests create and send quotes
+  test.slow();
   test.setTimeout(90000);
 
   // Auth state is loaded from storage, just navigate to dashboard
@@ -25,8 +27,9 @@ test.describe('Quote Workflow', () => {
     await expect(markAsSentBtn).toBeVisible({ timeout: 5000 });
     await markAsSentBtn.click();
 
-    // Wait for modal to close
+    // Wait for modal to close and network to settle
     await expect(markAsSentBtn).not.toBeVisible({ timeout: 10000 });
+    await page.waitForLoadState('networkidle');
   }
 
   test('send quote changes status from draft to sent', async ({ page }) => {

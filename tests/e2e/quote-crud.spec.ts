@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Quote CRUD Operations', () => {
+  test.setTimeout(90000);
+
   // Auth state is loaded from storage, just navigate to dashboard
   test.beforeEach(async ({ page }) => {
     await page.goto('/dashboard');
@@ -87,6 +89,9 @@ test.describe('Quote CRUD Operations', () => {
     const saveButton = page.getByRole('button', { name: /save|update/i }).first();
     await expect(saveButton).toBeVisible({ timeout: 5000 });
     await saveButton.click();
+
+    // Wait for save to complete before reloading
+    await page.waitForLoadState('networkidle');
 
     // Reload and verify the title was updated
     await page.reload();

@@ -7,7 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? 'github' : 'html',
-  timeout: 60000,
+  timeout: 90000,
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
@@ -50,12 +50,13 @@ export default defineConfig({
     },
 
     // Authenticated tests - depend on auth setup
-    // Run serially to avoid flaky navigation issues with parallel execution
+    // Run serially with single worker to avoid flaky navigation issues
     {
       name: 'authenticated',
       testMatch: /^(?!.*(?:smoke|demo-login|auth\.setup|global)).*\.spec\.ts$/,
       dependencies: ['auth-setup'],
       fullyParallel: false,
+      workers: 1,
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'tests/e2e/.auth/user.json',

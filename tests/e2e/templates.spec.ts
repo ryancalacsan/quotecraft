@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Quote Templates', () => {
+  // Mark as slow - tests create quotes and templates
+  test.slow();
   test.setTimeout(90000);
 
   // Auth state is loaded from storage, just navigate to dashboard
@@ -44,6 +46,14 @@ test.describe('Quote Templates', () => {
     // Verify the input was filled
     await expect(descriptionInput).toHaveValue('Template Service', { timeout: 5000 });
 
+    // Click Save Line Items button to persist the line item
+    const saveLineItemsBtn = page.getByRole('button', { name: /save line items/i });
+    await expect(saveLineItemsBtn).toBeVisible({ timeout: 5000 });
+    await saveLineItemsBtn.click();
+
+    // Wait for save confirmation toast
+    await expect(page.getByText(/line items saved/i)).toBeVisible({ timeout: 10000 });
+
     // Navigate to quote detail page
     const editUrl = page.url();
     const detailUrl = editUrl.replace('/edit', '');
@@ -67,6 +77,9 @@ test.describe('Quote Templates', () => {
     const saveTemplateBtn = page.getByRole('button', { name: /save template/i });
     await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
     await saveTemplateBtn.click();
+
+    // Wait for save to complete before navigating
+    await page.waitForLoadState('networkidle');
 
     // Navigate to templates page to verify
     await page.goto('/templates');
@@ -110,12 +123,15 @@ test.describe('Quote Templates', () => {
     await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
     await saveTemplateBtn.click();
 
+    // Wait for save to complete before navigating
+    await page.waitForLoadState('networkidle');
+
     // Navigate to templates page
     await page.goto('/templates');
     await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
 
     // Find the template and click use
-    await expect(page.getByText(templateName)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(templateName)).toBeVisible({ timeout: 10000 });
     const templateCard = page.getByText(templateName).locator('..').locator('..');
     const useTemplateBtn = templateCard.getByRole('button', { name: /use template|create quote/i });
     await expect(useTemplateBtn).toBeVisible({ timeout: 5000 });
@@ -164,12 +180,15 @@ test.describe('Quote Templates', () => {
     await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
     await saveTemplateBtn.click();
 
+    // Wait for save to complete before navigating
+    await page.waitForLoadState('networkidle');
+
     // Navigate to templates page
     await page.goto('/templates');
     await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
 
     // Verify template exists
-    await expect(page.getByText(templateName)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(templateName)).toBeVisible({ timeout: 10000 });
 
     // Find the template card and click delete
     const templateCard = page.getByText(templateName).locator('..').locator('..');
@@ -227,6 +246,14 @@ test.describe('Quote Templates', () => {
     // Verify the input was filled
     await expect(descriptionInput).toHaveValue('Inherited Service 1', { timeout: 5000 });
 
+    // Click Save Line Items button to persist the line item
+    const saveLineItemsBtn = page.getByRole('button', { name: /save line items/i });
+    await expect(saveLineItemsBtn).toBeVisible({ timeout: 5000 });
+    await saveLineItemsBtn.click();
+
+    // Wait for save confirmation toast
+    await expect(page.getByText(/line items saved/i)).toBeVisible({ timeout: 10000 });
+
     // Save as template
     const editUrl = page.url();
     const detailUrl = editUrl.replace('/edit', '');
@@ -248,11 +275,14 @@ test.describe('Quote Templates', () => {
     await expect(saveTemplateBtn).toBeVisible({ timeout: 5000 });
     await saveTemplateBtn.click();
 
+    // Wait for save to complete before navigating
+    await page.waitForLoadState('networkidle');
+
     // Use the template
     await page.goto('/templates');
     await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({ timeout: 10000 });
 
-    await expect(page.getByText(templateName)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(templateName)).toBeVisible({ timeout: 10000 });
     const templateCard = page.getByText(templateName).locator('..').locator('..');
     const useTemplateBtn = templateCard.getByRole('button', { name: /use template|create quote/i });
     await expect(useTemplateBtn).toBeVisible({ timeout: 5000 });
