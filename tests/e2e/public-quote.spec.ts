@@ -71,12 +71,14 @@ test.describe('Public Quote View', () => {
     await expect(markAsSentBtn).toBeVisible({ timeout: 5000 });
     await markAsSentBtn.click();
 
-    // Wait for modal to close and network to settle before reload
-    await expect(markAsSentBtn).not.toBeVisible({ timeout: 10000 });
-    await page.waitForLoadState('networkidle');
+    // Wait for success toast confirming status update
+    await expect(page.getByText(/quote marked as sent/i)).toBeVisible({ timeout: 10000 });
+
+    // Reload to get the updated page with share link
     await page.reload();
     await expect(page.getByRole('heading', { name: title })).toBeVisible({ timeout: 10000 });
 
+    // ShareLinkCard uses Input with readOnly prop
     const shareInput = page.locator('input[readonly]').first();
     await expect(shareInput).toBeVisible({ timeout: 10000 });
     const shareUrl = await shareInput.inputValue();
@@ -150,8 +152,8 @@ test.describe('Public Quote View', () => {
     await expect(declineBtn).toBeVisible({ timeout: 5000 });
     await declineBtn.click();
 
-    // Verify status changed
-    await expect(page.getByText(/declined/i)).toBeVisible({ timeout: 10000 });
+    // Verify status changed - use specific text to avoid matching multiple elements
+    await expect(page.getByText('Quote Declined', { exact: true })).toBeVisible({ timeout: 10000 });
   });
 
   test('accepted quote shows payment option', async ({ page }) => {
@@ -241,13 +243,16 @@ test.describe('Expired Quote', () => {
     await expect(markAsSentBtn).toBeVisible({ timeout: 5000 });
     await markAsSentBtn.click();
 
-    // Wait for modal to close and reload to get share link
-    await expect(markAsSentBtn).not.toBeVisible({ timeout: 10000 });
+    // Wait for success toast confirming status update
+    await expect(page.getByText(/quote marked as sent/i)).toBeVisible({ timeout: 10000 });
+
+    // Reload to get the updated page with share link
     await page.reload();
     await expect(page.getByRole('heading', { name: 'Expired Quote' })).toBeVisible({
       timeout: 10000,
     });
 
+    // ShareLinkCard uses Input with readOnly prop
     const shareInput = page.locator('input[readonly]').first();
     await expect(shareInput).toBeVisible({ timeout: 10000 });
     const shareUrl = await shareInput.inputValue();
@@ -258,8 +263,13 @@ test.describe('Expired Quote', () => {
     await page.context().clearCookies();
     await page.goto(`/q/${expiredToken}`);
 
+    // Wait for page to load and verify quote title is visible
+    await expect(page.getByRole('heading', { name: 'Expired Quote' })).toBeVisible({
+      timeout: 10000,
+    });
+
     // Verify expiration warning is shown
-    await expect(page.getByText(/expired/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/this quote expired/i)).toBeVisible({ timeout: 10000 });
 
     // Verify action buttons are hidden or disabled
     const acceptButton = page.getByRole('button', { name: /accept/i });

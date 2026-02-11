@@ -84,7 +84,7 @@ jobs:
         run: pnpm playwright install --with-deps chromium
 
       - name: Run E2E tests
-        run: pnpm playwright test --project=smoke --project=demo-login
+        run: pnpm playwright test --project=smoke --project=demo-login --project=authenticated
         env:
           NEXT_PUBLIC_APP_URL: http://localhost:3000
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_c2ltcGxlLWxhY2V3aW5nLTY3LmNsZXJrLmFjY291bnRzLmRldiQ
