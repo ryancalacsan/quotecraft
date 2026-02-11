@@ -85,13 +85,13 @@ test.describe('Quote CRUD Operations', () => {
     const titleInput = page.getByLabel(/title/i);
     await titleInput.fill('Updated Title');
 
-    // Save changes
-    const saveButton = page.getByRole('button', { name: /save|update/i }).first();
+    // Save changes - use exact match to avoid matching "Save Line Items"
+    const saveButton = page.getByRole('button', { name: 'Save Quote' });
     await expect(saveButton).toBeVisible({ timeout: 5000 });
     await saveButton.click();
 
-    // Wait for save to complete before reloading
-    await page.waitForLoadState('networkidle');
+    // Wait for save confirmation toast
+    await expect(page.getByText(/quote saved/i)).toBeVisible({ timeout: 10000 });
 
     // Reload and verify the title was updated
     await page.reload();
@@ -128,10 +128,16 @@ test.describe('Quote CRUD Operations', () => {
     await expect(dropdownTrigger).toBeVisible({ timeout: 5000 });
     await dropdownTrigger.click();
 
-    // Wait for dropdown menu to appear
+    // Set up dialog handler for confirm() before clicking delete
+    page.on('dialog', (dialog) => dialog.accept());
+
+    // Wait for dropdown menu to appear and click delete
     const deleteMenuItem = page.getByRole('menuitem', { name: /delete/i });
     await expect(deleteMenuItem).toBeVisible({ timeout: 5000 });
     await deleteMenuItem.click();
+
+    // Wait for delete confirmation toast
+    await expect(page.getByText(/quote deleted/i)).toBeVisible({ timeout: 10000 });
 
     // Verify the quote is no longer visible (web-first assertion auto-retries)
     await expect(page.getByText(quoteTitle)).not.toBeVisible({ timeout: 10000 });
@@ -225,7 +231,10 @@ test.describe('Quote CRUD Operations', () => {
       .click();
     await page.waitForURL(/\/quotes\/new/, { timeout: 10000 });
 
-    await page.getByLabel(/title/i).fill('Pricing Test Quote');
+    // Wait for form to be fully loaded
+    const titleInput = page.getByLabel(/title/i);
+    await expect(titleInput).toBeVisible({ timeout: 5000 });
+    await titleInput.fill('Pricing Test Quote');
     await page.getByLabel(/client name/i).fill('Pricing Client');
     await page.getByRole('button', { name: /create quote|save/i }).click();
     await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
