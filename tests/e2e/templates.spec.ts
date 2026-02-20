@@ -18,16 +18,20 @@ test.describe('Quote Templates', () => {
     await page.setViewportSize({ width: 1400, height: 900 });
 
     // Create a quote first
-    await page
-      .getByRole('link', { name: /new quote|create/i })
-      .first()
-      .click();
-    await page.waitForURL(/\/quotes\/new/, { timeout: 10000 });
+    await Promise.all([
+      page.waitForURL(/\/quotes\/new/, { timeout: 15000 }),
+      page
+        .getByRole('link', { name: /new quote|create/i })
+        .first()
+        .click(),
+    ]);
 
     await page.getByLabel(/title/i).fill('Template Source Quote');
     await page.getByLabel(/client name/i).fill('Template Client');
-    await page.getByRole('button', { name: /create quote|save/i }).click();
-    await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
+    await Promise.all([
+      page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 15000 }),
+      page.getByRole('button', { name: /create quote|save/i }).click(),
+    ]);
 
     // Add a line item using placeholders
     const addButton = page.getByRole('button', { name: /add.*item/i }).first();
@@ -95,16 +99,20 @@ test.describe('Quote Templates', () => {
 
   test('create quote from template', async ({ page }) => {
     // First create a template
-    await page
-      .getByRole('link', { name: /new quote|create/i })
-      .first()
-      .click();
-    await page.waitForURL(/\/quotes\/new/, { timeout: 10000 });
+    await Promise.all([
+      page.waitForURL(/\/quotes\/new/, { timeout: 15000 }),
+      page
+        .getByRole('link', { name: /new quote|create/i })
+        .first()
+        .click(),
+    ]);
 
     await page.getByLabel(/title/i).fill('Template for Creation');
     await page.getByLabel(/client name/i).fill('Creation Client');
-    await page.getByRole('button', { name: /create quote|save/i }).click();
-    await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
+    await Promise.all([
+      page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 15000 }),
+      page.getByRole('button', { name: /create quote|save/i }).click(),
+    ]);
 
     // Navigate to detail and save as template
     const editUrl = page.url();
@@ -143,10 +151,12 @@ test.describe('Quote Templates', () => {
     const templateCard = page.getByText(templateName).locator('..').locator('..');
     const useTemplateBtn = templateCard.getByRole('button', { name: 'Use Template', exact: true });
     await expect(useTemplateBtn).toBeVisible({ timeout: 5000 });
-    await useTemplateBtn.click();
 
     // Should redirect to new quote's edit page
-    await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
+    await Promise.all([
+      page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 15000 }),
+      useTemplateBtn.click(),
+    ]);
 
     // Verify the default title is applied
     await expect(page.getByLabel(/title/i)).toHaveValue('Template for Creation', {
@@ -156,16 +166,20 @@ test.describe('Quote Templates', () => {
 
   test('delete template', async ({ page }) => {
     // First create a template
-    await page
-      .getByRole('link', { name: /new quote|create/i })
-      .first()
-      .click();
-    await page.waitForURL(/\/quotes\/new/, { timeout: 10000 });
+    await Promise.all([
+      page.waitForURL(/\/quotes\/new/, { timeout: 15000 }),
+      page
+        .getByRole('link', { name: /new quote|create/i })
+        .first()
+        .click(),
+    ]);
 
     await page.getByLabel(/title/i).fill('Template to Delete');
     await page.getByLabel(/client name/i).fill('Delete Client');
-    await page.getByRole('button', { name: /create quote|save/i }).click();
-    await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
+    await Promise.all([
+      page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 15000 }),
+      page.getByRole('button', { name: /create quote|save/i }).click(),
+    ]);
 
     // Navigate to detail and save as template
     const editUrl = page.url();
@@ -231,16 +245,20 @@ test.describe('Quote Templates', () => {
     await page.setViewportSize({ width: 1400, height: 900 });
 
     // Create a quote with line items
-    await page
-      .getByRole('link', { name: /new quote|create/i })
-      .first()
-      .click();
-    await page.waitForURL(/\/quotes\/new/, { timeout: 10000 });
+    await Promise.all([
+      page.waitForURL(/\/quotes\/new/, { timeout: 15000 }),
+      page
+        .getByRole('link', { name: /new quote|create/i })
+        .first()
+        .click(),
+    ]);
 
     await page.getByLabel(/title/i).fill('Items Template Quote');
     await page.getByLabel(/client name/i).fill('Items Client');
-    await page.getByRole('button', { name: /create quote|save/i }).click();
-    await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
+    await Promise.all([
+      page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 15000 }),
+      page.getByRole('button', { name: /create quote|save/i }).click(),
+    ]);
 
     // Add line items using placeholders
     const addButton = page.getByRole('button', { name: /add.*item/i }).first();
@@ -303,9 +321,11 @@ test.describe('Quote Templates', () => {
     const templateCard = page.getByText(templateName).locator('..').locator('..');
     const useTemplateBtn = templateCard.getByRole('button', { name: 'Use Template', exact: true });
     await expect(useTemplateBtn).toBeVisible({ timeout: 5000 });
-    await useTemplateBtn.click();
 
-    await page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 10000 });
+    await Promise.all([
+      page.waitForURL(/\/quotes\/[^/]+\/edit/, { timeout: 15000 }),
+      useTemplateBtn.click(),
+    ]);
 
     // Verify line items are inherited (on edit page, items are in input fields)
     const inheritedDescription = page.getByPlaceholder('Description').first();
@@ -320,8 +340,10 @@ test.describe('Quote Templates', () => {
 
     // Click if visible
     if (await templatesLink.isVisible()) {
-      await templatesLink.click();
-      await page.waitForURL(/\/templates/, { timeout: 10000 });
+      await Promise.all([
+        page.waitForURL(/\/templates/, { timeout: 15000 }),
+        templatesLink.click(),
+      ]);
       await expect(page.getByRole('heading', { name: /templates/i })).toBeVisible({
         timeout: 5000,
       });
