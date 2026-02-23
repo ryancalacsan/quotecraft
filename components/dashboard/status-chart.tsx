@@ -45,7 +45,7 @@ export function StatusChart({ statusCounts }: StatusChartProps) {
 
   if (total === 0) {
     return (
-      <Card className="paper-texture">
+      <Card className="paper-texture h-full">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base font-medium">
             <PieChartIcon className="text-muted-foreground h-4 w-4" />
@@ -63,7 +63,7 @@ export function StatusChart({ statusCounts }: StatusChartProps) {
   }
 
   return (
-    <Card className="paper-texture">
+    <Card className="paper-texture h-full">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-base font-medium">
           <PieChartIcon className="text-muted-foreground h-4 w-4" />
@@ -72,8 +72,8 @@ export function StatusChart({ statusCounts }: StatusChartProps) {
         <CardDescription>Distribution by status</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center gap-4">
-          <ChartContainer config={chartConfig} className="h-[200px] w-[200px]">
+        <div className="flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:gap-4">
+          <ChartContainer config={chartConfig} className="h-[180px] w-[180px] shrink-0">
             <PieChart>
               <ChartTooltip
                 content={
@@ -108,10 +108,13 @@ export function StatusChart({ statusCounts }: StatusChartProps) {
               </Pie>
             </PieChart>
           </ChartContainer>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 lg:flex-col lg:flex-nowrap lg:justify-start lg:gap-2">
             {data.map((item) => (
               <div key={item.status} className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.fill }} />
+                <div
+                  className="h-3 w-3 shrink-0 rounded-full"
+                  style={{ backgroundColor: item.fill }}
+                />
                 <span className="text-muted-foreground text-sm">{item.label}</span>
                 <span className="font-mono text-sm font-medium">{item.count}</span>
               </div>

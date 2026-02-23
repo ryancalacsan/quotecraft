@@ -21,7 +21,7 @@ export function QuoteList({ quotes }: { quotes: Quote[] }) {
   return (
     <div className="space-y-6">
       {/* Status filter tabs */}
-      <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
         {FILTER_OPTIONS.map((status) => (
           <Button
             key={status}

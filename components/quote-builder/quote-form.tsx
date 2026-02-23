@@ -213,9 +213,9 @@ export function QuoteForm({
             {/* Column headers */}
             {lineItems.length > 0 && (
               <>
-                <div className="text-muted-foreground hidden grid-cols-12 gap-2 text-xs font-medium xl:grid">
-                  <span className="col-span-3">Description</span>
-                  <span className="col-span-2 flex items-center gap-1">
+                <div className="text-muted-foreground hidden grid-cols-[minmax(0,3fr)_140px_minmax(0,2.5fr)_68px_64px_100px_32px] gap-3 text-xs font-medium xl:grid">
+                  <span>Description</span>
+                  <span className="flex items-center gap-1">
                     Type
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -242,11 +242,11 @@ export function QuoteForm({
                       </TooltipContent>
                     </Tooltip>
                   </span>
-                  <span className="col-span-2">Rate</span>
-                  <span className="col-span-1">Qty</span>
-                  <span className="col-span-1">Disc %</span>
-                  <span className="col-span-2 text-right">Total</span>
-                  <span className="col-span-1" />
+                  <span>Rate</span>
+                  <span>Qty / Hrs</span>
+                  <span>Disc %</span>
+                  <span className="text-right">Total</span>
+                  <span />
                 </div>
                 <Separator />
               </>

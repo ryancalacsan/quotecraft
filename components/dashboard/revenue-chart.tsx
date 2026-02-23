@@ -42,7 +42,7 @@ export function RevenueChart({
   const hasRevenue = data.some((d) => d.revenue > 0);
 
   return (
-    <Card className="paper-texture">
+    <Card className="paper-texture h-full">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="space-y-1">
           <CardTitle className="flex items-center gap-2 text-base font-medium">

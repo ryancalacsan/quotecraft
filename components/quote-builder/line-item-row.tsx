@@ -61,7 +61,7 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
 
   const total = calculateLineItemTotal({
     rate: item.rate || '0',
-    quantity: item.quantity || '0',
+    quantity: item.pricingType === 'fixed' ? '1' : item.quantity || '0',
     discount: item.discount || '0',
   });
 
@@ -80,13 +80,19 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
   // Get icon for current pricing type
   const PricingIcon = PRICING_TYPE_ICONS[item.pricingType] || Tag;
 
+  function handleTypeChange(val: string) {
+    onChange(item.id, 'pricingType', val);
+    // Fixed price is always qty=1; reset to avoid stale multiplier
+    if (val === 'fixed') {
+      onChange(item.id, 'quantity', '1');
+    }
+  }
+
   return (
     <div ref={setNodeRef} style={style}>
       {/* Desktop: grid layout */}
-      <div className="hidden items-start gap-2 xl:grid xl:grid-cols-12">
-        <div
-          className={`flex items-center gap-1 ${item.pricingType === 'per_unit' ? 'col-span-2' : 'col-span-3'}`}
-        >
+      <div className="hidden items-start gap-3 xl:grid xl:grid-cols-[minmax(0,3fr)_140px_minmax(0,2.5fr)_68px_64px_100px_32px]">
+        <div className="flex items-center gap-1">
           {dragHandle}
           <Input
             placeholder="Description"
@@ -95,11 +101,8 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
             className="flex-1"
           />
         </div>
-        <div className="col-span-2">
-          <Select
-            value={item.pricingType}
-            onValueChange={(val) => onChange(item.id, 'pricingType', val)}
-          >
+        <div>
+          <Select value={item.pricingType} onValueChange={handleTypeChange}>
             <SelectTrigger>
               <div className="flex items-center gap-1.5">
                 <PricingIcon className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
@@ -123,16 +126,7 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
             </SelectContent>
           </Select>
         </div>
-        {item.pricingType === 'per_unit' && (
-          <div className="col-span-1">
-            <Input
-              placeholder="Unit"
-              value={item.unit}
-              onChange={(e) => onChange(item.id, 'unit', e.target.value)}
-            />
-          </div>
-        )}
-        <div className="col-span-2">
+        <div className="flex items-center gap-1.5">
           <Input
             type="number"
             placeholder="Rate"
@@ -140,35 +134,49 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
             step="0.01"
             value={item.rate}
             onChange={(e) => onChange(item.id, 'rate', e.target.value)}
+            className="min-w-0 flex-1 px-2"
           />
+          {item.pricingType === 'per_unit' && (
+            <>
+              <span className="text-muted-foreground shrink-0 text-xs">/</span>
+              <Input
+                placeholder="pg, word…"
+                value={item.unit}
+                onChange={(e) => onChange(item.id, 'unit', e.target.value)}
+                className="w-14 px-1.5 text-xs"
+              />
+            </>
+          )}
         </div>
-        <div className="col-span-1">
-          <Input
-            type="number"
-            placeholder="Qty"
-            min="0.01"
-            step="0.01"
-            value={item.quantity}
-            onChange={(e) => onChange(item.id, 'quantity', e.target.value)}
-            className="px-1.5 text-center text-xs"
-          />
+        <div>
+          {item.pricingType !== 'fixed' && (
+            <Input
+              type="number"
+              placeholder={item.pricingType === 'hourly' ? 'Hrs' : 'Qty'}
+              min="0.01"
+              step="0.01"
+              value={item.quantity}
+              onChange={(e) => onChange(item.id, 'quantity', e.target.value)}
+              className="text-center [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
+          )}
         </div>
-        <div className="col-span-1">
+        <div>
           <Input
             type="number"
             placeholder="%"
             min="0"
             max="100"
-            step="1"
+            step="0.01"
             value={item.discount}
             onChange={(e) => onChange(item.id, 'discount', e.target.value)}
-            className="px-1.5 text-center text-xs"
+            className="text-center [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
         </div>
-        <div className="col-span-2 flex h-9 items-center justify-end font-mono text-sm tabular-nums">
+        <div className="flex h-9 items-center justify-end font-mono text-sm tabular-nums">
           {formatCurrency(total)}
         </div>
-        <div className="col-span-1 flex justify-end">
+        <div className="flex justify-end">
           <Button
             type="button"
             variant="ghost"
@@ -227,10 +235,7 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
                 </TooltipContent>
               </Tooltip>
             </div>
-            <Select
-              value={item.pricingType}
-              onValueChange={(val) => onChange(item.id, 'pricingType', val)}
-            >
+            <Select value={item.pricingType} onValueChange={handleTypeChange}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -244,31 +249,53 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
             </Select>
           </div>
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs">Rate</Label>
-            <Input
-              type="number"
-              placeholder="Rate"
-              min="0"
-              step="0.01"
-              value={item.rate}
-              onChange={(e) => onChange(item.id, 'rate', e.target.value)}
-            />
+            <Label className="text-muted-foreground text-xs">
+              {item.pricingType === 'per_unit' ? 'Rate / Unit' : 'Rate'}
+            </Label>
+            <div className="flex items-center gap-1">
+              <Input
+                type="number"
+                placeholder="Rate"
+                min="0"
+                step="0.01"
+                value={item.rate}
+                onChange={(e) => onChange(item.id, 'rate', e.target.value)}
+                className="min-w-0 flex-1"
+              />
+              {item.pricingType === 'per_unit' && (
+                <>
+                  <span className="text-muted-foreground shrink-0 text-xs">/</span>
+                  <Input
+                    placeholder="pg, word…"
+                    value={item.unit}
+                    onChange={(e) => onChange(item.id, 'unit', e.target.value)}
+                    className="w-14 px-1.5 text-xs"
+                  />
+                </>
+              )}
+            </div>
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-2">
+        <div
+          className={`grid gap-2 ${item.pricingType === 'fixed' ? 'grid-cols-2' : 'grid-cols-3'}`}
+        >
+          {item.pricingType !== 'fixed' && (
+            <div className="space-y-1">
+              <Label className="text-muted-foreground text-xs">
+                {item.pricingType === 'hourly' ? 'Hrs' : 'Qty'}
+              </Label>
+              <Input
+                type="number"
+                placeholder={item.pricingType === 'hourly' ? 'Hrs' : 'Qty'}
+                min="0.01"
+                step="0.01"
+                value={item.quantity}
+                onChange={(e) => onChange(item.id, 'quantity', e.target.value)}
+              />
+            </div>
+          )}
           <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs">Qty</Label>
-            <Input
-              type="number"
-              placeholder="Qty"
-              min="0.01"
-              step="0.01"
-              value={item.quantity}
-              onChange={(e) => onChange(item.id, 'quantity', e.target.value)}
-            />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-muted-foreground text-xs">Discount</Label>
+            <Label className="text-muted-foreground text-xs">Disc %</Label>
             <Input
               type="number"
               placeholder="%"
@@ -279,25 +306,10 @@ export function LineItemRow({ item, onChange, onRemove }: LineItemRowProps) {
               onChange={(e) => onChange(item.id, 'discount', e.target.value)}
             />
           </div>
-          {item.pricingType === 'per_unit' && (
-            <div className="space-y-1">
-              <Label className="text-muted-foreground text-xs">Unit</Label>
-              <Input
-                placeholder="Unit"
-                value={item.unit}
-                onChange={(e) => onChange(item.id, 'unit', e.target.value)}
-              />
-            </div>
-          )}
-          {item.pricingType !== 'per_unit' && (
-            <div className="flex items-end justify-end pb-1 font-mono text-sm tabular-nums">
-              {formatCurrency(total)}
-            </div>
-          )}
+          <div className="flex items-end justify-end pb-1 font-mono text-sm tabular-nums">
+            {formatCurrency(total)}
+          </div>
         </div>
-        {item.pricingType === 'per_unit' && (
-          <div className="text-right font-mono text-sm tabular-nums">{formatCurrency(total)}</div>
-        )}
       </div>
     </div>
   );
