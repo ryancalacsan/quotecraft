@@ -249,6 +249,11 @@ test.describe('Quote CRUD Operations', () => {
     await expect(descriptionInput).toBeVisible({ timeout: 10000 });
     await descriptionInput.fill('Test Service');
 
+    // Switch to Per Unit pricing so the Qty input is visible (fixed type hides it)
+    const typeSelect = page.getByRole('combobox').first();
+    await typeSelect.click();
+    await page.getByRole('option', { name: 'Per Unit' }).click();
+
     const rateInput = page.getByPlaceholder('Rate').first();
     await expect(rateInput).toBeVisible({ timeout: 5000 });
     await rateInput.fill('100');
