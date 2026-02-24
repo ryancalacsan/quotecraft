@@ -54,7 +54,6 @@ describe('calculateQuotePricing', () => {
       0,
     );
     expect(result.subtotal).toBe(500);
-    expect(result.total).toBe(500);
     expect(result.lineItemTotals).toEqual([100, 400]);
     expect(result.depositAmount).toBe(0);
   });
@@ -75,7 +74,6 @@ describe('calculateQuotePricing', () => {
   it('handles empty line items array', () => {
     const result = calculateQuotePricing([], 0);
     expect(result.subtotal).toBe(0);
-    expect(result.total).toBe(0);
     expect(result.lineItemTotals).toEqual([]);
     expect(result.depositAmount).toBe(0);
   });

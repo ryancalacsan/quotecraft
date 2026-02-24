@@ -48,7 +48,7 @@ export default async function PublicQuotePage({
   const pricing = calculateQuotePricing(
     items.map((item) => ({
       rate: item.rate,
-      quantity: item.quantity,
+      quantity: item.pricingType === 'fixed' ? '1' : item.quantity,
       discount: item.discount,
     })),
     quote.depositPercent,
@@ -186,7 +186,7 @@ export default async function PublicQuotePage({
                         {formatCurrency(Number(item.rate))}
                       </span>
                       <span className="col-span-1 text-right font-mono tabular-nums">
-                        {item.quantity}
+                        {item.pricingType === 'fixed' ? '\u2014' : item.quantity}
                       </span>
                       <span className="text-muted-foreground col-span-1 text-right font-mono tabular-nums">
                         {Number(item.discount) > 0 ? `${item.discount}%` : '\u2014'}
@@ -209,9 +209,11 @@ export default async function PublicQuotePage({
                           {PRICING_TYPE_LABELS[item.pricingType as PricingType]}
                           {item.unit ? ` (${item.unit})` : ''}
                         </span>
-                        <span className="font-mono">
-                          {formatCurrency(Number(item.rate))} × {item.quantity}
-                        </span>
+                        {item.pricingType !== 'fixed' && (
+                          <span className="font-mono">
+                            {formatCurrency(Number(item.rate))} × {item.quantity}
+                          </span>
+                        )}
                         {Number(item.discount) > 0 && (
                           <span className="text-gold font-medium">{item.discount}% off</span>
                         )}

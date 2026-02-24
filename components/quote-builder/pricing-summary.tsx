@@ -1,3 +1,5 @@
+import Decimal from 'decimal.js';
+
 import { Separator } from '@/components/ui/separator';
 import { formatCurrency } from '@/lib/utils';
 
@@ -8,7 +10,7 @@ interface PricingSummaryProps {
 }
 
 export function PricingSummary({ subtotal, depositPercent, depositAmount }: PricingSummaryProps) {
-  const balanceDue = subtotal - depositAmount;
+  const balanceDue = new Decimal(subtotal).minus(depositAmount).toDecimalPlaces(2).toNumber();
 
   return (
     <div className="border-border/60 bg-card/50 ml-auto w-72 rounded-lg border p-4">

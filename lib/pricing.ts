@@ -10,7 +10,6 @@ export interface QuotePricing {
   subtotal: number;
   lineItemTotals: number[];
   depositAmount: number;
-  total: number;
 }
 
 export function calculateLineItemTotal(item: LineItemInput): number {
@@ -41,7 +40,6 @@ export function calculateQuotePricing(
     subtotal,
     lineItemTotals,
     depositAmount,
-    total: subtotal,
   };
 }
 
