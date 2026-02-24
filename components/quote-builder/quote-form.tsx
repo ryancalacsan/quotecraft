@@ -45,7 +45,7 @@ export function QuoteForm({
   const pricing = calculateQuotePricing(
     lineItems.map((item) => ({
       rate: item.rate || '0',
-      quantity: item.quantity || '0',
+      quantity: item.pricingType === 'fixed' ? '1' : item.quantity || '0',
       discount: item.discount || '0',
     })),
     parseInt(depositPercent) || 0,
