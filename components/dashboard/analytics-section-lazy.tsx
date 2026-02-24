@@ -27,7 +27,7 @@ function AnalyticsSkeleton() {
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <Skeleton className="h-[200px] w-full" />
+            <Skeleton className="h-50 w-full" />
           </CardContent>
         </Card>
       </div>
@@ -44,7 +44,7 @@ function AnalyticsSkeleton() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
-              <Skeleton className="h-[200px] w-[200px] rounded-full" />
+              <Skeleton className="h-50 w-50 rounded-full" />
               <div className="flex flex-col gap-3">
                 <Skeleton className="h-4 w-20" />
                 <Skeleton className="h-4 w-16" />

@@ -18,7 +18,7 @@ export function EmptyState({ icon, title, description, action, className }: Empt
       )}
     >
       {/* Icon with subtle gradient background */}
-      <div className="from-muted to-muted/50 mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br shadow-inner">
+      <div className="from-muted to-muted/50 mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br shadow-inner">
         <div className="text-muted-foreground/70 [&>svg]:h-10 [&>svg]:w-10">{icon}</div>
       </div>
 

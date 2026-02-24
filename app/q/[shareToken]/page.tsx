@@ -63,7 +63,7 @@ export default async function PublicQuotePage({
       {/* Paid watermark overlay */}
       {isPaid && (
         <div className="pointer-events-none fixed inset-0 flex items-center justify-center">
-          <span className="text-jade/[0.06] rotate-[-15deg] text-[120px] font-bold tracking-[0.3em] uppercase select-none">
+          <span className="text-jade/6 rotate-[-15deg] text-[120px] font-bold tracking-[0.3em] uppercase select-none">
             Paid
           </span>
         </div>

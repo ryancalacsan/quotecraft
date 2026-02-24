@@ -50,7 +50,7 @@ export default function LandingPage() {
           {/* Decorative background elements */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             {/* Subtle radial gradient */}
-            <div className="bg-gold/5 absolute top-0 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full blur-3xl" />
+            <div className="bg-gold/5 absolute top-0 left-1/2 h-125 w-200 -translate-x-1/2 rounded-full blur-3xl" />
             {/* Decorative diagonal line */}
             <div className="bg-gold/20 absolute top-20 -right-20 h-px w-96 rotate-45" />
             <div className="bg-gold/10 absolute bottom-32 -left-20 h-px w-64 -rotate-45" />
@@ -135,7 +135,7 @@ export default function LandingPage() {
         <section className="relative px-6 py-24 text-center">
           {/* Decorative elements */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="bg-gold/5 absolute bottom-0 left-1/2 h-[300px] w-[600px] -translate-x-1/2 rounded-full blur-3xl" />
+            <div className="bg-gold/5 absolute bottom-0 left-1/2 h-75 w-150 -translate-x-1/2 rounded-full blur-3xl" />
           </div>
 
           <div className="relative mx-auto max-w-2xl space-y-6">

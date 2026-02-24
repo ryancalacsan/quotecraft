@@ -54,7 +54,7 @@ export function StatusChart({ statusCounts }: StatusChartProps) {
           <CardDescription>Distribution by status</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex h-[200px] items-center justify-center">
+          <div className="flex h-50 items-center justify-center">
             <p className="text-muted-foreground text-sm">No quotes yet</p>
           </div>
         </CardContent>
@@ -73,7 +73,7 @@ export function StatusChart({ statusCounts }: StatusChartProps) {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:gap-4">
-          <ChartContainer config={chartConfig} className="h-[180px] w-[180px] shrink-0">
+          <ChartContainer config={chartConfig} className="h-45 w-45 shrink-0">
             <PieChart>
               <ChartTooltip
                 content={

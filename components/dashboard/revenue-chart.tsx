@@ -66,7 +66,7 @@ export function RevenueChart({
       </CardHeader>
       <CardContent className="pt-0">
         {hasRevenue ? (
-          <ChartContainer config={chartConfig} className="h-[200px] w-full">
+          <ChartContainer config={chartConfig} className="h-50 w-full">
             <AreaChart
               accessibilityLayer
               data={data}
@@ -125,7 +125,7 @@ export function RevenueChart({
             </AreaChart>
           </ChartContainer>
         ) : (
-          <div className="flex h-[200px] items-center justify-center">
+          <div className="flex h-50 items-center justify-center">
             <p className="text-muted-foreground text-sm">No revenue data yet</p>
           </div>
         )}

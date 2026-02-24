@@ -37,7 +37,7 @@ export function DemoBanner() {
   }
 
   return (
-    <div className="relative z-50 flex min-h-[40px] items-center justify-center bg-[#C9A96E] px-10 py-2 text-center text-sm font-medium text-[#1a1a1a]">
+    <div className="relative z-50 flex min-h-10 items-center justify-center bg-[#C9A96E] px-10 py-2 text-center text-sm font-medium text-[#1a1a1a]">
       <span className="inline-flex flex-wrap items-center justify-center gap-1">
         You&apos;re in demo mode. Data resets nightly.
         <Tooltip>
