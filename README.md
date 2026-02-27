@@ -9,7 +9,7 @@ Built as a portfolio project demonstrating full-stack skills: complex form state
 
 **[Try the Live Demo](https://quotecraft-taupe.vercel.app)** — no signup required, explore instantly
 
-![QuoteCraft Dashboard](./public/screenshot-dashboard.png)
+![QuoteCraft Preview](./preview.png)
 
 ## Features
 
