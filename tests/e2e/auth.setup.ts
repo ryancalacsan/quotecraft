@@ -112,6 +112,13 @@ setup('authenticate', async ({ page }) => {
     timeout: 15000,
   });
 
+  // Close the demo guide panel in the saved auth state so it doesn't overlap
+  // form buttons during tests. Real users start with no localStorage key, so
+  // the panel opens by default for them — this only affects E2E tests.
+  await page.evaluate(() => {
+    localStorage.setItem('demo_guide_open', 'false');
+  });
+
   // Save the authenticated state
   await page.context().storageState({ path: authFile });
 });
