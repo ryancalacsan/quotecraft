@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDate } from '@/lib/utils';
 import { deleteTemplate, createQuoteFromTemplate } from '@/app/actions/templates';
 import type { Template } from '@/lib/db/schema';
+import { completeDemoStep } from '@/lib/demo-guide';
 
 export function TemplateCard({ template }: { template: Template }) {
   const [isPending, startTransition] = useTransition();
@@ -23,6 +24,7 @@ export function TemplateCard({ template }: { template: Template }) {
 
   function handleCreateQuote() {
     setPendingAction('create');
+    completeDemoStep(4); // Write to localStorage before redirect
     startTransition(async () => {
       await createQuoteFromTemplate(template.id);
       // Redirect happens in the action, but just in case:

@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { MobileNav } from '@/components/dashboard/mobile-nav';
 import { UserMenu } from '@/components/shared/user-menu';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
+import { DemoGuideFloat } from '@/components/shared/demo-guide-float';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -71,6 +72,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
+      <DemoGuideFloat />
     </div>
   );
 }

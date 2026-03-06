@@ -7,7 +7,6 @@ import { getDemoSessionId } from '@/lib/demo-session';
 import { LazyAnalyticsSection } from '@/components/dashboard/analytics-section-lazy';
 import { QuoteList } from '@/components/dashboard/quote-list';
 import { StatsRow } from '@/components/dashboard/stats-row';
-import { DemoGuide } from '@/components/shared/demo-guide';
 
 export const metadata = { title: 'Dashboard' };
 
@@ -26,8 +25,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <DemoGuide />
-
       {/* Header with fade-in animation */}
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
         <h2 className="font-display text-2xl font-bold tracking-tight">Quotes</h2>

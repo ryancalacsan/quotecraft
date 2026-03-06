@@ -5,6 +5,7 @@ import { CheckCircle } from 'lucide-react';
 import { getQuoteByShareToken } from '@/lib/db/queries';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { MarkDemoStep } from '@/components/shared/mark-demo-step';
 
 export default async function QuoteSuccessPage({
   params,
@@ -19,6 +20,7 @@ export default async function QuoteSuccessPage({
 
   return (
     <div className="mx-auto max-w-lg px-6">
+      {isPaid && <MarkDemoStep step={3} />}
       <Card>
         <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
           <CheckCircle className="h-12 w-12 text-green-600" />
