@@ -155,6 +155,15 @@ export function DemoGuideFloat() {
     localStorage.setItem(DEMO_GUIDE_OPEN_KEY, String(next));
   }
 
+  function toggleStep(i: number) {
+    setSteps((prev) => {
+      const next = [...prev];
+      next[i] = !next[i];
+      localStorage.setItem(DEMO_STEPS_KEY, JSON.stringify(next));
+      return next;
+    });
+  }
+
   if (!mounted || !isDemoMode || !user) return null;
 
   const completedCount = steps.filter(Boolean).length;
@@ -196,11 +205,19 @@ export function DemoGuideFloat() {
               const done = steps[i];
               return (
                 <li key={i} className={`flex items-start gap-3 ${done ? 'opacity-50' : ''}`}>
-                  {done ? (
-                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#C9A96E]" />
-                  ) : (
-                    <Circle className="text-muted-foreground/30 mt-0.5 h-5 w-5 shrink-0" />
-                  )}
+                  <button
+                    onClick={() => toggleStep(i)}
+                    className="mt-0.5 shrink-0 transition-transform hover:scale-110"
+                    aria-label={
+                      done ? `Mark step ${i + 1} incomplete` : `Mark step ${i + 1} complete`
+                    }
+                  >
+                    {done ? (
+                      <CheckCircle2 className="h-5 w-5 text-[#C9A96E]" />
+                    ) : (
+                      <Circle className="text-muted-foreground/30 h-5 w-5" />
+                    )}
+                  </button>
                   <div>
                     <p className="text-sm leading-snug">
                       {step.href ? (
