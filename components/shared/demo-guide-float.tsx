@@ -129,7 +129,20 @@ export function DemoGuideFloat() {
     return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
-  // 3. Route-based step detection — fires event (picked up by listener above)
+  // 3. Visibility change — re-sync from localStorage when user tabs back.
+  //    Catches Stripe step completion even if the storage event was missed
+  //    (e.g. payment tab closed before event fired, or same-origin restriction).
+  useEffect(() => {
+    function handleVisibility() {
+      if (document.visibilityState === 'visible') {
+        setSteps(loadDemoSteps());
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
+  // 4. Route-based step detection — fires event (picked up by listener above)
   useEffect(() => {
     if (pathname.includes('/edit')) {
       completeDemoStep(0);
