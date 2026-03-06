@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useSyncExternalStore } from 'react';
+import { useState, useEffect, useRef, useSyncExternalStore } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
@@ -97,6 +97,11 @@ export function DemoGuideFloat() {
     const savedOpen = localStorage.getItem(DEMO_GUIDE_OPEN_KEY);
     return savedOpen === null ? true : savedOpen === 'true';
   });
+  const [isClosing, setIsClosing] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
+  // Tracks whether we've already triggered the completion animation for the
+  // current "all done" state so it doesn't re-fire on unrelated re-renders.
+  const wasAllDoneRef = useRef(false);
 
   // 1. Custom event listener — same-tab step completions from other components
   //    Must be defined before the route-detection effect so the listener is
@@ -149,10 +154,51 @@ export function DemoGuideFloat() {
     }
   }, [pathname]);
 
+  // 5. Completion animation + auto-collapse when all steps done
+  //    setState calls are inside setTimeout callbacks (not the effect body)
+  //    to satisfy react-hooks/set-state-in-effect.
+  useEffect(() => {
+    const allDone = steps.every(Boolean);
+    if (!allDone) {
+      wasAllDoneRef.current = false;
+      return;
+    }
+    // Mark ref true regardless of panel state so that opening the panel
+    // after all steps were already done doesn't re-trigger the animation.
+    if (wasAllDoneRef.current) return;
+    wasAllDoneRef.current = true;
+    if (!isOpen) return;
+
+    const showTimer = setTimeout(() => setShowCompletion(true), 0);
+    // At 2500ms start the exit animation, at 2700ms remove the panel
+    const animateOutTimer = setTimeout(() => {
+      setShowCompletion(false);
+      setIsClosing(true);
+    }, 2500);
+    const closeTimer = setTimeout(() => {
+      setIsOpen(false);
+      setIsClosing(false);
+      localStorage.setItem(DEMO_GUIDE_OPEN_KEY, 'false');
+    }, 2700);
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(animateOutTimer);
+      clearTimeout(closeTimer);
+    };
+  }, [steps, isOpen]);
+
   function toggleOpen() {
-    const next = !isOpen;
-    setIsOpen(next);
-    localStorage.setItem(DEMO_GUIDE_OPEN_KEY, String(next));
+    if (isOpen) {
+      setIsClosing(true);
+      localStorage.setItem(DEMO_GUIDE_OPEN_KEY, 'false');
+      setTimeout(() => {
+        setIsOpen(false);
+        setIsClosing(false);
+      }, 200);
+    } else {
+      setIsOpen(true);
+      localStorage.setItem(DEMO_GUIDE_OPEN_KEY, 'true');
+    }
   }
 
   function toggleStep(i: number) {
@@ -172,8 +218,14 @@ export function DemoGuideFloat() {
   return (
     <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2">
       {/* Expanded panel */}
-      {isOpen && (
-        <div className="animate-in slide-in-from-bottom-2 fade-in bg-card w-80 overflow-hidden rounded-xl border shadow-xl duration-200">
+      {(isOpen || isClosing) && (
+        <div
+          className={`bg-card w-80 overflow-hidden rounded-xl border shadow-xl ${
+            isClosing
+              ? 'animate-out slide-out-to-bottom-2 fade-out duration-200'
+              : 'animate-in slide-in-from-bottom-2 fade-in duration-200'
+          }`}
+        >
           {/* Header */}
           <div className="flex items-center justify-between border-b px-4 py-3">
             <div>
@@ -199,41 +251,51 @@ export function DemoGuideFloat() {
             />
           </div>
 
-          {/* Steps */}
-          <ol className="space-y-1 p-4">
-            {stepDefs.map((step, i) => {
-              const done = steps[i];
-              return (
-                <li key={i} className={`flex items-start gap-3 ${done ? 'opacity-50' : ''}`}>
-                  <button
-                    onClick={() => toggleStep(i)}
-                    className="mt-0.5 shrink-0 transition-transform hover:scale-110"
-                    aria-label={
-                      done ? `Mark step ${i + 1} incomplete` : `Mark step ${i + 1} complete`
-                    }
-                  >
-                    {done ? (
-                      <CheckCircle2 className="h-5 w-5 text-[#C9A96E]" />
-                    ) : (
-                      <Circle className="text-muted-foreground/30 h-5 w-5" />
-                    )}
-                  </button>
-                  <div>
-                    <p className="text-sm leading-snug">
-                      {step.href ? (
-                        <Link href={step.href} className="font-medium hover:underline">
-                          {step.label}
-                        </Link>
+          {/* Steps or completion celebration */}
+          {showCompletion ? (
+            <div className="animate-in fade-in flex flex-col items-center gap-3 px-4 py-8 text-center duration-300">
+              <CheckCircle2 className="h-12 w-12 text-[#C9A96E]" />
+              <p className="text-base font-semibold">You&apos;re all set!</p>
+              <p className="text-muted-foreground text-xs">
+                You&apos;ve explored all the key features. The guide will close shortly.
+              </p>
+            </div>
+          ) : (
+            <ol className="space-y-1 p-4">
+              {stepDefs.map((step, i) => {
+                const done = steps[i];
+                return (
+                  <li key={i} className={`flex items-start gap-3 ${done ? 'opacity-50' : ''}`}>
+                    <button
+                      onClick={() => toggleStep(i)}
+                      className="mt-0.5 shrink-0 transition-transform hover:scale-110"
+                      aria-label={
+                        done ? `Mark step ${i + 1} incomplete` : `Mark step ${i + 1} complete`
+                      }
+                    >
+                      {done ? (
+                        <CheckCircle2 className="h-5 w-5 text-[#C9A96E]" />
                       ) : (
-                        <span className="font-medium">{step.label}</span>
+                        <Circle className="text-muted-foreground/30 h-5 w-5" />
                       )}
-                    </p>
-                    <p className="text-muted-foreground mt-0.5 text-xs">{step.sublabel}</p>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+                    </button>
+                    <div>
+                      <p className="text-sm leading-snug">
+                        {step.href ? (
+                          <Link href={step.href} className="font-medium hover:underline">
+                            {step.label}
+                          </Link>
+                        ) : (
+                          <span className="font-medium">{step.label}</span>
+                        )}
+                      </p>
+                      <p className="text-muted-foreground mt-0.5 text-xs">{step.sublabel}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
         </div>
       )}
 
@@ -243,8 +305,8 @@ export function DemoGuideFloat() {
         className="flex items-center gap-2 rounded-full bg-[#C9A96E] px-4 py-2 text-sm font-semibold text-[#1a1a1a] shadow-lg transition-all hover:bg-[#C9A96E]/90 hover:shadow-xl active:scale-95"
         aria-label={isOpen ? 'Collapse demo guide' : 'Open demo guide'}
       >
-        <ListChecks className="h-4 w-4" />
-        <span>Try the demo</span>
+        {allDone ? <CheckCircle2 className="h-4 w-4" /> : <ListChecks className="h-4 w-4" />}
+        <span>{allDone ? 'Demo complete' : 'Try the demo'}</span>
         {isOpen ? (
           <ChevronDown className="h-3.5 w-3.5 opacity-70" />
         ) : (
