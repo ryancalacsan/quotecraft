@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { updateQuoteStatus } from '@/app/actions/quotes';
+import { completeDemoStep } from '@/lib/demo-guide';
 
 // Get window origin safely (empty string on server, actual origin on client)
 const emptySubscribe = () => () => {};
@@ -48,6 +49,7 @@ export function SendQuoteModal({ quoteId, shareToken, fullWidthMobile }: SendQuo
       setCopied(true);
       toast.success('Link copied to clipboard');
       setTimeout(() => setCopied(false), 2000);
+      completeDemoStep(2); // "Open the share link" — copying implies they'll open it
     } catch (error) {
       console.error('Failed to copy to clipboard:', error);
       toast.error('Failed to copy link. Please copy manually.');
@@ -68,6 +70,10 @@ export function SendQuoteModal({ quoteId, shareToken, fullWidthMobile }: SendQuo
           console.warn('Clipboard copy failed:', clipboardError);
           clipboardSuccess = false;
         }
+
+        // Mark demo steps: "Send quote" (1) and "Copy share link" (2)
+        completeDemoStep(1);
+        completeDemoStep(2);
 
         // Close modal and show success
         setOpen(false);
