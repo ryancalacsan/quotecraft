@@ -91,7 +91,7 @@ export function SendQuoteModal({ quoteId, shareToken, fullWidthMobile }: SendQuo
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className={fullWidthMobile ? 'w-full md:w-auto' : ''}>
+        <Button variant="gold" size="sm" className={fullWidthMobile ? 'w-full md:w-auto' : ''}>
           <Send className="mr-2 h-4 w-4" />
           Send Quote
         </Button>

@@ -6,6 +6,8 @@ import { getDemoSessionId } from '@/lib/demo-session';
 import { EditQuoteClient } from '@/components/quote-builder/edit-quote-client';
 import { Breadcrumbs } from '@/components/shared/breadcrumbs';
 
+export const metadata = { title: 'Edit Quote' };
+
 export default async function EditQuotePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { userId } = await auth();

@@ -51,13 +51,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main content */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-16 items-center justify-between border-b px-4 md:px-6">
-          <div className="flex items-center gap-3">
+        <header className="flex h-16 items-center justify-between border-b px-4 md:justify-end md:px-6">
+          <div className="flex items-center gap-3 md:hidden">
             <MobileNav />
             <UserMenu />
           </div>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
+            <div className="md:hidden">
+              <ThemeToggle />
+            </div>
             <Link href="/quotes/new">
               <Button size="sm" className="gap-2">
                 <FileText className="h-4 w-4" />
