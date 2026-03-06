@@ -14,11 +14,11 @@ export function completeDemoStep(step: number) {
     if (!steps[step]) {
       steps[step] = true;
       localStorage.setItem(DEMO_STEPS_KEY, JSON.stringify(steps));
+      window.dispatchEvent(new CustomEvent('demo-step-complete', { detail: { step } }));
     }
   } catch {
     // Silently fail if localStorage is unavailable
   }
-  window.dispatchEvent(new CustomEvent('demo-step-complete', { detail: { step } }));
 }
 
 export function loadDemoSteps(): boolean[] {

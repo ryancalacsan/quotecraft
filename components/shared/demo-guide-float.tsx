@@ -101,7 +101,13 @@ export function DemoGuideFloat() {
   const [showCompletion, setShowCompletion] = useState(false);
   // Tracks whether we've already triggered the completion animation for the
   // current "all done" state so it doesn't re-fire on unrelated re-renders.
-  const wasAllDoneRef = useRef(false);
+  // Initialize to true if already all done at mount so the animation only fires
+  // when the user actually completes the last step in the current session,
+  // not every time they open the panel from a prior completed session.
+  const wasAllDoneRef = useRef(steps.every(Boolean));
+  // Holds the timer ID for the 200ms close animation so it can be cancelled
+  // if the user re-opens the panel before the timer fires.
+  const closeAnimTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 1. Custom event listener — same-tab step completions from other components
   //    Must be defined before the route-detection effect so the listener is
@@ -147,14 +153,21 @@ export function DemoGuideFloat() {
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, []);
 
-  // 4. Route-based step detection — fires event (picked up by listener above)
+  // 4. Sync manual step toggles to localStorage (kept outside the updater so the
+  //    updater stays pure and safe under React Strict Mode's double-invocation).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(DEMO_STEPS_KEY, JSON.stringify(steps));
+  }, [steps]);
+
+  // 5. Route-based step detection — fires event (picked up by listener 1 above)
   useEffect(() => {
     if (pathname.includes('/edit')) {
       completeDemoStep(0);
     }
   }, [pathname]);
 
-  // 5. Completion animation + auto-collapse when all steps done
+  // 6. Completion animation + auto-collapse when all steps done
   //    setState calls are inside setTimeout callbacks (not the effect body)
   //    to satisfy react-hooks/set-state-in-effect.
   useEffect(() => {
@@ -163,11 +176,12 @@ export function DemoGuideFloat() {
       wasAllDoneRef.current = false;
       return;
     }
-    // Mark ref true regardless of panel state so that opening the panel
-    // after all steps were already done doesn't re-trigger the animation.
+    // Only trigger if the animation hasn't run yet this session.
+    // Ref is set AFTER the isOpen check so that completing all steps while
+    // the panel is closed still allows the animation to play on the next open.
     if (wasAllDoneRef.current) return;
-    wasAllDoneRef.current = true;
     if (!isOpen) return;
+    wasAllDoneRef.current = true;
 
     const showTimer = setTimeout(() => setShowCompletion(true), 0);
     // At 2500ms start the exit animation, at 2700ms remove the panel
@@ -191,11 +205,18 @@ export function DemoGuideFloat() {
     if (isOpen) {
       setIsClosing(true);
       localStorage.setItem(DEMO_GUIDE_OPEN_KEY, 'false');
-      setTimeout(() => {
+      closeAnimTimerRef.current = setTimeout(() => {
         setIsOpen(false);
         setIsClosing(false);
+        closeAnimTimerRef.current = null;
       }, 200);
     } else {
+      // Cancel any in-flight close animation before re-opening
+      if (closeAnimTimerRef.current) {
+        clearTimeout(closeAnimTimerRef.current);
+        closeAnimTimerRef.current = null;
+      }
+      setIsClosing(false);
       setIsOpen(true);
       localStorage.setItem(DEMO_GUIDE_OPEN_KEY, 'true');
     }
@@ -205,7 +226,6 @@ export function DemoGuideFloat() {
     setSteps((prev) => {
       const next = [...prev];
       next[i] = !next[i];
-      localStorage.setItem(DEMO_STEPS_KEY, JSON.stringify(next));
       return next;
     });
   }
