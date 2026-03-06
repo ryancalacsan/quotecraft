@@ -236,11 +236,11 @@ export function DemoGuideFloat() {
   const allDone = completedCount === DEMO_STEP_COUNT;
 
   return (
-    <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2">
+    <div className="pointer-events-none fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2">
       {/* Expanded panel */}
       {(isOpen || isClosing) && (
         <div
-          className={`bg-card w-80 overflow-hidden rounded-xl border shadow-xl ${
+          className={`bg-card pointer-events-auto w-80 overflow-hidden rounded-xl border shadow-xl ${
             isClosing
               ? 'animate-out slide-out-to-bottom-2 fade-out duration-200'
               : 'animate-in slide-in-from-bottom-2 fade-in duration-200'
@@ -322,7 +322,7 @@ export function DemoGuideFloat() {
       {/* Launcher button */}
       <button
         onClick={toggleOpen}
-        className="flex items-center gap-2 rounded-full bg-[#C9A96E] px-4 py-2 text-sm font-semibold text-[#1a1a1a] shadow-lg transition-all hover:bg-[#C9A96E]/90 hover:shadow-xl active:scale-95"
+        className="pointer-events-auto flex items-center gap-2 rounded-full bg-[#C9A96E] px-4 py-2 text-sm font-semibold text-[#1a1a1a] shadow-lg transition-all hover:bg-[#C9A96E]/90 hover:shadow-xl active:scale-95"
         aria-label={isOpen ? 'Collapse demo guide' : 'Open demo guide'}
       >
         {allDone ? <CheckCircle2 className="h-4 w-4" /> : <ListChecks className="h-4 w-4" />}
