@@ -95,6 +95,7 @@ export function DemoLoginButton({ variant = 'default', size = 'default' }: DemoL
         }
 
         // Use full page navigation to ensure cookies are included in the request
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.href = '/dashboard';
       }
     } catch (err) {
