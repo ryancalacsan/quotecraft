@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
 import { getTemplatesByUserId } from '@/lib/db/queries/templates';
+import { getDemoSessionId } from '@/lib/demo-session';
 import { QuoteForm } from '@/components/quote-builder/quote-form';
 import { TemplatePicker } from '@/components/templates/template-picker';
 import { Separator } from '@/components/ui/separator';
@@ -15,7 +16,8 @@ export default async function NewQuotePage() {
   const { userId } = await auth();
   if (!userId) redirect('/sign-in');
 
-  const templates = await getTemplatesByUserId(userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const templates = await getTemplatesByUserId(userId, demoSessionId);
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">

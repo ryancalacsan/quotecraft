@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { ensureUserExists } from '@/lib/db/queries';
 import { getTemplatesByUserId } from '@/lib/db/queries/templates';
+import { getDemoSessionId } from '@/lib/demo-session';
 import { TemplateList } from '@/components/templates/template-list';
 import { Breadcrumbs } from '@/components/shared/breadcrumbs';
 
@@ -20,7 +21,8 @@ export default async function TemplatesPage() {
   // Ensure user exists in DB before querying
   await ensureUserExists(userId);
 
-  const templates = await getTemplatesByUserId(userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const templates = await getTemplatesByUserId(userId, demoSessionId);
 
   return (
     <div className="space-y-6">

@@ -148,6 +148,44 @@ describe('templates actions', () => {
       expect(mockCreateTemplateItems).toHaveBeenCalled();
     });
 
+    it('should tag template with the demo session', async () => {
+      const mockCreateTemplate = vi.fn((data: { demoSessionId?: string | null }) =>
+        Promise.resolve({ ...testTemplate, ...data, id: 'new-template-id' }),
+      );
+
+      vi.doMock('@clerk/nextjs/server', () => ({
+        auth: vi.fn(() => Promise.resolve({ userId: 'demo-user-id' })),
+      }));
+      vi.doMock('@/lib/db/queries', () => ({
+        ensureUserExists: vi.fn(() => Promise.resolve()),
+        getQuoteById: vi.fn(() => Promise.resolve(draftQuote)),
+        getLineItemsByQuoteId: vi.fn(() => Promise.resolve([])),
+      }));
+      vi.doMock('@/lib/db/queries/templates', () => ({
+        getTemplateById: vi.fn(),
+        getTemplateItemsByTemplateId: vi.fn(),
+        createTemplate: mockCreateTemplate,
+        createTemplateItems: vi.fn(() => Promise.resolve([])),
+        updateTemplate: vi.fn(),
+        deleteTemplate: vi.fn(),
+      }));
+      vi.doMock('@/lib/demo-session', () => ({
+        getDemoSessionId: vi.fn(() => Promise.resolve('demo-session-abc123')),
+      }));
+      vi.doMock('next/cache', () => ({
+        revalidatePath: vi.fn(),
+      }));
+
+      const { saveAsTemplate } = await import('@/app/actions/templates');
+      const formData = createFormData({ name: 'Demo Template', description: '' });
+
+      await saveAsTemplate(draftQuote.id, formData);
+
+      expect(mockCreateTemplate).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: 'demo-user-id', demoSessionId: 'demo-session-abc123' }),
+      );
+    });
+
     it('should save template without line items', async () => {
       const mockCreateTemplate = vi.fn(() =>
         Promise.resolve({
@@ -542,7 +580,39 @@ describe('templates actions', () => {
       const result = await deleteTemplate(testTemplate.id);
 
       expect(result).toEqual({ success: true });
-      expect(mockDeleteTemplateQuery).toHaveBeenCalledWith(testTemplate.id, 'test-user-123');
+      expect(mockDeleteTemplateQuery).toHaveBeenCalledWith(testTemplate.id, 'test-user-123', null);
+    });
+
+    it('should scope delete to the demo session', async () => {
+      const mockDeleteTemplateQuery = vi.fn(() => Promise.resolve(true));
+
+      vi.doMock('@clerk/nextjs/server', () => ({
+        auth: vi.fn(() => Promise.resolve({ userId: 'demo-user-id' })),
+      }));
+      vi.doMock('@/lib/demo-session', () => ({
+        getDemoSessionId: vi.fn(() => Promise.resolve('demo-session-abc123')),
+      }));
+      vi.doMock('@/lib/db/queries/templates', () => ({
+        getTemplateById: vi.fn(),
+        getTemplateItemsByTemplateId: vi.fn(),
+        createTemplate: vi.fn(),
+        createTemplateItems: vi.fn(),
+        updateTemplate: vi.fn(),
+        deleteTemplate: mockDeleteTemplateQuery,
+      }));
+      vi.doMock('next/cache', () => ({
+        revalidatePath: vi.fn(),
+      }));
+
+      const { deleteTemplate } = await import('@/app/actions/templates');
+
+      await deleteTemplate(testTemplate.id);
+
+      expect(mockDeleteTemplateQuery).toHaveBeenCalledWith(
+        testTemplate.id,
+        'demo-user-id',
+        'demo-session-abc123',
+      );
     });
   });
 

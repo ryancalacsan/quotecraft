@@ -111,6 +111,7 @@ export const templates = pgTable(
     userId: text('user_id')
       .notNull()
       .references(() => users.id),
+    demoSessionId: text('demo_session_id'),
 
     name: text('name').notNull(),
     description: text('description'),
@@ -130,6 +131,7 @@ export const templates = pgTable(
       sql`${table.defaultDepositPercent} >= 0 AND ${table.defaultDepositPercent} <= 100`,
     ),
     index('templates_user_id_idx').on(table.userId),
+    index('templates_demo_session_idx').on(table.demoSessionId),
   ],
 );
 

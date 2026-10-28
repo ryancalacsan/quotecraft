@@ -38,7 +38,9 @@ export async function seedDemoData(demoUserId: string, demoSessionId: string) {
     db
       .delete(quotes)
       .where(and(eq(quotes.userId, demoUserId), eq(quotes.demoSessionId, demoSessionId))),
-    db.delete(templates).where(eq(templates.userId, demoUserId)),
+    db
+      .delete(templates)
+      .where(and(eq(templates.userId, demoUserId), eq(templates.demoSessionId, demoSessionId))),
   ]);
 
   // Batch insert all quotes at once
@@ -354,6 +356,7 @@ export async function seedDemoData(demoUserId: string, demoSessionId: string) {
     {
       id: templateIds.webDev,
       userId: demoUserId,
+      demoSessionId,
       name: 'Web Development Project',
       description:
         'Standard template for website development projects with design, development, and testing phases.',
@@ -366,6 +369,7 @@ export async function seedDemoData(demoUserId: string, demoSessionId: string) {
     {
       id: templateIds.brand,
       userId: demoUserId,
+      demoSessionId,
       name: 'Brand Identity Package',
       description:
         'Complete branding package including logo, guidelines, and marketing collateral.',
@@ -378,6 +382,7 @@ export async function seedDemoData(demoUserId: string, demoSessionId: string) {
     {
       id: templateIds.consulting,
       userId: demoUserId,
+      demoSessionId,
       name: 'Monthly Consulting Retainer',
       description: 'Ongoing consulting services billed monthly with dedicated hours.',
       defaultTitle: 'Consulting Services',
