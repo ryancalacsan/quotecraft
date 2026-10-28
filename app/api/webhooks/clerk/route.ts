@@ -21,18 +21,20 @@ export async function POST(req: Request) {
     return new Response('Missing svix headers', { status: 400 });
   }
 
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
+  // Verify against the raw body; re-serialized JSON may not match the signed bytes
+  const body = await req.text();
 
   const wh = new Webhook(WEBHOOK_SECRET);
   let evt: WebhookEvent;
 
   try {
-    evt = wh.verify(body, {
+    // svix v2 verify() only throws on a bad signature; it no longer returns the parsed payload
+    wh.verify(body, {
       'svix-id': svix_id,
       'svix-timestamp': svix_timestamp,
       'svix-signature': svix_signature,
-    }) as WebhookEvent;
+    });
+    evt = JSON.parse(body) as WebhookEvent;
   } catch (err) {
     console.error('Webhook verification failed:', err);
     return new Response('Verification failed', { status: 400 });
