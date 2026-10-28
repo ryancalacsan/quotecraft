@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 import { isNotNull } from 'drizzle-orm';
 
 import { db } from '@/lib/db';
-import { quotes } from '@/lib/db/schema';
+import { quotes, templates } from '@/lib/db/schema';
 
 /**
  * Cron job to clean up all demo session data (runs daily at 2am UTC).
- * Deletes all quotes with a demoSessionId (cascade deletes line items).
+ * Deletes all quotes and templates with a demoSessionId (cascade deletes their items).
  * Fresh data is seeded when users start a new demo session.
  */
 export async function POST(req: Request) {
@@ -23,8 +23,11 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Delete ALL demo quotes (those with any demoSessionId)
-    await db.delete(quotes).where(isNotNull(quotes.demoSessionId));
+    // Delete ALL demo quotes and templates (those with any demoSessionId)
+    await Promise.all([
+      db.delete(quotes).where(isNotNull(quotes.demoSessionId)),
+      db.delete(templates).where(isNotNull(templates.demoSessionId)),
+    ]);
     return NextResponse.json({
       success: true,
       message: 'Demo data cleaned up successfully',

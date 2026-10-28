@@ -1,4 +1,4 @@
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, isNull } from 'drizzle-orm';
 
 import { db } from '@/lib/db';
 import {
@@ -10,12 +10,30 @@ import {
   type NewTemplateItem,
 } from '@/lib/db/schema';
 
+// Real users only see templates with null demoSessionId; demo users only see their session's
+function ownershipFilter(templateId: string, userId: string, demoSessionId: string | null) {
+  return and(
+    eq(templates.id, templateId),
+    eq(templates.userId, userId),
+    sessionFilter(demoSessionId),
+  );
+}
+
+function sessionFilter(demoSessionId: string | null) {
+  return demoSessionId
+    ? eq(templates.demoSessionId, demoSessionId)
+    : isNull(templates.demoSessionId);
+}
+
 // Get all templates for a user
-export async function getTemplatesByUserId(userId: string): Promise<Template[]> {
+export async function getTemplatesByUserId(
+  userId: string,
+  demoSessionId: string | null = null,
+): Promise<Template[]> {
   return db
     .select()
     .from(templates)
-    .where(eq(templates.userId, userId))
+    .where(and(eq(templates.userId, userId), sessionFilter(demoSessionId)))
     .orderBy(desc(templates.createdAt));
 }
 
@@ -23,11 +41,12 @@ export async function getTemplatesByUserId(userId: string): Promise<Template[]> 
 export async function getTemplateById(
   templateId: string,
   userId: string,
+  demoSessionId: string | null = null,
 ): Promise<Template | undefined> {
   const result = await db
     .select()
     .from(templates)
-    .where(and(eq(templates.id, templateId), eq(templates.userId, userId)))
+    .where(ownershipFilter(templateId, userId, demoSessionId))
     .limit(1);
 
   return result[0];
@@ -37,12 +56,13 @@ export async function getTemplateById(
 export async function getTemplateItemsByTemplateId(
   templateId: string,
   userId: string,
+  demoSessionId: string | null = null,
 ): Promise<TemplateItem[]> {
   // First verify template ownership (defense-in-depth)
   const template = await db
     .select({ id: templates.id })
     .from(templates)
-    .where(and(eq(templates.id, templateId), eq(templates.userId, userId)))
+    .where(ownershipFilter(templateId, userId, demoSessionId))
     .limit(1);
 
   if (!template[0]) return [];
@@ -70,22 +90,27 @@ export async function createTemplateItems(items: NewTemplateItem[]): Promise<Tem
 export async function updateTemplate(
   templateId: string,
   userId: string,
-  data: Partial<Omit<NewTemplate, 'id' | 'userId' | 'createdAt'>>,
+  data: Partial<Omit<NewTemplate, 'id' | 'userId' | 'demoSessionId' | 'createdAt'>>,
+  demoSessionId: string | null = null,
 ): Promise<Template | undefined> {
   const result = await db
     .update(templates)
     .set({ ...data, updatedAt: new Date() })
-    .where(and(eq(templates.id, templateId), eq(templates.userId, userId)))
+    .where(ownershipFilter(templateId, userId, demoSessionId))
     .returning();
 
   return result[0];
 }
 
 // Delete a template (cascade deletes template items)
-export async function deleteTemplate(templateId: string, userId: string): Promise<boolean> {
+export async function deleteTemplate(
+  templateId: string,
+  userId: string,
+  demoSessionId: string | null = null,
+): Promise<boolean> {
   const result = await db
     .delete(templates)
-    .where(and(eq(templates.id, templateId), eq(templates.userId, userId)))
+    .where(ownershipFilter(templateId, userId, demoSessionId))
     .returning({ id: templates.id });
 
   return result.length > 0;

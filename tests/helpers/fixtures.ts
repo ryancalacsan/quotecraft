@@ -162,6 +162,7 @@ export const discountedLineItem: LineItem = {
 export const testTemplate: Template = {
   id: 'template-uuid-1',
   userId: testUser.id,
+  demoSessionId: null,
   name: 'Web Development Package',
   description: 'Standard web development template',
   defaultTitle: 'Web Development Project',
@@ -175,6 +176,7 @@ export const testTemplate: Template = {
 export const minimalTemplate: Template = {
   id: 'template-uuid-2',
   userId: testUser.id,
+  demoSessionId: null,
   name: 'Minimal Template',
   description: null,
   defaultTitle: null,

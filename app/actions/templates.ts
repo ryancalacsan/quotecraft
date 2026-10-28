@@ -55,6 +55,7 @@ export async function saveAsTemplate(quoteId: string, formData: FormData) {
   try {
     const template = await createTemplate({
       userId,
+      demoSessionId,
       name: parsed.data.name,
       description: parsed.data.description || null,
       defaultTitle: parsed.data.defaultTitle || null,
@@ -97,14 +98,14 @@ export async function createQuoteFromTemplate(templateId: string) {
 
   await ensureUserExists(userId);
 
-  const template = await getTemplateById(templateId, userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const template = await getTemplateById(templateId, userId, demoSessionId);
   if (!template) {
     return { error: 'Template not found' };
   }
 
   try {
-    const templateLineItems = await getTemplateItemsByTemplateId(templateId, userId);
-    const demoSessionId = await getDemoSessionId(userId);
+    const templateLineItems = await getTemplateItemsByTemplateId(templateId, userId, demoSessionId);
     const quoteNumber = await generateQuoteNumber(userId, demoSessionId);
     const shareToken = nanoid();
 
@@ -164,7 +165,8 @@ export async function updateTemplate(templateId: string, formData: FormData) {
     return { error: 'You must be signed in to update a template' };
   }
 
-  const template = await getTemplateById(templateId, userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const template = await getTemplateById(templateId, userId, demoSessionId);
   if (!template) {
     return { error: 'Template not found' };
   }
@@ -184,14 +186,19 @@ export async function updateTemplate(templateId: string, formData: FormData) {
   }
 
   try {
-    await updateTemplateQuery(templateId, userId, {
-      name: parsed.data.name,
-      description: parsed.data.description || null,
-      defaultTitle: parsed.data.defaultTitle || null,
-      defaultNotes: parsed.data.defaultNotes || null,
-      defaultValidDays: parsed.data.defaultValidDays || null,
-      defaultDepositPercent: parsed.data.defaultDepositPercent,
-    });
+    await updateTemplateQuery(
+      templateId,
+      userId,
+      {
+        name: parsed.data.name,
+        description: parsed.data.description || null,
+        defaultTitle: parsed.data.defaultTitle || null,
+        defaultNotes: parsed.data.defaultNotes || null,
+        defaultValidDays: parsed.data.defaultValidDays || null,
+        defaultDepositPercent: parsed.data.defaultDepositPercent,
+      },
+      demoSessionId,
+    );
 
     revalidatePath('/templates');
     revalidatePath(`/templates/${templateId}`);
@@ -209,7 +216,8 @@ export async function deleteTemplate(templateId: string) {
   }
 
   try {
-    await deleteTemplateQuery(templateId, userId);
+    const demoSessionId = await getDemoSessionId(userId);
+    await deleteTemplateQuery(templateId, userId, demoSessionId);
     revalidatePath('/templates');
     return { success: true };
   } catch (error) {
@@ -234,7 +242,8 @@ export async function updateTemplateItems(
     return { error: 'You must be signed in to update template items' };
   }
 
-  const template = await getTemplateById(templateId, userId);
+  const demoSessionId = await getDemoSessionId(userId);
+  const template = await getTemplateById(templateId, userId, demoSessionId);
   if (!template) {
     return { error: 'Template not found' };
   }
